@@ -1,0 +1,17 @@
+export enum Role {
+  super_admin = 'super_admin',
+  admin = 'admin',
+  user = 'user',
+  student = 'student',
+  moderator = 'moderator',
+  academic_director = 'academic_director',
+  head_admission = 'head_admission',
+  admission_specialist = 'admission_specialist',
+  finance_manager = 'finance_manager',
+  hr = 'hr',
+  dean = 'dean',
+  academic_manager = 'academic_manager',
+  department_head = 'department_head',
+  course_leader = 'course_leader',
+  teacher = 'teacher',
+}
