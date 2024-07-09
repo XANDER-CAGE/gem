@@ -5,6 +5,9 @@ interface IEnv {
   PG_DB: string;
   PG_USER: string;
   PG_PASS: string;
+  REDIS_HOST: string;
+  REDIS_PORT: string;
+  REDIS_PASS: string;
 }
 
 export const env: IEnv = {
@@ -14,4 +17,7 @@ export const env: IEnv = {
   PG_DB: process.env.PG_DB || '',
   PG_USER: process.env.PG_USER || '',
   PG_PASS: process.env.PG_PASS || '',
+  REDIS_HOST: process.env.REDIS_HOST || '',
+  REDIS_PORT: process.env.REDIS_PORT || '',
+  REDIS_PASS: process.env.REDIS_PASS || '',
 };
