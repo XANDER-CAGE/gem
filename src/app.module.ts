@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { ChannelModule } from './modules/channel/channel.module';
+import { KnexModule } from 'nest-knexjs';
+import { KnexConfigService } from './common/config/knex.config';
+import { UsersModule } from './modules/users/users.module';
 import { MarketModule } from './modules/market/market.module';
 import { StreaksModule } from './modules/streaks/streaks.module';
 import { StudentProfilesModule } from './modules/student-profiles/student-profiles.module';
@@ -14,8 +15,10 @@ import { FullStreaksModule } from './modules/full-streaks/full-streaks.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
-    ChannelModule,
+    KnexModule.forRootAsync({
+      useClass: KnexConfigService,
+    }),
+    UsersModule,
     MarketModule,
     StreaksModule,
     StudentProfilesModule,
