@@ -11,7 +11,6 @@ import { ProductReviewsModule } from './modules/product-reviews/product-reviews.
 import { SpendingsModule } from './modules/spendings/spendings.module';
 import { CourseModule } from './modules/course/course.module';
 import { MarketCategoriesModule } from './modules/market-categories/market-categories.module';
-import { FullStreaksModule } from './modules/full-streaks/full-streaks.module';
 
 @Module({
   imports: [
@@ -28,7 +27,6 @@ import { FullStreaksModule } from './modules/full-streaks/full-streaks.module';
     SpendingsModule,
     CourseModule,
     MarketCategoriesModule,
-    FullStreaksModule,
   ],
 })
 export class AppModule {}
