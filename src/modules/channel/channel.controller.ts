@@ -8,9 +8,8 @@ import {
   Delete,
 } from '@nestjs/common';
 import { ChannelService } from './channel.service';
-import { CreateChannelDto } from './dto/create-channel.dto';
-import { UpdateChannelDto } from './dto/update-channel.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { CreateChannelDto, UpdateChannelDto } from './dto/channel.dto';
 
 @ApiTags('Channel')
 @Controller('channel')
