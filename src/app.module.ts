@@ -1,8 +1,14 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { ChannelModule } from './modules/channel/channel.module';
+import { KnexModule } from 'nest-knexjs';
+import { KnexConfigService } from './common/config/knex.config';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), ChannelModule],
+  imports: [
+    KnexModule.forRootAsync({
+      useClass: KnexConfigService,
+    }),
+    UsersModule,
+  ],
 })
 export class AppModule {}

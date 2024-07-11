@@ -1,23 +1,18 @@
-interface IEnv {
-  PORT: number;
-  PG_HOST: string;
-  PG_PORT: number;
-  PG_DB: string;
-  PG_USER: string;
-  PG_PASS: string;
-  REDIS_HOST: string;
-  REDIS_PORT: string;
-  REDIS_PASS: string;
-}
+import { config } from 'dotenv';
+import { cleanEnv, num, str } from 'envalid';
 
-export const env: IEnv = {
-  PORT: +process.env.PORT || 3000,
-  PG_HOST: process.env.PG_HOST || '',
-  PG_PORT: +process.env.PG_PORT || 5432,
-  PG_DB: process.env.PG_DB || '',
-  PG_USER: process.env.PG_USER || '',
-  PG_PASS: process.env.PG_PASS || '',
-  REDIS_HOST: process.env.REDIS_HOST || '',
-  REDIS_PORT: process.env.REDIS_PORT || '',
-  REDIS_PASS: process.env.REDIS_PASS || '',
-};
+config();
+
+export const env = cleanEnv(process.env, {
+  PORT: num({ default: 3000, example: '3000' }),
+  NODE_ENV: str({ choices: ['development', 'test', 'production'] }),
+  API_HOST: str({ default: 'localhost' }),
+  PG_HOST: str(),
+  PG_PORT: num({ default: 5432 }),
+  PG_DB: str(),
+  PG_USER: str(),
+  PG_PASS: str(),
+  REDIS_HOST: str(),
+  REDIS_PORT: num({ default: 6379 }),
+  REDIS_PASS: str(),
+});

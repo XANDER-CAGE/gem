@@ -6,7 +6,7 @@ import { env } from './env.config';
 export class KnexConfigService implements KnexOptionsFactory {
   createKnexOptions(): KnexModuleOptions {
     return {
-      name: 'Back-API',
+      name: 'GEM-API',
       config: {
         client: 'postgresql',
         connection: {
