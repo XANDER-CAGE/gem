@@ -11,6 +11,7 @@ import { ProductReviewsModule } from './modules/product-reviews/product-reviews.
 import { SpendingsModule } from './modules/spendings/spendings.module';
 import { CourseModule } from './modules/course/course.module';
 import { MarketCategoriesModule } from './modules/market-categories/market-categories.module';
+import { ChannelModule } from './channel/channel.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { MarketCategoriesModule } from './modules/market-categories/market-categ
     SpendingsModule,
     CourseModule,
     MarketCategoriesModule,
+    ChannelModule,
   ],
 })
 export class AppModule {}
