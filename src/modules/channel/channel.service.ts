@@ -16,6 +16,7 @@ export class ChannelService {
   ) {}
   async create(createChannelDto: CreateChannelDto) {
     const { badge_id: badgeId } = createChannelDto;
+    // TODO: review
     if (badgeId) {
       const badge = await this.badgeService.findOne(badgeId);
       if (!badge) throw new NotFoundException('Badge not found');
@@ -27,17 +28,21 @@ export class ChannelService {
     return this.channelRepo.findAll(findAllChannelDto);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} channel`;
+  async findOne(id: string) {
+    return await this.channelRepo.findOne(id);
   }
 
-  update(id: number, updateChannelDto: UpdateChannelDto) {
-    console.log(updateChannelDto);
-
-    return `This action updates a #${id} channel`;
+  async update(id: string, updateChannelDto: UpdateChannelDto) {
+    const { badge_id: badgeId } = updateChannelDto;
+    // TODO: review
+    if (badgeId) {
+      const badge = await this.badgeService.findOne(badgeId);
+      if (!badge) throw new NotFoundException('Badge not found');
+    }
+    return this.channelRepo.update(id, updateChannelDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} channel`;
+  async remove(id: string) {
+    await this.channelRepo.delete(id);
   }
 }
