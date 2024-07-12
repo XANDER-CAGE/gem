@@ -4,6 +4,7 @@ import { SwaggerModule } from '@nestjs/swagger';
 import { swaggerConfig } from './common/config/swagger.config';
 import { env } from './common/config/env.config';
 import { ValidationPipe } from '@nestjs/common';
+import { HttpExceptionFilter } from './common/filter/http.exception-filter';
 
 const api = `http://${env.API_HOST}:${env.PORT}`;
 async function bootstrap() {
@@ -19,6 +20,7 @@ async function bootstrap() {
     console.log(`Swagger -  ${api}/swagger`);
   }
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  app.useGlobalFilters(new HttpExceptionFilter());
   await app.listen(env.PORT || 3000);
 }
 bootstrap().then(() => console.log('API runnning on port ', env.PORT));

@@ -8,3 +8,8 @@ export interface IChannelInterface {
   created_at: Date;
   updated_at: Date;
 }
+
+export interface IFindAll {
+  total: number;
+  data: IChannelInterface[];
+}

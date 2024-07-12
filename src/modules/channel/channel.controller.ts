@@ -6,10 +6,16 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { ChannelService } from './channel.service';
 import { ApiTags } from '@nestjs/swagger';
-import { CreateChannelDto, UpdateChannelDto } from './dto/channel.dto';
+import {
+  CreateChannelDto,
+  FindAllChannelDto,
+  UpdateChannelDto,
+} from './dto/channel.dto';
+import { CoreApiResponse } from 'src/common/util/core-api-response.util';
 
 @ApiTags('Channel')
 @Controller('channel')
@@ -17,13 +23,16 @@ export class ChannelController {
   constructor(private readonly channelService: ChannelService) {}
 
   @Post()
-  create(@Body() createChannelDto: CreateChannelDto) {
-    return this.channelService.create(createChannelDto);
+  async create(@Body() createChannelDto: CreateChannelDto) {
+    const data = await this.channelService.create(createChannelDto);
+    return CoreApiResponse.success(data);
   }
 
   @Get()
-  findAll() {
-    return this.channelService.findAll();
+  async findAll(@Query() dto: FindAllChannelDto) {
+    const { total, data } = await this.channelService.findAll(dto);
+    const pagination = { total, limit: dto.limit, page: dto.page };
+    return CoreApiResponse.success(data, pagination);
   }
 
   @Get(':id')

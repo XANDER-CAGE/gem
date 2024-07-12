@@ -1,7 +1,12 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { ChannelRepo } from './repo/channel.repo';
 import { BadgeService } from '../badge/badge.service';
-import { CreateChannelDto, UpdateChannelDto } from './dto/channel.dto';
+import {
+  CreateChannelDto,
+  FindAllChannelDto,
+  UpdateChannelDto,
+} from './dto/channel.dto';
+import { IFindAll } from './interface/channel.interface';
 
 @Injectable()
 export class ChannelService {
@@ -18,8 +23,8 @@ export class ChannelService {
     return this.channelRepo.create(createChannelDto);
   }
 
-  findAll() {
-    return `This action returns all channel`;
+  async findAll(findAllChannelDto: FindAllChannelDto): Promise<IFindAll> {
+    return this.channelRepo.findAll(findAllChannelDto);
   }
 
   findOne(id: number) {
