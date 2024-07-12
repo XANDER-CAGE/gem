@@ -16,6 +16,7 @@ import {
   UpdateChannelDto,
 } from './dto/channel.dto';
 import { CoreApiResponse } from 'src/common/util/core-api-response.util';
+import { IdDto } from 'src/common/dto/id.dto';
 
 @ApiTags('Channel')
 @Controller('channel')
@@ -36,17 +37,23 @@ export class ChannelController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.channelService.findOne(+id);
+  async findOne(@Param() { id }: IdDto) {
+    const data = await this.channelService.findOne(id);
+    return CoreApiResponse.success(data);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateChannelDto: UpdateChannelDto) {
-    return this.channelService.update(+id, updateChannelDto);
+  async update(
+    @Param() { id }: IdDto,
+    @Body() updateChannelDto: UpdateChannelDto,
+  ) {
+    const data = await this.channelService.update(id, updateChannelDto);
+    return CoreApiResponse.success(data);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.channelService.remove(+id);
+  async remove(@Param() { id }: IdDto) {
+    await this.channelService.remove(id);
+    return CoreApiResponse.success(null);
   }
 }
