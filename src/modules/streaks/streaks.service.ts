@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateStreakDto } from './dto/create-streak.dto';
-import { UpdateStreakDto } from './dto/update-streak.dto';
+import { CreateStreakDto, UpdateStreakDto } from './dto/streaks.dto';
 
 @Injectable()
 export class StreaksService {

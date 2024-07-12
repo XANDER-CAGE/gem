@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { StreaksService } from './streaks.service';
-import { CreateStreakDto } from './dto/create-streak.dto';
-import { UpdateStreakDto } from './dto/update-streak.dto';
+import { CreateStreakDto, UpdateStreakDto } from './dto/streaks.dto';
 
 @Controller('streaks')
 export class StreaksController {

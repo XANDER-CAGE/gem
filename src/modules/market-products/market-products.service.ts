@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CreateMarketProductDto } from './dto/create-market-product.dto';
-import { UpdateMarketProductDto } from './dto/update-market-product.dto';
+import { CreateMarketProductDto, UpdateMarketProductDto } from './dto/market-products.dto';
+
 
 @Injectable()
 export class MarketProductsService {
@@ -12,15 +12,15 @@ export class MarketProductsService {
     return `This action returns all marketProducts`;
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return `This action returns a #${id} marketProduct`;
   }
 
-  update(id: number, updateMarketProductDto: UpdateMarketProductDto) {
+  update(id: string, updateMarketProductDto: UpdateMarketProductDto) {
     return `This action updates a #${id} marketProduct`;
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} marketProduct`;
   }
 }

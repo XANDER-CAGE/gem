@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateStudentProfileDto } from './dto/create-student-profile.dto';
-import { UpdateStudentProfileDto } from './dto/update-student-profile.dto';
+import { CreateStudentProfileDto, UpdateStudentProfileDto } from './dto/student-profile.dto';
 
 @Injectable()
 export class StudentProfilesService {
@@ -12,15 +11,15 @@ export class StudentProfilesService {
     return `This action returns all studentProfiles`;
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return `This action returns a #${id} studentProfile`;
   }
 
-  update(id: number, updateStudentProfileDto: UpdateStudentProfileDto) {
+  update(id: string, updateStudentProfileDto: UpdateStudentProfileDto) {
     return `This action updates a #${id} studentProfile`;
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} studentProfile`;
   }
 }
