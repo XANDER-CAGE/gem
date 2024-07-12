@@ -1,15 +1,30 @@
-import { Injectable } from '@nestjs/common';
-import { CreateChannelDto } from './dto/create-channel.dto';
-import { UpdateChannelDto } from './dto/update-channel.dto';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { ChannelRepo } from './repo/channel.repo';
+import { BadgeService } from '../badge/badge.service';
+import {
+  CreateChannelDto,
+  FindAllChannelDto,
+  UpdateChannelDto,
+} from './dto/channel.dto';
+import { IFindAll } from './interface/channel.interface';
 
 @Injectable()
 export class ChannelService {
-  create(createChannelDto: CreateChannelDto) {
-    return 'This action adds a new channel';
+  constructor(
+    @Inject() private readonly channelRepo: ChannelRepo,
+    private readonly badgeService: BadgeService,
+  ) {}
+  async create(createChannelDto: CreateChannelDto) {
+    const { badge_id: badgeId } = createChannelDto;
+    if (badgeId) {
+      const badge = await this.badgeService.findOne(badgeId);
+      if (!badge) throw new NotFoundException('Badge not found');
+    }
+    return this.channelRepo.create(createChannelDto);
   }
 
-  findAll() {
-    return `This action returns all channel`;
+  async findAll(findAllChannelDto: FindAllChannelDto): Promise<IFindAll> {
+    return this.channelRepo.findAll(findAllChannelDto);
   }
 
   findOne(id: number) {
@@ -17,6 +32,8 @@ export class ChannelService {
   }
 
   update(id: number, updateChannelDto: UpdateChannelDto) {
+    console.log(updateChannelDto);
+
     return `This action updates a #${id} channel`;
   }
 
