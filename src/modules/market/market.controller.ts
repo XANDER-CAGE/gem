@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { MarketService } from './market.service';
-import { CreateMarketDto } from './dto/create-market.dto';
-import { UpdateMarketDto } from './dto/update-market.dto';
+import { CreateMarketDto, UpdateMarketDto } from './dto/market.dto';
+
 
 @Controller('market')
 export class MarketController {
@@ -19,16 +19,16 @@ export class MarketController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.marketService.findOne(+id);
+    return this.marketService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateMarketDto: UpdateMarketDto) {
-    return this.marketService.update(+id, updateMarketDto);
+    return this.marketService.update(id, updateMarketDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.marketService.remove(+id);
+    return this.marketService.remove(id);
   }
 }

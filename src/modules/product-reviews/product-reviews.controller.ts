@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { ProductReviewsService } from './product-reviews.service';
-import { CreateProductReviewDto } from './dto/create-product-review.dto';
-import { UpdateProductReviewDto } from './dto/update-product-review.dto';
+import { CreateProductReviewDto, UpdateProductReviewDto } from './dto/product-reviews.dto';
 
 @Controller('product-reviews')
 export class ProductReviewsController {
@@ -19,16 +18,16 @@ export class ProductReviewsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.productReviewsService.findOne(+id);
+    return this.productReviewsService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateProductReviewDto: UpdateProductReviewDto) {
-    return this.productReviewsService.update(+id, updateProductReviewDto);
+    return this.productReviewsService.update(id, updateProductReviewDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.productReviewsService.remove(+id);
+    return this.productReviewsService.remove(id);
   }
 }

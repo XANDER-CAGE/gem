@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { StudentProfilesService } from './student-profiles.service';
-import { CreateStudentProfileDto } from './dto/create-student-profile.dto';
-import { UpdateStudentProfileDto } from './dto/update-student-profile.dto';
+import { CreateStudentProfileDto, UpdateStudentProfileDto } from './dto/student-profile.dto';
 
 @Controller('student-profiles')
 export class StudentProfilesController {
@@ -19,16 +18,16 @@ export class StudentProfilesController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.studentProfilesService.findOne(+id);
+    return this.studentProfilesService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateStudentProfileDto: UpdateStudentProfileDto) {
-    return this.studentProfilesService.update(+id, updateStudentProfileDto);
+    return this.studentProfilesService.update(id, updateStudentProfileDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.studentProfilesService.remove(+id);
+    return this.studentProfilesService.remove(id);
   }
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CreateProductReviewDto } from './dto/create-product-review.dto';
-import { UpdateProductReviewDto } from './dto/update-product-review.dto';
+import { CreateProductReviewDto, UpdateProductReviewDto } from './dto/product-reviews.dto';
+
 
 @Injectable()
 export class ProductReviewsService {
@@ -12,15 +12,15 @@ export class ProductReviewsService {
     return `This action returns all productReviews`;
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return `This action returns a #${id} productReview`;
   }
 
-  update(id: number, updateProductReviewDto: UpdateProductReviewDto) {
+  update(id: string, updateProductReviewDto: UpdateProductReviewDto) {
     return `This action updates a #${id} productReview`;
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} productReview`;
   }
 }

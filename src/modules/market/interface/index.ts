@@ -8,3 +8,4 @@ export interface ICreateMarket {
   created_at: Date;
   updated_at: Date;
 }
+export interface IUpdateMarket extends Partial<ICreateMarket>{}

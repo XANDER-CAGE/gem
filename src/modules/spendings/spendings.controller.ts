@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { SpendingsService } from './spendings.service';
-import { CreateSpendingDto } from './dto/create-spending.dto';
-import { UpdateSpendingDto } from './dto/update-spending.dto';
+import { CreateSpendingDto, UpdateSpendingDto } from './dto/spendings.dto';
 
 @Controller('spendings')
 export class SpendingsController {

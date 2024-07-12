@@ -1,5 +1,4 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsNumber,
@@ -36,7 +35,7 @@ export class CreateMarketDto {
   @ApiProperty({ default: '507f1f77bcf86cd799439011' })
   @IsOptional()
   @MinLength(1)
-  @MaxLength(255)
+  @MaxLength(24)
   category_id: string;
 
   @ApiProperty({ example: 4.5 })
