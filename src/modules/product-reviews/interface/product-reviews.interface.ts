@@ -7,4 +7,8 @@ export interface ICreateProductReview {
   updated_at?: Date;
 }
 
+export interface IFindAllProductReview {
+  total: number;
+  data: ICreateProductReview[];
+}
 export interface IUpdateProductReview extends Partial<ICreateProductReview> {}

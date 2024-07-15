@@ -16,7 +16,7 @@ export class StudentsRepo {
     }
   }
 
-  async getOne(id: number) {
+  async findOne(id: string) {
     try {
       return await this.knex(this.table).where('id', id).first();
     } catch (error) {
