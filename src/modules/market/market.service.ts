@@ -2,6 +2,7 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { MarketRepo } from './repo/market.repo';
 import { ICreateMarket, IUpdateMarket } from './interface/market.interface';
 import { MarketCategoriesRepo } from '../market-categories/repo/market-categories.repo';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class MarketService {
@@ -11,7 +12,7 @@ export class MarketService {
   create(createMarketDto: ICreateMarket) {
     const { category_id } = createMarketDto;
     if (category_id) {
-      const exist = this.marketRepo.existCategoryId('id', category_id);
+      const exist = this.marketCategoryRepo.findOne(category_id);
       if (!exist) {
         throw new NotFoundException('This category_id does not exist');
       }
@@ -19,8 +20,8 @@ export class MarketService {
     return this.marketRepo.create(createMarketDto);
   }
 
-  findAll() {
-    return this.marketRepo.list();
+  findAll(findAllMarketsDto:PaginationDto) {
+    return this.marketRepo.findAll(findAllMarketsDto);
   }
 
   findOne(id: string) {
@@ -30,7 +31,7 @@ export class MarketService {
   update(id: string, updateMarketDto: IUpdateMarket) {
     const { category_id } = updateMarketDto;
     if (category_id) {
-      const exist = this.marketCategoryRepo.getOne(category_id);
+      const exist = this.marketCategoryRepo.findOne(category_id);
       if (!exist) {
         throw new NotFoundException('This category_id does not exist');
       }

@@ -1,5 +1,12 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString, IsJSON } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsJSON,
+  IsString,
+  IsDate,
+} from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateMarketCategoryDto {
   @ApiProperty({ example: 'Category Name' })
@@ -14,20 +21,24 @@ export class CreateMarketCategoryDto {
 
   @ApiProperty({ example: '{}' })
   @IsOptional()
-  @IsJSON()
-  background?: Record<string, any>;
+  @IsString()
+  background?: string;
 
   @ApiProperty({ example: '{}' })
   @IsOptional()
-  @IsJSON()
-  avatar?: Record<string, any>;
+  @IsString()
+  avatar?: string;
 
   @ApiProperty({ example: new Date() })
   @IsOptional()
+  @IsDate()
+  @Type(() => Date)
   created_at?: Date;
 
   @ApiProperty({ example: new Date() })
   @IsOptional()
+  @IsDate()
+  @Type(() => Date)
   updated_at?: Date;
 }
 

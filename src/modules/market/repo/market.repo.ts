@@ -1,8 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
-import { ICreateMarket, IUpdateMarket } from '../interface/market.interface';
+import { ICreateMarket, IFindAllMarkets, IUpdateMarket } from '../interface/market.interface';
 import { NotFoundError } from 'rxjs';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class MarketRepo {
@@ -11,8 +12,28 @@ export class MarketRepo {
 
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
-  async list(knex = this.knex) {
-    return await knex(this.table).select('*');
+  async findAll(
+    dto: PaginationDto,
+    knex = this.knex,
+  ): Promise<IFindAllMarkets> {
+    const { limit = 10, page = 1 } = dto;
+    const innerQuery = knex(this.table)
+      .select('*')
+      .where('deleted_at', null)
+      .limit(limit)
+      .offset((page - 1) * limit)
+      .as('c');
+    const [{ total, data }] = await knex
+      .select([
+        knex.raw(
+          '(SELECT COUNT(id) FROM ?? WHERE deleted_at is null) AS total',
+          this.table,
+        ),
+        knex.raw('jsonb_agg(c.*) AS data'),
+      ])
+      .from(innerQuery);
+
+    return { total: +total, data };
   }
 
   async findOne(id: string, knex = this.knex) {
@@ -22,9 +43,6 @@ export class MarketRepo {
       .where('id', id)
       .andWhere('deleted_at', null)
       .first();
-  }
-  async existCategoryId(field: string, value: string, knex = this.knex) {
-    return await knex(this.mc_table).where(field, value).first();
   }
 
   async create(data: ICreateMarket, knex = this.knex) {

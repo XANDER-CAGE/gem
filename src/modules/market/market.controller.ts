@@ -6,11 +6,13 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { MarketService } from './market.service';
 import { CreateMarketDto, UpdateMarketDto } from './dto/market.dto';
 import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CoreApiResponse } from 'src/common/util/core-api-response.util';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @ApiTags('Market')
 @Controller('market')
@@ -29,8 +31,8 @@ export class MarketController {
   @ApiOperation({ summary: 'Find all' })
   @Get('/list')
   @ApiOkResponse({ type: CoreApiResponse })
-  findAll() {
-    return this.marketService.findAll();
+  findAll(@Query() dto: PaginationDto) {
+    return this.marketService.findAll(dto);
   }
 
   @ApiOperation({ summary: 'Get one' })

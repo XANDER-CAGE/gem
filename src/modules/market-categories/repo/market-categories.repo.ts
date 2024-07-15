@@ -1,7 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
-
+import {
+  ICreateMarketCategory,
+  IFindAllCategoriesMarkets,
+  IUpdateMarketCategory,
+} from '../interface/market-categories.interface';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { IFindAllChannel } from 'src/modules/channel/interface/channel.interface';
 
 @Injectable()
 export class MarketCategoriesRepo {
@@ -9,53 +15,61 @@ export class MarketCategoriesRepo {
 
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
-  async list() {
-    try {
-      return await this.knex(this.table).select('*');
-    } catch (error) {
-      throw new Error(`Error retrieving market-category: ${error.message}`);
-    }
+  async findAll(
+    dto: PaginationDto,
+    knex = this.knex,
+  ): Promise<IFindAllCategoriesMarkets> {
+    const { limit = 10, page = 1 } = dto;
+    const innerQuery = knex(this.table)
+      .select('*')
+      .where('deleted_at', null)
+      .limit(limit)
+      .offset((page - 1) * limit)
+      .as('c');
+    const [{ total, data }] = await knex
+      .select([
+        knex.raw(
+          '(SELECT COUNT(id) FROM ?? WHERE deleted_at is null) AS total',
+          this.table,
+        ),
+        knex.raw('jsonb_agg(c.*) AS data'),
+      ])
+      .from(innerQuery);
+
+    return { total: +total, data };
   }
 
-  async getOne(id: string) {
-    try {
-      return await this.knex(this.table).where('id', id).first();
-    } catch (error) {
-      throw new Error(
-        `Error retrieving market-category with id ${id}: ${error.message}`,
-      );
-    }
+  async findOne(id: string, knex = this.knex) {
+    return await knex
+      .select('*')
+      .from(this.table)
+      .where('id', id)
+      .andWhere('deleted_at', null)
+      .first();
+  }
+  async create(data: ICreateMarketCategory, knex = this.knex) {
+    return await knex(this.table).insert(data).returning('*');
   }
 
-  async create(data: any) {
-    try {
-      const [newMarketCategory] = await this.knex(this.table)
-        .insert(data)
-        .returning('*');
-      return newMarketCategory;
-    } catch (error) {
-      throw new Error(`Error creating market-category: ${error.message}`);
-    }
+  async update(id: string, data: IUpdateMarketCategory, knex = this.knex) {
+    const [updateMarket] = await knex(this.table)
+      .update({
+        ...data,
+        updated_at: new Date(),
+      })
+      .where('id', id)
+      .andWhere('deleted_at', null)
+      .returning('*');
+    return updateMarket;
   }
 
-  async update(id: string, data: any) {
-    try {
-      const [updatedMarketCategory] = await this.knex(this.table)
-        .where('id', id)
-        .update(data)
-        .returning('*');
-      return updatedMarketCategory;
-    } catch (error) {
-      throw new Error(`Error updating market-category with id ${id}: ${error.message}`);
-    }
-  }
-
-  async deleteOne(id: string) {
-    try {
-      await this.knex(this.table).where('id', id).del();
-      return { message: `Market-category with id ${id} deleted successfully` };
-    } catch (error) {
-      throw new Error(`Error deleting market-category with id ${id}: ${error.message}`);
-    }
+  async deleteOne(id: string, knex = this.knex) {
+    await knex(this.table)
+      .update({
+        deleted_at: new Date(),
+        updated_at: new Date(),
+      })
+      .where('id', id)
+      .andWhere('deleted_at', null);
   }
 }
