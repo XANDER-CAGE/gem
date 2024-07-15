@@ -21,8 +21,8 @@ export class BadgeController {
   constructor(private readonly badgeService: BadgeService) {}
 
   @Post()
-  async create(@Body() createChannelDto: CreateBadgeDto) {
-    const data = await this.badgeService.create(createChannelDto);
+  async create(@Body() dto: CreateBadgeDto) {
+    const data = await this.badgeService.create(dto);
     return CoreApiResponse.success(data);
   }
 
@@ -40,11 +40,8 @@ export class BadgeController {
   }
 
   @Patch(':id')
-  async update(
-    @Param() { id }: IdDto,
-    @Body() updateChannelDto: UpdateBadgeDto,
-  ) {
-    const data = await this.badgeService.update(id, updateChannelDto);
+  async update(@Param() { id }: IdDto, @Body() dto: UpdateBadgeDto) {
+    const data = await this.badgeService.update(id, dto);
     return CoreApiResponse.success(data);
   }
 

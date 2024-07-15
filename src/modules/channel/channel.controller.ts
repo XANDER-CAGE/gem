@@ -21,8 +21,8 @@ export class ChannelController {
   constructor(private readonly channelService: ChannelService) {}
 
   @Post()
-  async create(@Body() createChannelDto: CreateChannelDto) {
-    const data = await this.channelService.create(createChannelDto);
+  async create(@Body() dto: CreateChannelDto) {
+    const data = await this.channelService.create(dto);
     return CoreApiResponse.success(data);
   }
 
@@ -40,11 +40,8 @@ export class ChannelController {
   }
 
   @Patch(':id')
-  async update(
-    @Param() { id }: IdDto,
-    @Body() updateChannelDto: UpdateChannelDto,
-  ) {
-    const data = await this.channelService.update(id, updateChannelDto);
+  async update(@Param() { id }: IdDto, @Body() dto: UpdateChannelDto) {
+    const data = await this.channelService.update(id, dto);
     return CoreApiResponse.success(data);
   }
 

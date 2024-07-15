@@ -1,26 +1,52 @@
-import { Injectable } from '@nestjs/common';
-import { CreateMarketProductDto, UpdateMarketProductDto } from './dto/market-products.dto';
-
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { CreateProductDto, UpdateProductDto } from './dto/market-products.dto';
+import { ProductRepo } from './repo/market-products.repo';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { IFindAllProduct } from './interface/product.interface';
+import { MarketCategoriesService } from '../market-categories/market-categories.service';
+import { MarketService } from '../market/market.service';
 
 @Injectable()
-export class MarketProductsService {
-  create(createMarketProductDto: CreateMarketProductDto) {
-    return 'This action adds a new marketProduct';
+export class ProductsService {
+  constructor(
+    @Inject() private readonly badgeRepo: ProductRepo,
+    private readonly categoryService: MarketCategoriesService,
+    private readonly marketService: MarketService,
+  ) {}
+
+  async create(dto: CreateProductDto) {
+    const { market_id: marketId, category_id: categoryId } = dto;
+    if (categoryId) {
+      const category = await this.categoryService.findOne(categoryId);
+      if (!category) throw new NotFoundException('Category not found');
+    }
+    const market = await this.marketService.findOne(marketId);
+    if (!market) throw new NotFoundException('Category not found');
+    return this.badgeRepo.create(dto);
   }
 
-  findAll() {
-    return `This action returns all marketProducts`;
+  async findAll(dto: PaginationDto): Promise<IFindAllProduct> {
+    return this.badgeRepo.findAll(dto);
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} marketProduct`;
+  async findOne(id: string) {
+    return await this.badgeRepo.findOne(id);
   }
 
-  update(id: string, updateMarketProductDto: UpdateMarketProductDto) {
-    return `This action updates a #${id} marketProduct`;
+  async update(id: string, dto: UpdateProductDto) {
+    const { market_id: marketId, category_id: categoryId } = dto;
+    if (categoryId) {
+      const category = await this.categoryService.findOne(categoryId);
+      if (!category) throw new NotFoundException('Category not found');
+    }
+    if (marketId) {
+      const market = await this.marketService.findOne(marketId);
+      if (!market) throw new NotFoundException('Category not found');
+    }
+    return this.badgeRepo.update(id, dto);
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} marketProduct`;
+  async remove(id: string) {
+    await this.badgeRepo.delete(id);
   }
 }
