@@ -1,7 +1,9 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { MarketCategoriesService } from './market-categories.service';
 import { CreateMarketCategoryDto, UpdateMarketCategoryDto } from './dto/market-categories.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags("Market-Categories")
 @Controller('market-categories')
 export class MarketCategoriesController {
   constructor(private readonly marketCategoriesService: MarketCategoriesService) {}

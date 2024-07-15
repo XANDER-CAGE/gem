@@ -1,33 +1,56 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { MarketService } from './market.service';
 import { CreateMarketDto, UpdateMarketDto } from './dto/market.dto';
+import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CoreApiResponse } from 'src/common/util/core-api-response.util';
 
-
+@ApiTags('Market')
 @Controller('market')
 export class MarketController {
   constructor(private readonly marketService: MarketService) {}
 
-  @Post()
+  @ApiOperation({ summary: 'Create new market' })
+  @Post('/create')
+  @ApiBody({ type: CreateMarketDto })
+  @ApiOkResponse({ type: CoreApiResponse })
   create(@Body() createMarketDto: CreateMarketDto) {
-    return this.marketService.create(createMarketDto);
+    const data = this.marketService.create(createMarketDto);
+    return CoreApiResponse.success(data);
   }
 
-  @Get()
+  @ApiOperation({ summary: 'Find all' })
+  @Get('/list')
+  @ApiOkResponse({ type: CoreApiResponse })
   findAll() {
     return this.marketService.findAll();
   }
 
+  @ApiOperation({ summary: 'Get one' })
   @Get(':id')
+  @ApiOkResponse({ type: CoreApiResponse })
   findOne(@Param('id') id: string) {
     return this.marketService.findOne(id);
   }
 
+  @ApiOperation({ summary: 'Update one' })
   @Patch(':id')
+  @ApiBody({ type: UpdateMarketDto })
+  @ApiOkResponse({ type: CoreApiResponse })
   update(@Param('id') id: string, @Body() updateMarketDto: UpdateMarketDto) {
     return this.marketService.update(id, updateMarketDto);
   }
 
+  @ApiOperation({ summary: 'Delete one' })
   @Delete(':id')
+  @ApiOkResponse({ type: CoreApiResponse })
   remove(@Param('id') id: string) {
     return this.marketService.remove(id);
   }

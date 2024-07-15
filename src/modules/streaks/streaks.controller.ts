@@ -1,7 +1,10 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { StreaksService } from './streaks.service';
 import { CreateStreakDto, UpdateStreakDto } from './dto/streaks.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+
+@ApiTags("Streaks")
 @Controller('streaks')
 export class StreaksController {
   constructor(private readonly streaksService: StreaksService) {}

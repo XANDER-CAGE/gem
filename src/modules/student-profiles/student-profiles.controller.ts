@@ -1,7 +1,10 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { StudentProfilesService } from './student-profiles.service';
 import { CreateStudentProfileDto, UpdateStudentProfileDto } from './dto/student-profile.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+
+@ApiTags("Student-Profiles")
 @Controller('student-profiles')
 export class StudentProfilesController {
   constructor(private readonly studentProfilesService: StudentProfilesService) {}
