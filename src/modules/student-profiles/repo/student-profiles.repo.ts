@@ -16,7 +16,7 @@ export class StudentProfilesRepo {
     }
   }
 
-  async getOne(id: string) {
+  async findOne(id: string) {
     try {
       return await this.knex(this.table).where('id', id).first();
     } catch (error) {
