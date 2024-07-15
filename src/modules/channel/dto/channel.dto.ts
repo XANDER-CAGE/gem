@@ -1,5 +1,4 @@
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
 import {
   IsNotEmpty,
   IsNumber,
@@ -38,19 +37,3 @@ export class CreateChannelDto {
 }
 
 export class UpdateChannelDto extends PartialType(CreateChannelDto) {}
-
-export class FindAllChannelDto {
-  @ApiPropertyOptional({ default: 10 })
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  @Min(1)
-  limit: number;
-
-  @ApiPropertyOptional({ default: 1 })
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  @Min(1)
-  page: number;
-}
