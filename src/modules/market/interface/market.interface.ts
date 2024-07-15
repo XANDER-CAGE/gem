@@ -9,4 +9,9 @@ export interface ICreateMarket {
   updated_at: Date;
 }
 
+export interface IFindAllMarkets {
+  total: number;
+  data: ICreateMarket[];
+}
+
 export interface IUpdateMarket extends Partial<ICreateMarket> {}
