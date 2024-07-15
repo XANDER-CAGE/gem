@@ -7,7 +7,6 @@ import {
   IUpdateMarketCategory,
 } from '../interface/market-categories.interface';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { IFindAllChannel } from 'src/modules/channel/interface/channel.interface';
 
 @Injectable()
 export class MarketCategoriesRepo {
