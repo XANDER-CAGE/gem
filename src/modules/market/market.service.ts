@@ -1,12 +1,12 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { MarketRepo } from './repo/market.repo';
 import { ICreateMarket, IUpdateMarket } from './interface/market.interface';
-import { MarketCategoriesRepo } from '../market-categories/repo/market-categories.repo';
+import { MarketCategoriesService } from '../market-categories/market-categories.service';
 
 @Injectable()
 export class MarketService {
   @Inject() private readonly marketRepo: MarketRepo;
-  @Inject() private readonly marketCategoryRepo:MarketCategoriesRepo;
+  @Inject() private readonly categoryService: MarketCategoriesService;
 
   create(createMarketDto: ICreateMarket) {
     const { category_id } = createMarketDto;
@@ -30,7 +30,7 @@ export class MarketService {
   update(id: string, updateMarketDto: IUpdateMarket) {
     const { category_id } = updateMarketDto;
     if (category_id) {
-      const exist = this.marketCategoryRepo.getOne(category_id);
+      const exist = this.categoryService.findOne(category_id);
       if (!exist) {
         throw new NotFoundException('This category_id does not exist');
       }
@@ -39,6 +39,6 @@ export class MarketService {
   }
 
   remove(id: string) {
-    return this.marketRepo.deleteOne(id)
+    return this.marketRepo.deleteOne(id);
   }
 }

@@ -1,8 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
 import { ICreateMarket, IUpdateMarket } from '../interface/market.interface';
-import { NotFoundError } from 'rxjs';
 
 @Injectable()
 export class MarketRepo {

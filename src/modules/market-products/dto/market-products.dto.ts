@@ -3,19 +3,25 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  IsJSON,
   IsDecimal,
   IsInt,
   MinLength,
   MaxLength,
+  IsObject,
 } from 'class-validator';
 
-export class CreateMarketProductDto {
+export class CreateProductDto {
+  @ApiProperty({ default: '507f1f77bcf86cd799439011' })
+  @IsNotEmpty()
+  @MinLength(1)
+  @MaxLength(24)
+  market_id: string;
+
   @ApiProperty({ default: '507f1f77bcf86cd799439011' })
   @IsOptional()
   @MinLength(1)
   @MaxLength(24)
-  market_id: number;
+  category_id: string;
 
   @ApiProperty({ example: 'Product Name' })
   @IsNotEmpty()
@@ -29,13 +35,13 @@ export class CreateMarketProductDto {
 
   @ApiProperty({ example: '{}' })
   @IsOptional()
-  @IsJSON()
+  @IsObject()
   avatar?: Record<string, any>;
 
   @ApiProperty({ example: 'Product Type' })
   @IsOptional()
   @IsString()
-  type?: string;
+  type: string;
 
   @ApiProperty({ example: 99.99 })
   @IsNotEmpty()
@@ -43,19 +49,9 @@ export class CreateMarketProductDto {
   price: number;
 
   @ApiProperty({ example: 100 })
-  @IsNotEmpty()
+  @IsOptional()
   @IsInt()
   remaining_count: number;
-
-  @ApiProperty({ example: new Date() })
-  @IsOptional()
-  created_at?: Date;
-
-  @ApiProperty({ example: new Date() })
-  @IsOptional()
-  updated_at?: Date;
 }
 
-export class UpdateMarketProductDto extends PartialType(
-  CreateMarketProductDto,
-) {}
+export class UpdateProductDto extends PartialType(CreateProductDto) {}
