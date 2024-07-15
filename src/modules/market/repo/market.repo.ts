@@ -1,14 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
 import { ICreateMarket, IFindAllMarkets, IUpdateMarket } from '../interface/market.interface';
-import { NotFoundError } from 'rxjs';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class MarketRepo {
   private table = 'markets';
-  private mc_table = 'market_categories';
 
   constructor(@InjectConnection() private readonly knex: Knex) {}
 

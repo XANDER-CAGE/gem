@@ -1,8 +1,4 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import {
-  CreateProductReviewDto,
-  UpdateProductReviewDto,
-} from './dto/product-reviews.dto';
 import { ProductReviewsRepo } from './repo/product-reviews.repo';
 import {
   ICreateProductReview,
@@ -10,20 +6,20 @@ import {
   IUpdateProductReview,
 } from './interface/product-reviews.interface';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { StudentsRepo } from '../students/repo/students.repo';
-import { MarketRepo } from '../market/repo/market.repo';
+import { StudentsService } from '../students/students.service';
+import { MarketService } from '../market/market.service';
 
 @Injectable()
 export class ProductReviewsService {
   @Inject() private readonly productReviewRepo: ProductReviewsRepo;
-  @Inject() private readonly studentRepo: StudentsRepo;
-  @Inject() private readonly productRepo: MarketRepo;
+  @Inject() private readonly studentService: StudentsService;
+  @Inject() private readonly productService: MarketService;
 
   async create(createProductReview: ICreateProductReview) {
     const { student_id, product_id } = createProductReview;
     if (student_id && product_id) {
-      const student_exist = await this.studentRepo.findOne(student_id);
-      const product_exist = await this.productRepo.findOne(product_id);
+      const student_exist = await this.studentService.findOne(student_id);
+      const product_exist = await this.productService.findOne(product_id);
       if (!student_exist || !product_exist) {
         throw new NotFoundException(
           'This (student or product) id does not exist',
@@ -46,8 +42,8 @@ export class ProductReviewsService {
   async update(id: string, updateProductReview: IUpdateProductReview) {
     const { student_id, product_id } = updateProductReview;
     if (student_id && product_id) {
-      const student_exist = await this.studentRepo.findOne(student_id);
-      const product_exist = await this.productRepo.findOne(product_id);
+      const student_exist = await this.studentService.findOne(student_id);
+      const product_exist = await this.productService.findOne(product_id);
       if (!student_exist || !product_exist) {
         throw new NotFoundException(
           'This (student or product) id does not exist',

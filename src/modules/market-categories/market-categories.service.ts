@@ -1,13 +1,8 @@
-import { Inject, Injectable, NotFoundException, Query } from '@nestjs/common';
-import {
-  CreateMarketCategoryDto,
-  UpdateMarketCategoryDto,
-} from './dto/market-categories.dto';
+import { Inject, Injectable } from '@nestjs/common';
+
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { CoreApiResponse } from 'src/common/util/core-api-response.util';
 import { MarketCategoriesRepo } from './repo/market-categories.repo';
 import { ICreateMarketCategory, IFindAllCategoriesMarkets, IUpdateMarketCategory } from './interface/market-categories.interface';
-import { IFindAllChannel } from '../channel/interface/channel.interface';
 
 @Injectable()
 export class MarketCategoriesService {

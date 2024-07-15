@@ -6,6 +6,6 @@ import { MarketCategoriesRepo } from './repo/market-categories.repo';
 @Module({
   controllers: [MarketCategoriesController],
   providers: [MarketCategoriesService, MarketCategoriesRepo],
-  exports: [MarketCategoriesRepo]
+  exports: [MarketCategoriesService]
 })
 export class MarketCategoriesModule {}
