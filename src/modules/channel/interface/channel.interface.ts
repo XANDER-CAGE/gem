@@ -1,4 +1,4 @@
-export interface IChannelInterface {
+export interface IChannel {
   id: string;
   name: string;
   desctription?: string;
@@ -9,7 +9,7 @@ export interface IChannelInterface {
   updated_at: Date;
 }
 
-export interface IFindAll {
+export interface IFindAllChannel {
   total: number;
-  data: IChannelInterface[];
+  data: IChannel[];
 }

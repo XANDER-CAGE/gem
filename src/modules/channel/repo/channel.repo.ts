@@ -1,30 +1,27 @@
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
-import {
-  CreateChannelDto,
-  FindAllChannelDto,
-  UpdateChannelDto,
-} from '../dto/channel.dto';
-import { IChannelInterface, IFindAll } from '../interface/channel.interface';
+import { CreateChannelDto, UpdateChannelDto } from '../dto/channel.dto';
+import { IChannel, IFindAllChannel } from '../interface/channel.interface';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 export class ChannelRepo {
   private readonly table = 'channels';
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
-  async create(
-    dto: CreateChannelDto,
-    knex = this.knex,
-  ): Promise<IChannelInterface> {
-    const [channel] = await knex
+  async create(dto: CreateChannelDto, knex = this.knex): Promise<IChannel> {
+    const [data] = await knex
       .insert({
         ...dto,
       })
       .into(this.table)
       .returning('*');
-    return channel;
+    return data;
   }
 
-  async findAll(dto: FindAllChannelDto, knex = this.knex): Promise<IFindAll> {
+  async findAll(
+    dto: PaginationDto,
+    knex = this.knex,
+  ): Promise<IFindAllChannel> {
     const { limit = 10, page = 1 } = dto;
     const innerQuery = knex(this.table)
       .select('*')
@@ -45,7 +42,7 @@ export class ChannelRepo {
     return { total: +total, data };
   }
 
-  async findOne(id: string, knex = this.knex): Promise<IChannelInterface> {
+  async findOne(id: string, knex = this.knex): Promise<IChannel> {
     return await knex
       .select('*')
       .from(this.table)
@@ -58,7 +55,7 @@ export class ChannelRepo {
     id: string,
     dto: UpdateChannelDto,
     knex = this.knex,
-  ): Promise<IChannelInterface> {
+  ): Promise<IChannel> {
     const [data] = await knex(this.table)
       .update({
         ...dto,
