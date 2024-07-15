@@ -1,23 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
-import {
-  ICreateMarketCategory,
-  IFindAllCategoriesMarkets,
-  IUpdateMarketCategory,
-} from '../interface/market-categories.interface';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { ICreateProductReview, IFindAllProductReview, IUpdateProductReview } from '../interface/product-reviews.interface';
 
 @Injectable()
-export class MarketCategoriesRepo {
-  private table = 'market_categories';
+export class ProductReviewsRepo {
+  private table = 'product_reviews';
 
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
   async findAll(
     dto: PaginationDto,
     knex = this.knex,
-  ): Promise<IFindAllCategoriesMarkets> {
+  ): Promise<IFindAllProductReview> {
     const { limit = 10, page = 1 } = dto;
     const innerQuery = knex(this.table)
       .select('*')
@@ -46,11 +42,11 @@ export class MarketCategoriesRepo {
       .andWhere('deleted_at', null)
       .first();
   }
-  async create(data: ICreateMarketCategory, knex = this.knex) {
+  async create(data: ICreateProductReview, knex = this.knex) {
     return await knex(this.table).insert(data).returning('*');
   }
 
-  async update(id: string, data: IUpdateMarketCategory, knex = this.knex) {
+  async update(id: string, data: IUpdateProductReview, knex = this.knex) {
     const [updateMarket] = await knex(this.table)
       .update({
         ...data,
