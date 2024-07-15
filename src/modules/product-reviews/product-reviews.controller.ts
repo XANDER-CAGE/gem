@@ -1,17 +1,26 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { ProductReviewsService } from './product-reviews.service';
-import { CreateProductReviewDto, UpdateProductReviewDto } from './dto/product-reviews.dto';
+import {
+  CreateProductReviewDto,
+  UpdateProductReviewDto,
+} from './dto/product-reviews.dto';
 import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CoreApiResponse } from 'src/common/util/core-api-response.util';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 
-
 @ApiTags('Product-Reviews')
 @Controller('product-reviews')
 export class ProductReviewsController {
-  constructor(
-    private readonly productReviewService: ProductReviewsService,
-  ) {}
+  constructor(private readonly productReviewService: ProductReviewsService) {}
 
   @ApiOperation({ summary: 'Create new market' })
   @Post('/create')

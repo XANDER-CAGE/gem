@@ -15,42 +15,34 @@ export class ProductReviewsService {
   @Inject() private readonly studentService: StudentsService;
   @Inject() private readonly productService: MarketService;
 
-  async create(createProductReview: ICreateProductReview) {
-    const { student_id, product_id } = createProductReview;
-    if (student_id && product_id) {
-      const student_exist = await this.studentService.findOne(student_id);
-      const product_exist = await this.productService.findOne(product_id);
-      if (!student_exist || !product_exist) {
-        throw new NotFoundException(
-          'This (student or product) id does not exist',
-        );
-      }
-    }
-    return this.productReviewRepo.create(createProductReview);
+  async create(dto: ICreateProductReview) {
+    const { student_id: studentId, product_id: productId } = dto;
+    const student = await this.studentService.findOne(studentId);
+    const product = await this.productService.findOne(productId);
+    if (!student) throw new NotFoundException('Student does not exist');
+    if (!product) throw new NotFoundException('Product does not exist');
+    return this.productReviewRepo.create(dto);
   }
 
-  async findAll(
-    findAllProductReview: PaginationDto,
-  ): Promise<IFindAllProductReview> {
-    return await this.productReviewRepo.findAll(findAllProductReview);
+  async findAll(dto: PaginationDto): Promise<IFindAllProductReview> {
+    return await this.productReviewRepo.findAll(dto);
   }
 
   findOne(id: string) {
     return this.productReviewRepo.findOne(id);
   }
 
-  async update(id: string, updateProductReview: IUpdateProductReview) {
-    const { student_id, product_id } = updateProductReview;
-    if (student_id && product_id) {
-      const student_exist = await this.studentService.findOne(student_id);
-      const product_exist = await this.productService.findOne(product_id);
-      if (!student_exist || !product_exist) {
-        throw new NotFoundException(
-          'This (student or product) id does not exist',
-        );
-      }
+  async update(id: string, dto: IUpdateProductReview) {
+    const { student_id: studentId, product_id: productId } = dto;
+    if (studentId) {
+      const student = await this.studentService.findOne(studentId);
+      if (!student) throw new NotFoundException('Student does not exist');
     }
-    return this.productReviewRepo.update(id, updateProductReview);
+    if (productId) {
+      const product = await this.productService.findOne(productId);
+      if (!product) throw new NotFoundException('Student does not exist');
+    }
+    return this.productReviewRepo.update(id, dto);
   }
 
   remove(id: string) {

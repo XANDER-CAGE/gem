@@ -8,6 +8,6 @@ import { MarketCategoriesModule } from '../market-categories/market-categories.m
   imports: [MarketCategoriesModule],
   controllers: [MarketController],
   providers: [MarketService, MarketRepo],
-  exports: [MarketService]
+  exports: [MarketService],
 })
 export class MarketModule {}

@@ -20,7 +20,7 @@ export class MarketService {
     return this.marketRepo.create(createMarketDto);
   }
 
-  findAll(findAllMarketsDto:PaginationDto) {
+  findAll(findAllMarketsDto: PaginationDto) {
     return this.marketRepo.findAll(findAllMarketsDto);
   }
 
