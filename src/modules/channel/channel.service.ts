@@ -16,7 +16,6 @@ export class ChannelService {
   ) {}
   async create(createChannelDto: CreateChannelDto) {
     const { badge_id: badgeId } = createChannelDto;
-    // TODO: review
     if (badgeId) {
       const badge = await this.badgeService.findOne(badgeId);
       if (!badge) throw new NotFoundException('Badge not found');
@@ -34,7 +33,6 @@ export class ChannelService {
 
   async update(id: string, updateChannelDto: UpdateChannelDto) {
     const { badge_id: badgeId } = updateChannelDto;
-    // TODO: review
     if (badgeId) {
       const badge = await this.badgeService.findOne(badgeId);
       if (!badge) throw new NotFoundException('Badge not found');

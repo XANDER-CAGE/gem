@@ -10,7 +10,9 @@ import {
 import { BadgeService } from './badge.service';
 import { CreateBadgeDto } from './dto/create-badge.dto';
 import { UpdateBadgeDto } from './dto/update-badge.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags("Badge")
 @Controller('badge')
 export class BadgeController {
   constructor(private readonly badgeService: BadgeService) {}
