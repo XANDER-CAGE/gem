@@ -6,12 +6,11 @@ import { MarketModule } from './modules/market/market.module';
 import { StreaksModule } from './modules/streaks/streaks.module';
 import { StudentProfilesModule } from './modules/student-profiles/student-profiles.module';
 import { MarketProductsModule } from './modules/market-products/market-products.module';
-import { StudentsModule } from './modules/students/students.module';
 import { ProductReviewsModule } from './modules/product-reviews/product-reviews.module';
-import { CourseModule } from './modules/course/course.module';
 import { MarketCategoriesModule } from './modules/market-categories/market-categories.module';
 import { ChannelModule } from './modules/channel/channel.module';
 import { BadgeModule } from './modules/badge/badge.module';
+import { LevelModule } from './modules/level/level.module';
 
 @Module({
   imports: [
@@ -23,12 +22,11 @@ import { BadgeModule } from './modules/badge/badge.module';
     StreaksModule,
     StudentProfilesModule,
     MarketProductsModule,
-    StudentsModule,
     ProductReviewsModule,
-    CourseModule,
     MarketCategoriesModule,
     ChannelModule,
     BadgeModule,
+    LevelModule,
   ],
 })
 export class AppModule {}

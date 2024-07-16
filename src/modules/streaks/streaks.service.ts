@@ -11,7 +11,7 @@ export class StreaksService {
     return `This action returns all streaks`;
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return `This action returns a #${id} streak`;
   }
 
