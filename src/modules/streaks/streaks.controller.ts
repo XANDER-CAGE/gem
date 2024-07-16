@@ -21,7 +21,7 @@ export class StreaksController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.streaksService.findOne(+id);
+    return this.streaksService.findOne(id);
   }
 
   @Patch(':id')

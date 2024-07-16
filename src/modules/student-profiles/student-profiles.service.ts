@@ -1,31 +1,56 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { ICreateStudentProfile, IFindAllStudentProfile, IUpdateStudentProfile } from './interface/student-profile.intefrace';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ICreateStudentProfile,
+  IFindAllStudentProfile,
+  IUpdateStudentProfile,
+} from './interface/student-profile.intefrace';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { StudentProfilesRepo } from './repo/student-profiles.repo';
+import { StreaksService } from '../streaks/streaks.service';
+import { LevelService } from '../level/level.service';
 
 @Injectable()
 export class StudentProfilesService {
-  @Inject() private readonly studentService: StudentProfilesRepo;
+  @Inject() private readonly studentProfileService: StudentProfilesRepo;
+  @Inject() private readonly streakService: StreaksService;
+  @Inject() private readonly levelService: LevelService;
+  //Also i need to add StudentService
 
-  create(createMarketDto: ICreateStudentProfile) {
-    return this.studentService.create(createMarketDto);
+  async create(createStudentProfile: ICreateStudentProfile) {
+    const { streak_id, level_id } = createStudentProfile;
+
+    if (streak_id) {
+      const streak = await this.streakService.findOne(streak_id);
+      if (!streak) throw new NotFoundException('Streak does not exist');
+    }
+    const level = await this.levelService.findOne(level_id);
+    if (!level) throw new NotFoundException('Level does not exist');
+    return this.studentProfileService.create(createStudentProfile);
   }
 
   async findAll(
     findAllStudentProfiles: PaginationDto,
   ): Promise<IFindAllStudentProfile> {
-    return await this.studentService.findAll(findAllStudentProfiles);
+    return await this.studentProfileService.findAll(findAllStudentProfiles);
   }
 
-  findOne(id: string) {
-    return this.studentService.findOne(id);
+  async findOne(id: string) {
+    return await this.studentProfileService.findOne(id);
   }
 
-  update(id: string, updateMarketDto: IUpdateStudentProfile) {
-    return this.studentService.update(id, updateMarketDto);
+  async update(id: string, updateMarketDto: IUpdateStudentProfile) {
+    const { streak_id, level_id } = updateMarketDto;
+
+    if (streak_id) {
+      const streak = await this.streakService.findOne(streak_id);
+      if (!streak) throw new NotFoundException('Streak does not exist');
+    }
+    const level = await this.levelService.findOne(level_id);
+    if (!level) throw new NotFoundException('Level does not exist');
+    return this.studentProfileService.update(id, updateMarketDto);
   }
 
-  remove(id: string) {
-    return this.studentService.deleteOne(id);
+  async remove(id: string) {
+    return await this.studentProfileService.deleteOne(id);
   }
 }

@@ -7,6 +7,7 @@ import {
   IUpdateMarket,
 } from '../interface/market.interface';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { CreateMarketDto } from '../dto/market.dto';
 
 @Injectable()
 export class MarketRepo {
@@ -47,8 +48,12 @@ export class MarketRepo {
       .first();
   }
 
-  async create(data: ICreateMarket, knex = this.knex) {
-    return await knex(this.table).insert(data).returning('*');
+  async create(
+    data: CreateMarketDto,
+    knex = this.knex,
+  ): Promise<ICreateMarket> {
+    const [res] = await knex(this.table).insert(data).returning('*');
+    return res;
   }
 
   async update(id: string, data: IUpdateMarket, knex = this.knex) {
