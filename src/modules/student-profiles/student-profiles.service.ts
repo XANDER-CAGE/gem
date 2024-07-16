@@ -1,25 +1,31 @@
-import { Injectable } from '@nestjs/common';
-import { CreateStudentProfileDto, UpdateStudentProfileDto } from './dto/student-profile.dto';
+import { Inject, Injectable } from '@nestjs/common';
+import { ICreateStudentProfile, IFindAllStudentProfile, IUpdateStudentProfile } from './interface/student-profile.intefrace';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { StudentProfilesRepo } from './repo/student-profiles.repo';
 
 @Injectable()
 export class StudentProfilesService {
-  create(createStudentProfileDto: CreateStudentProfileDto) {
-    return 'This action adds a new studentProfile';
+  @Inject() private readonly studentService: StudentProfilesRepo;
+
+  create(createMarketDto: ICreateStudentProfile) {
+    return this.studentService.create(createMarketDto);
   }
 
-  findAll() {
-    return `This action returns all studentProfiles`;
+  async findAll(
+    findAllStudentProfiles: PaginationDto,
+  ): Promise<IFindAllStudentProfile> {
+    return await this.studentService.findAll(findAllStudentProfiles);
   }
 
   findOne(id: string) {
-    return `This action returns a #${id} studentProfile`;
+    return this.studentService.findOne(id);
   }
 
-  update(id: string, updateStudentProfileDto: UpdateStudentProfileDto) {
-    return `This action updates a #${id} studentProfile`;
+  update(id: string, updateMarketDto: IUpdateStudentProfile) {
+    return this.studentService.update(id, updateMarketDto);
   }
 
   remove(id: string) {
-    return `This action removes a #${id} studentProfile`;
+    return this.studentService.deleteOne(id);
   }
 }

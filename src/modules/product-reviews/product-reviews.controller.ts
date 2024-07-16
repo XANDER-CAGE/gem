@@ -22,7 +22,7 @@ import { PaginationDto } from 'src/common/dto/pagination.dto';
 export class ProductReviewsController {
   constructor(private readonly productReviewService: ProductReviewsService) {}
 
-  @ApiOperation({ summary: 'Create new market' })
+  @ApiOperation({ summary: 'Create new' })
   @Post('/create')
   @ApiBody({ type: CreateProductReviewDto })
   @ApiOkResponse({ type: CoreApiResponse })
