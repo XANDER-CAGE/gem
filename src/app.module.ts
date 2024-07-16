@@ -12,6 +12,7 @@ import { CourseModule } from './modules/course/course.module';
 import { MarketCategoriesModule } from './modules/market-categories/market-categories.module';
 import { ChannelModule } from './modules/channel/channel.module';
 import { BadgeModule } from './modules/badge/badge.module';
+import { TransactionModule } from './transaction/transaction.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { BadgeModule } from './modules/badge/badge.module';
     MarketCategoriesModule,
     ChannelModule,
     BadgeModule,
+    TransactionModule,
   ],
 })
 export class AppModule {}
