@@ -8,7 +8,6 @@ import { StudentProfilesModule } from './modules/student-profiles/student-profil
 import { MarketProductsModule } from './modules/market-products/market-products.module';
 import { StudentsModule } from './modules/students/students.module';
 import { ProductReviewsModule } from './modules/product-reviews/product-reviews.module';
-import { SpendingsModule } from './modules/spendings/spendings.module';
 import { CourseModule } from './modules/course/course.module';
 import { MarketCategoriesModule } from './modules/market-categories/market-categories.module';
 import { ChannelModule } from './modules/channel/channel.module';
@@ -26,7 +25,6 @@ import { BadgeModule } from './modules/badge/badge.module';
     MarketProductsModule,
     StudentsModule,
     ProductReviewsModule,
-    SpendingsModule,
     CourseModule,
     MarketCategoriesModule,
     ChannelModule,

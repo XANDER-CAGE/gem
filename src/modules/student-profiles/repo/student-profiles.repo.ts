@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { ICreateStudentProfile, IFindAllStudentProfile, IUpdateStudentProfile } from '../interface/student-profile.intefrace';
 
 @Injectable()
 export class StudentProfilesRepo {
@@ -8,53 +10,61 @@ export class StudentProfilesRepo {
 
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
-  async list() {
-    try {
-      return await this.knex(this.table).select('*');
-    } catch (error) {
-      throw new Error(`Error retrieving student profile: ${error.message}`);
-    }
+  async findAll(
+    dto: PaginationDto,
+    knex = this.knex,
+  ): Promise<IFindAllStudentProfile> {
+    const { limit = 10, page = 1 } = dto;
+    const innerQuery = knex(this.table)
+      .select('*')
+      .where('deleted_at', null)
+      .limit(limit)
+      .offset((page - 1) * limit)
+      .as('c');
+    const [{ total, data }] = await knex
+      .select([
+        knex.raw(
+          '(SELECT COUNT(id) FROM ?? WHERE deleted_at is null) AS total',
+          this.table,
+        ),
+        knex.raw('jsonb_agg(c.*) AS data'),
+      ])
+      .from(innerQuery);
+
+    return { total: +total, data };
   }
 
-  async findOne(id: string) {
-    try {
-      return await this.knex(this.table).where('id', id).first();
-    } catch (error) {
-      throw new Error(
-        `Error retrieving course with id ${id}: ${error.message}`,
-      );
-    }
+  async findOne(id: string, knex = this.knex) {
+    return await knex
+      .select('*')
+      .from(this.table)
+      .where('id', id)
+      .andWhere('deleted_at', null)
+      .first();
+  }
+  async create(data: ICreateStudentProfile, knex = this.knex) {
+    return await knex(this.table).insert(data).returning('*');
   }
 
-  async create(data: any) {
-    try {
-      const [newStudentsProfile] = await this.knex(this.table)
-        .insert(data)
-        .returning('*');
-      return newStudentsProfile;
-    } catch (error) {
-      throw new Error(`Error creating student profile: ${error.message}`);
-    }
+  async update(id: string, data: IUpdateStudentProfile, knex = this.knex) {
+    const [updateStudent] = await knex(this.table)
+      .update({
+        ...data,
+        updated_at: new Date(),
+      })
+      .where('id', id)
+      .andWhere('deleted_at', null)
+      .returning('*');
+    return updateStudent;
   }
 
-  async update(id: string, data: any) {
-    try {
-      const [updatedCourse] = await this.knex(this.table)
-        .where('id', id)
-        .update(data)
-        .returning('*');
-      return updatedCourse;
-    } catch (error) {
-      throw new Error(`Error updating student profile with id ${id}: ${error.message}`);
-    }
-  }
-
-  async deleteOne(id: string) {
-    try {
-      await this.knex(this.table).where('id', id).del();
-      return { message: `Student profile with id ${id} deleted successfully` };
-    } catch (error) {
-      throw new Error(`Error deleting student profile with id ${id}: ${error.message}`);
-    }
+  async deleteOne(id: string, knex = this.knex) {
+    await knex(this.table)
+      .update({
+        deleted_at: new Date(),
+        updated_at: new Date(),
+      })
+      .where('id', id)
+      .andWhere('deleted_at', null);
   }
 }
