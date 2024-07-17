@@ -1,20 +1,19 @@
-import { Injectable } from '@nestjs/common';
-import { Knex } from 'knex';
-import { InjectConnection } from 'nest-knexjs';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { ICreateStreak, IFindAllStreaks } from '../intefrace';
-import { IUpdateLevel } from 'src/modules/level/interface/level.intefrace';
+import { Injectable } from "@nestjs/common";
+import { Knex } from "knex";
+import { InjectConnection } from "nest-knexjs";
+import { PaginationDto } from "src/common/dto/pagination.dto";
+import { ICreateLevel, IFindAllLevel, IUpdateLevel } from "../interface/level.intefrace";
 
 @Injectable()
-export class FullStreaksRepo {
-  private table = 'streaks';
+export class LevelRepo {
+  private table = 'markets';
 
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
   async findAll(
     dto: PaginationDto,
     knex = this.knex,
-  ): Promise<IFindAllStreaks> {
+  ): Promise<IFindAllLevel> {
     const { limit = 10, page = 1 } = dto;
     const innerQuery = knex(this.table)
       .select('*')
@@ -45,9 +44,9 @@ export class FullStreaksRepo {
   }
 
   async create(
-    data: ICreateStreak,
+    data: ICreateLevel,
     knex = this.knex,
-  ): Promise<ICreateStreak> {
+  ): Promise<ICreateLevel> {
     const [res] = await knex(this.table).insert(data).returning('*');
     return res;
   }
