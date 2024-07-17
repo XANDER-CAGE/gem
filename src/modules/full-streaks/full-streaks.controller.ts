@@ -1,22 +1,20 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
-import { StreaksService } from './streaks.service';
-import { CreateStreakDto, UpdateStreakDto } from './dto/streaks.dto';
-import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { FullStreaksService } from './full-streaks.service';
+import { ApiBody, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 import { CoreApiResponse } from 'src/common/util/core-api-response.util';
+import { CreateFullStreakDto, UpdateFullStreakDto } from './dto/full-streaks.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 
-
-@ApiTags('Streaks')
-@Controller('streaks')
-export class StreaksController {
-  constructor(private readonly streaksService: StreaksService) {}
+@Controller('full-streaks')
+export class FullStreaksController {
+  constructor(private readonly fullStreakService: FullStreaksService) {}
 
   @ApiOperation({ summary: 'Create new one' })
   @Post('/create')
-  @ApiBody({ type: CreateStreakDto })
+  @ApiBody({ type: CreateFullStreakDto })
   @ApiOkResponse({ type: CoreApiResponse })
-  create(@Body() createStreak: CreateStreakDto): any {
-    const data = this.streaksService.create(createStreak);
+  create(@Body() createFullStreak: CreateFullStreakDto) {
+    const data = this.fullStreakService.create(createFullStreak);
     return CoreApiResponse.success(data);
   }
 
@@ -24,31 +22,28 @@ export class StreaksController {
   @Get('/list')
   @ApiOkResponse({ type: CoreApiResponse })
   findAll(@Query() dto: PaginationDto) {
-    return this.streaksService.findAll(dto);
+    return this.fullStreakService.findAll(dto);
   }
 
   @ApiOperation({ summary: 'Get one' })
   @Get(':id')
   @ApiOkResponse({ type: CoreApiResponse })
   findOne(@Param('id') id: string) {
-    return this.streaksService.findOne(id);
+    return this.fullStreakService.findOne(id);
   }
 
   @ApiOperation({ summary: 'Update one' })
   @Patch(':id')
-  @ApiBody({ type: UpdateStreakDto })
+  @ApiBody({ type: UpdateFullStreakDto })
   @ApiOkResponse({ type: CoreApiResponse })
-  update(
-    @Param('id') id: string,
-    @Body() updateStreak: UpdateStreakDto,
-  ) {
-    return this.streaksService.update(id, updateStreak);
+  update(@Param('id') id: string, @Body() updateMarketDto: UpdateFullStreakDto) {
+    return this.fullStreakService.update(id, updateMarketDto);
   }
 
   @ApiOperation({ summary: 'Delete one' })
   @Delete(':id')
   @ApiOkResponse({ type: CoreApiResponse })
   remove(@Param('id') id: string) {
-    return this.streaksService.remove(id);
+    return this.fullStreakService.remove(id);
   }
 }

@@ -11,6 +11,7 @@ import { MarketCategoriesModule } from './modules/market-categories/market-categ
 import { ChannelModule } from './modules/channel/channel.module';
 import { BadgeModule } from './modules/badge/badge.module';
 import { LevelModule } from './modules/level/level.module';
+import { FullStreaksModule } from './modules/full-streaks/full-streaks.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { LevelModule } from './modules/level/level.module';
     ChannelModule,
     BadgeModule,
     LevelModule,
+    FullStreaksModule,
   ],
 })
 export class AppModule {}
