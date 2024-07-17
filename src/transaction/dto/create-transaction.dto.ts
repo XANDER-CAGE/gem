@@ -1,35 +1,24 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import {
-  IsIn,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
   Length,
-  Validate,
 } from 'class-validator';
-import { transactionTypeValidator } from 'src/common/validator/transaction.validator';
 
-type transactionType = 'spending' | 'earning';
-
-export class CreateTransactionDto {
-  @ApiProperty()
+export class CreateSpendingDto {
+  @ApiProperty({ default: '507f1f77bcf86cd799439011' })
   @IsNotEmpty()
   @IsString()
   @Length(24)
   profile_id: string;
 
-  @ApiPropertyOptional()
-  @IsOptional()
+  @ApiProperty({ default: '507f1f77bcf86cd799439011' })
+  @IsNotEmpty()
   @IsString()
   @Length(24)
-  channel_id: string;
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsString()
-  @Length(24)
-  streak_id: string;
+  product_id: string;
 
   @ApiProperty()
   @IsNumber()
@@ -40,10 +29,21 @@ export class CreateTransactionDto {
   @IsNumber()
   @IsOptional()
   count: number;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  @IsIn(['spending', 'earning'])
-  @Validate(transactionTypeValidator, ['count', 'channel_id', 'streak_id'])
-  type: transactionType;
 }
+
+export class CreateEarningDto {
+  @ApiProperty({ default: '507f1f77bcf86cd799439011' })
+  @IsNotEmpty()
+  @IsString()
+  @Length(24)
+  profile_id: string;
+
+  @ApiPropertyOptional({ default: '507f1f77bcf86cd799439011' })
+  @IsNotEmpty()
+  @IsString()
+  @Length(24)
+  channel_id: string;
+}
+
+export class UpdateSpendingDto extends PartialType(CreateSpendingDto) {}
+export class UpdateEarningDto extends PartialType(CreateEarningDto) {}

@@ -6,5 +6,5 @@ export class IdDto {
   @IsNotEmpty()
   @MinLength(1)
   @MaxLength(255)
-  id?: string;
+  id: string;
 }
