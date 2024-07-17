@@ -2,14 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { ICreateFullStreak, IFindAllFullStreak, IUpdateFullStreak } from '../intefrace';
+import { ICreateFullStreak, IFindAllFullStreak, IUpdateFullStreak } from '../interface/full-streak.interface';
 
 @Injectable()
-export class FullStreaksRepo {
+export class FullStreakRepo {
   private table = 'full_streaks';
-
   constructor(@InjectConnection() private readonly knex: Knex) {}
-
   async findAll(
     dto: PaginationDto,
     knex = this.knex,
@@ -43,7 +41,10 @@ export class FullStreaksRepo {
       .first();
   }
 
-  async create(data: ICreateFullStreak, knex = this.knex): Promise<ICreateFullStreak> {
+  async create(
+    data: ICreateFullStreak,
+    knex = this.knex,
+  ): Promise<ICreateFullStreak> {
     const [res] = await knex(this.table).insert(data).returning('*');
     return res;
   }

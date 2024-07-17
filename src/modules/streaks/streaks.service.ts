@@ -1,25 +1,43 @@
-import { Injectable } from '@nestjs/common';
-import { CreateStreakDto, UpdateStreakDto } from './dto/streaks.dto';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { StreaksRepo } from './repo/streaks.repo';
+import { ChannelService } from '../channel/channel.service';
+import { ICreateStreak, IUpdateStreak } from './intefrace/streaks.interface';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class StreaksService {
-  create(createStreakDto: CreateStreakDto) {
-    return 'This action adds a new streak';
+  @Inject() private readonly streakRepo: StreaksRepo;
+  @Inject() private readonly chanelService: ChannelService;
+
+  async create(createStreak: ICreateStreak) {
+    const { channel_id } = createStreak;
+    const chanelExist = await this.streakRepo.findOne(channel_id);
+    if (!chanelExist) {
+      throw new NotFoundException('This badge does not exist');
+    }
+
+    return this.streakRepo.create(createStreak);
   }
 
-  findAll() {
-    return `This action returns all streaks`;
+  findAll(findAllMarketsDto: PaginationDto) {
+    return this.streakRepo.findAll(findAllMarketsDto);
   }
 
   findOne(id: string) {
-    return `This action returns a #${id} streak`;
+    return this.streakRepo.findOne(id);
   }
 
-  update(id: number, updateStreakDto: UpdateStreakDto) {
-    return `This action updates a #${id} streak`;
+  async update(id: string, updateStreak: IUpdateStreak) {
+    const { channel_id } = updateStreak;
+    const chanelExist = await this.chanelService.findOne(channel_id);
+    if (!chanelExist) {
+      throw new NotFoundException('This chanel does not exist');
+    }
+
+    return this.streakRepo.update(id, updateStreak);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} streak`;
+  remove(id: string) {
+    return this.streakRepo.deleteOne(id);
   }
 }
