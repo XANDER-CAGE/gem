@@ -17,11 +17,11 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 import {
   CoreApiResponse,
-  SuccessRes,
+  ErrorApiResponse,
 } from 'src/common/util/core-api-response.util';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @ApiTags('Market')
 @Controller('market')
@@ -31,7 +31,8 @@ export class MarketController {
   @ApiOperation({ summary: 'Create new market' })
   @Post('/create')
   @ApiBody({ type: CreateMarketDto })
-  @ApiResponse({ type: SuccessRes })
+  @ApiResponse({ type: ErrorApiResponse, status: 500 })
+  @ApiResponse({})
   create(@Body() createMarketDto: CreateMarketDto) {
     const data = this.marketService.create(createMarketDto);
     return CoreApiResponse.success(data);

@@ -1,27 +1,26 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IdDto } from '../dto/id.dto';
 
-class PaginationRes {
-  @ApiProperty()
-  total_items: number;
-  @ApiProperty()
-  total_pages: number;
-  @ApiProperty()
-  current_page: number;
-  @ApiProperty()
-  limit: number;
-  @ApiProperty()
-  offset: number;
-}
-
-// class ErrorRes {
+// class PaginationRes {
 //   @ApiProperty()
-//   message: string | string[];
+//   total_items: number;
 //   @ApiProperty()
-//   error: string;
+//   total_pages: number;
 //   @ApiProperty()
-//   statusCode: number;
+//   current_page: number;
+//   @ApiProperty()
+//   limit: number;
+//   @ApiProperty()
+//   offset: number;
 // }
+
+class ErrorRes {
+  @ApiProperty()
+  message: string;
+  @ApiProperty()
+  error: string;
+  @ApiProperty()
+  statusCode: number;
+}
 
 interface IpaginationArg {
   total: number;
@@ -29,23 +28,19 @@ interface IpaginationArg {
   limit: number;
 }
 
-export class CoreApiResponse<T, E> {
-  @ApiProperty()
-  readonly success: boolean;
+export class CoreApiResponse {
   @ApiProperty({ example: '17.07.2024, 18:06:33' })
   readonly timestamp: string;
-  @ApiProperty()
-  readonly error: E;
-  @ApiProperty({ type: PaginationRes })
-  readonly pagination: PaginationRes;
-  @ApiProperty()
-  readonly data: T;
+  readonly success: boolean;
+  readonly error: any;
+  readonly data: any;
+  readonly pagination: any;
 
   constructor(
     success: boolean,
-    data?: T,
+    data?: any,
     pagination?: IpaginationArg,
-    error?: E,
+    error?: any,
   ) {
     this.success = success;
     this.data = data || null;
@@ -56,14 +51,11 @@ export class CoreApiResponse<T, E> {
     this.pagination = pagination ? this.paginate(pagination) : null;
   }
 
-  public static success<TData>(
-    data: TData,
-    pagination?: IpaginationArg,
-  ): CoreApiResponse<TData, null> {
+  public static success(data: any, pagination?: IpaginationArg) {
     return new CoreApiResponse(true, data, pagination, null);
   }
 
-  public static error<E>(error?: any): CoreApiResponse<null, E> {
+  public static error(error?: any) {
     return new CoreApiResponse(false, null, null, error);
   }
 
@@ -79,7 +71,16 @@ export class CoreApiResponse<T, E> {
   }
 }
 
-export class SuccessRes extends CoreApiResponse<IdDto, null> {
-  @ApiProperty({ type: IdDto })
-  data: IdDto;
+export class ErrorApiResponse extends CoreApiResponse {
+  @ApiProperty({ example: false })
+  success: boolean;
+
+  @ApiProperty({ type: Object, example: null })
+  data: null;
+
+  @ApiProperty({ type: Object, example: null })
+  pagination: null;
+
+  @ApiProperty({ type: ErrorRes })
+  error: ErrorRes;
 }
