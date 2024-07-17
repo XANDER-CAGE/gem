@@ -1,10 +1,27 @@
-interface IpaginationRes {
+import { ApiProperty } from '@nestjs/swagger';
+import { IdDto } from '../dto/id.dto';
+
+class PaginationRes {
+  @ApiProperty()
   total_items: number;
+  @ApiProperty()
   total_pages: number;
+  @ApiProperty()
   current_page: number;
+  @ApiProperty()
   limit: number;
+  @ApiProperty()
   offset: number;
 }
+
+// class ErrorRes {
+//   @ApiProperty()
+//   message: string | string[];
+//   @ApiProperty()
+//   error: string;
+//   @ApiProperty()
+//   statusCode: number;
+// }
 
 interface IpaginationArg {
   total: number;
@@ -12,18 +29,23 @@ interface IpaginationArg {
   limit: number;
 }
 
-export class CoreApiResponse<Data> {
+export class CoreApiResponse<T, E> {
+  @ApiProperty()
   readonly success: boolean;
+  @ApiProperty({ example: '17.07.2024, 18:06:33' })
   readonly timestamp: string;
-  readonly data: Data | null;
-  readonly error: any;
-  readonly pagination: IpaginationRes;
+  @ApiProperty()
+  readonly error: E;
+  @ApiProperty({ type: PaginationRes })
+  readonly pagination: PaginationRes;
+  @ApiProperty()
+  readonly data: T;
 
-  private constructor(
+  constructor(
     success: boolean,
-    data?: Data,
+    data?: T,
     pagination?: IpaginationArg,
-    error?: any,
+    error?: E,
   ) {
     this.success = success;
     this.data = data || null;
@@ -37,11 +59,11 @@ export class CoreApiResponse<Data> {
   public static success<TData>(
     data: TData,
     pagination?: IpaginationArg,
-  ): CoreApiResponse<TData> {
+  ): CoreApiResponse<TData, null> {
     return new CoreApiResponse(true, data, pagination, null);
   }
 
-  public static error<TData>(error?: any): CoreApiResponse<TData> {
+  public static error<E>(error?: any): CoreApiResponse<null, E> {
     return new CoreApiResponse(false, null, null, error);
   }
 
@@ -55,4 +77,9 @@ export class CoreApiResponse<Data> {
       offset: (page - 1) * limit,
     };
   }
+}
+
+export class SuccessRes extends CoreApiResponse<IdDto, null> {
+  @ApiProperty({ type: IdDto })
+  data: IdDto;
 }
