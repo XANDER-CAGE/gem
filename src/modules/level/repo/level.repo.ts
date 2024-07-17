@@ -1,8 +1,12 @@
-import { Injectable } from "@nestjs/common";
-import { Knex } from "knex";
-import { InjectConnection } from "nest-knexjs";
-import { PaginationDto } from "src/common/dto/pagination.dto";
-import { ICreateLevel, IFindAllLevel, IUpdateLevel } from "../interface/level.intefrace";
+import { Injectable } from '@nestjs/common';
+import { Knex } from 'knex';
+import { InjectConnection } from 'nest-knexjs';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
+import {
+  ICreateLevel,
+  IFindAllLevel,
+  IUpdateLevel,
+} from '../entity/level.intefrace';
 
 @Injectable()
 export class LevelRepo {
@@ -10,10 +14,7 @@ export class LevelRepo {
 
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
-  async findAll(
-    dto: PaginationDto,
-    knex = this.knex,
-  ): Promise<IFindAllLevel> {
+  async findAll(dto: PaginationDto, knex = this.knex): Promise<IFindAllLevel> {
     const { limit = 10, page = 1 } = dto;
     const innerQuery = knex(this.table)
       .select('*')
@@ -43,10 +44,7 @@ export class LevelRepo {
       .first();
   }
 
-  async create(
-    data: ICreateLevel,
-    knex = this.knex,
-  ): Promise<ICreateLevel> {
+  async create(data: ICreateLevel, knex = this.knex): Promise<ICreateLevel> {
     const [res] = await knex(this.table).insert(data).returning('*');
     return res;
   }

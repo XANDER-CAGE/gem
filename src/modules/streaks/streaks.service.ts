@@ -1,7 +1,7 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { StreaksRepo } from './repo/streaks.repo';
 import { ChannelService } from '../channel/channel.service';
-import { ICreateStreak, IUpdateStreak } from './intefrace/streaks.interface';
+import { ICreateStreak, IUpdateStreak } from './entity/streaks.interface';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()

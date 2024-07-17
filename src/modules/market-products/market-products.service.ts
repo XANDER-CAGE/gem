@@ -2,7 +2,7 @@ import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto, UpdateProductDto } from './dto/market-products.dto';
 import { ProductRepo } from './repo/market-products.repo';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { IFindAllProduct } from './interface/product.interface';
+import { IFindAllProduct } from './entity/product.interface';
 import { MarketCategoriesService } from '../market-categories/market-categories.service';
 import { MarketService } from '../market/market.service';
 

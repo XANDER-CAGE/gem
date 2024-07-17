@@ -1,5 +1,5 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { ICreateLevel, IUpdateLevel } from './interface/level.intefrace';
+import { ICreateLevel, IUpdateLevel } from './entity/level.intefrace';
 import { BadgeService } from '../badge/badge.service';
 import { LevelRepo } from './repo/level.repo';
 import { PaginationDto } from 'src/common/dto/pagination.dto';

@@ -1,7 +1,7 @@
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
 import { CreateChannelDto, UpdateChannelDto } from '../dto/channel.dto';
-import { IChannel, IFindAllChannel } from '../interface/channel.interface';
+import { IChannel, IFindAllChannel } from '../entity/channel.interface';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 export class ChannelRepo {

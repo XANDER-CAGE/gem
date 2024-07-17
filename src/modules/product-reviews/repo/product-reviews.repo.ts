@@ -2,7 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { ICreateProductReview, IFindAllProductReview, IUpdateProductReview } from '../interface/product-reviews.interface';
+import {
+  ICreateProductReview,
+  IFindAllProductReview,
+  IUpdateProductReview,
+} from '../entity/product-reviews.interface';
 
 @Injectable()
 export class ProductReviewsRepo {
