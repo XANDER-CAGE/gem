@@ -9,5 +9,6 @@ import { StreaksModule } from '../streaks/streaks.module';
   imports: [LevelModule, StreaksModule],
   controllers: [StudentProfilesController],
   providers: [StudentProfilesService, StudentProfilesRepo],
+  exports: [StudentProfilesService],
 })
 export class StudentProfilesModule {}

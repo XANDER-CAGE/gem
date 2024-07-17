@@ -3,7 +3,6 @@ import { MarketCategoriesService } from './market-categories.service';
 import { CreateMarketCategoryDto, UpdateMarketCategoryDto } from './dto/market-categories.dto';
 import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CoreApiResponse } from 'src/common/util/core-api-response.util';
-import { CreateMarketDto } from '../market/dto/market.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @ApiTags('Market-Categories')
@@ -17,7 +16,7 @@ export class MarketCategoriesController {
   @Post('/create')
   @ApiBody({ type: CreateMarketCategoryDto })
   @ApiOkResponse({ type: CoreApiResponse })
-  create(@Body() createMarketCategoriesDto: CreateMarketDto): any {
+  create(@Body() createMarketCategoriesDto: CreateMarketCategoryDto): any {
     const data = this.marketCategoryService.create(createMarketCategoriesDto);
     return CoreApiResponse.success(data);
   }

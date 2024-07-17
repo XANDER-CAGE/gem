@@ -1,7 +1,6 @@
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import {
   IsNotEmpty,
-  IsNumber,
   IsObject,
   IsOptional,
   IsString,
@@ -26,11 +25,6 @@ export class CreateBadgeDto {
   @IsString()
   @IsOptional()
   description?: string;
-
-  @ApiPropertyOptional()
-  @IsNumber()
-  @IsOptional()
-  course_level?: number;
 
   // @ApiPropertyOptional()
   // @IsString()
