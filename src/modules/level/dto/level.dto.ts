@@ -1,8 +1,8 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import {
-  IsDecimal,
   IsInt,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
   MaxLength,
@@ -41,7 +41,7 @@ export class CreateLevelDto {
 
   @ApiProperty({ example: 100 })
   @IsNotEmpty()
-  @IsDecimal({ decimal_digits: '2' })
+  @IsNumber({ maxDecimalPlaces: 2 })
   free_gem: number;
 }
 

@@ -6,21 +6,23 @@ import {
   IUpdateProductReview,
 } from './interface/product-reviews.interface';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-// import { StudentsService } from '../students/students.service';
-import { MarketService } from '../market/market.service';
+import { ProductsService } from '../market-products/market-products.service';
+import { StudentProfilesService } from '../student-profiles/student-profiles.service';
 
 @Injectable()
 export class ProductReviewsService {
   @Inject() private readonly productReviewRepo: ProductReviewsRepo;
-  // @Inject() private readonly studentService: StudentsService;
-  @Inject() private readonly productService: MarketService;
+  @Inject() private readonly productService: ProductsService;
+  @Inject() private readonly profileService: StudentProfilesService;
 
   async create(dto: ICreateProductReview) {
-    const { product_id: productId } = dto;
-    // const student = await this.studentService.findOne(studentId);
+    const { product_id: productId, profile_id: profileId } = dto;
     const product = await this.productService.findOne(productId);
-    // if (!student) throw new NotFoundException('Student does not exist');
     if (!product) throw new NotFoundException('Product does not exist');
+
+    const profile = await this.profileService.findOne(profileId);
+    if (!profile) throw new NotFoundException('Profile does not exist');
+
     return this.productReviewRepo.create(dto);
   }
 
@@ -33,15 +35,13 @@ export class ProductReviewsService {
   }
 
   async update(id: string, dto: IUpdateProductReview) {
-    const { product_id: productId } = dto;
-    // if (studentId) {
-    // const student = await this.studentService.findOne(studentId);
-    // if (!student) throw new NotFoundException('Student does not exist');
-    // }
-    if (productId) {
-      const product = await this.productService.findOne(productId);
-      if (!product) throw new NotFoundException('Student does not exist');
-    }
+    const { product_id: productId, profile_id: profileId } = dto;
+    const product = await this.productService.findOne(productId);
+    if (!product) throw new NotFoundException('Product does not exist');
+
+    const profile = await this.profileService.findOne(profileId);
+    if (!profile) throw new NotFoundException('Profile does not exist');
+
     return this.productReviewRepo.update(id, dto);
   }
 

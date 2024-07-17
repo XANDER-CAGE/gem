@@ -3,11 +3,11 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  IsDecimal,
   IsInt,
   MinLength,
   MaxLength,
   IsObject,
+  IsNumber,
 } from 'class-validator';
 
 export class CreateProductDto {
@@ -43,9 +43,9 @@ export class CreateProductDto {
   @IsString()
   type: string;
 
-  @ApiProperty({ example: 99.99 })
+  @ApiProperty({ example: 99 })
   @IsNotEmpty()
-  @IsDecimal({ decimal_digits: '2' })
+  @IsNumber()
   price: number;
 
   @ApiProperty({ example: 100 })

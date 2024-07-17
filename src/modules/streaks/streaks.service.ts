@@ -11,9 +11,9 @@ export class StreaksService {
 
   async create(createStreak: ICreateStreak) {
     const { channel_id } = createStreak;
-    const chanelExist = await this.streakRepo.findOne(channel_id);
+    const chanelExist = await this.chanelService.findOne(channel_id);
     if (!chanelExist) {
-      throw new NotFoundException('This badge does not exist');
+      throw new NotFoundException('This chanel does not exist');
     }
 
     return this.streakRepo.create(createStreak);

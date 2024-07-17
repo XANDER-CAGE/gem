@@ -3,10 +3,10 @@ import {
   IsNotEmpty,
   IsString,
   IsInt,
-  IsDecimal,
   IsBoolean,
   MinLength,
   MaxLength,
+  IsNumber,
 } from 'class-validator';
 
 export class CreateStreakDto {
@@ -22,9 +22,9 @@ export class CreateStreakDto {
   @IsInt()
   streak_day: number;
 
-  @ApiProperty({ example: 10.0 })
+  @ApiProperty({ example: 10.00 })
   @IsNotEmpty()
-  @IsDecimal({ decimal_digits: '2' })
+  @IsNumber({ maxDecimalPlaces: 2 })
   streak_reward: number;
 
   @ApiProperty({ example: true })

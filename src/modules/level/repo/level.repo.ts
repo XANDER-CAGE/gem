@@ -6,7 +6,7 @@ import { ICreateLevel, IFindAllLevel, IUpdateLevel } from "../interface/level.in
 
 @Injectable()
 export class LevelRepo {
-  private table = 'markets';
+  private table = 'level';
 
   constructor(@InjectConnection() private readonly knex: Knex) {}
 

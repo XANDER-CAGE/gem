@@ -3,11 +3,11 @@ import {
   IsNotEmpty,
   IsOptional,
   IsInt,
-  IsDecimal,
   IsJSON,
   IsString,
   MinLength,
   MaxLength,
+  IsNumber,
 } from 'class-validator';
 
 export class CreateStudentProfileDto {
@@ -51,7 +51,7 @@ export class CreateStudentProfileDto {
 
   @ApiProperty({ example: 100.0 })
   @IsNotEmpty()
-  @IsDecimal({ decimal_digits: '2' })
+  @IsNumber({ maxDecimalPlaces: 2 })
   gem: number;
 }
 
