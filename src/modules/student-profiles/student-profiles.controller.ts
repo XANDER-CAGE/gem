@@ -1,11 +1,9 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { StudentProfilesService } from './student-profiles.service';
 import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CreateStudentDto } from '../students/dto/create-student.dto';
 import { CoreApiResponse } from 'src/common/util/core-api-response.util';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { UpdateStudentDto } from '../students/dto/update-student.dto';
-import { CreateStudentProfileDto } from './dto/student-profile.dto';
+import { CreateStudentProfileDto, UpdateStudentProfileDto } from './dto/student-profile.dto';
 
 
 @ApiTags('Student-Profiles')
@@ -13,11 +11,11 @@ import { CreateStudentProfileDto } from './dto/student-profile.dto';
 export class StudentProfilesController {
   constructor(private readonly studentProfileService: StudentProfilesService) {}
 
-  @ApiOperation({ summary: 'Create new student' })
+  @ApiOperation({ summary: 'Create new one' })
   @Post('/create')
-  @ApiBody({ type: CreateStudentDto })
+  @ApiBody({ type: CreateStudentProfileDto })
   @ApiOkResponse({ type: CoreApiResponse })
-  create(@Body() createStudent: CreateStudentProfileDto): any {
+  create(@Body() createStudent: CreateStudentProfileDto) {
     const data = this.studentProfileService.create(createStudent);
     return CoreApiResponse.success(data);
   }
@@ -40,11 +38,11 @@ export class StudentProfilesController {
 
   @ApiOperation({ summary: 'Update one' })
   @Patch(':id')
-  @ApiBody({ type: UpdateStudentDto })
+  @ApiBody({ type: UpdateStudentProfileDto })
   @ApiOkResponse({ type: CoreApiResponse })
   update(
     @Param('id') id: string,
-    @Body() updateProductReview: UpdateStudentDto,
+    @Body() updateProductReview: UpdateStudentProfileDto,
   ) {
     return this.studentProfileService.update(id, updateProductReview);
   }

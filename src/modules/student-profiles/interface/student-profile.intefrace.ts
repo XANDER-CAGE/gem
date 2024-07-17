@@ -1,7 +1,12 @@
 export interface ICreateStudentProfile {
-  avatar?: Record<string, any>;
+  id?: string;
+  avatar?: string;
   level: number;
+  student_id?: string;
+  streak_id?: string;
+  level_id?: string;
   gem: number;
+  deleted_at?: Date;
   created_at?: Date;
   updated_at?: Date;
 }

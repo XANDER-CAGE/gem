@@ -8,5 +8,6 @@ import { ChannelRepo } from './repo/channel.repo';
   imports: [BadgeModule],
   controllers: [ChannelController],
   providers: [ChannelService, ChannelRepo],
+  exports: [ChannelService],
 })
 export class ChannelModule {}

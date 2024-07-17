@@ -13,7 +13,7 @@ export class CreateProductReviewDto {
   @IsNotEmpty()
   @MinLength(1)
   @MaxLength(24)
-  student_id: string;
+  profile_id: string;
 
   @ApiProperty({ default: '507f1f77bcf86cd799439011' })
   @IsNotEmpty()
@@ -30,14 +30,6 @@ export class CreateProductReviewDto {
   @IsNotEmpty()
   @IsInt()
   rate: number;
-
-  @ApiProperty({ example: new Date() })
-  @IsOptional()
-  created_at?: Date;
-
-  @ApiProperty({ example: new Date() })
-  @IsOptional()
-  updated_at?: Date;
 }
 
 export class UpdateProductReviewDto extends PartialType(

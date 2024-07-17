@@ -6,9 +6,7 @@ import {
   MinLength,
   MaxLength,
   IsNumber,
-  IsDate,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 
 export class CreateMarketDto {
   @ApiProperty({ example: 'Market Name' })
@@ -43,18 +41,6 @@ export class CreateMarketDto {
   @IsNotEmpty()
   @IsNumber({ maxDecimalPlaces: 2 })
   rating: number;
-
-  @ApiProperty({ example: new Date() })
-  @IsNotEmpty()
-  @IsDate()
-  @Type(() => Date) 
-  created_at: Date;
-
-  @ApiProperty({ example: new Date() })
-  @IsNotEmpty()
-  @IsDate()
-  @Type(() => Date)
-  updated_at: Date;
 }
 
 export class UpdateMarketDto extends PartialType(CreateMarketDto) {}

@@ -1,5 +1,5 @@
 export interface ICreateProductReview {
-  student_id: string;
+  profile_id: string;
   product_id: string;
   message?: string;
   rate: number;

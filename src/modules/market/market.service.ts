@@ -1,15 +1,16 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { MarketRepo } from './repo/market.repo';
-import { ICreateMarket, IUpdateMarket } from './interface/market.interface';
+import { IUpdateMarket } from './interface/market.interface';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { MarketCategoriesService } from '../market-categories/market-categories.service';
+import { CreateMarketDto } from './dto/market.dto';
 
 @Injectable()
 export class MarketService {
   @Inject() private readonly marketRepo: MarketRepo;
   @Inject() private readonly categoryService: MarketCategoriesService;
 
-  create(createMarketDto: ICreateMarket) {
+  create(createMarketDto: CreateMarketDto) {
     const { category_id } = createMarketDto;
     if (category_id) {
       const exist = this.categoryService.findOne(category_id);

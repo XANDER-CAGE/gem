@@ -1,7 +1,6 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import {
   IsNotEmpty,
-  IsOptional,
   IsString,
   IsInt,
   IsDecimal,
@@ -32,13 +31,5 @@ export class CreateStreakDto {
   @IsNotEmpty()
   @IsBoolean()
   is_last: boolean;
-
-  @ApiProperty({ example: new Date() })
-  @IsOptional()
-  created_at?: Date;
-
-  @ApiProperty({ example: new Date() })
-  @IsOptional()
-  updated_at?: Date;
 }
 export class UpdateStreakDto extends PartialType(CreateStreakDto) {}

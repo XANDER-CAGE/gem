@@ -3,9 +3,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  IsDate,
 } from 'class-validator';
-import { Type } from 'class-transformer';
 
 export class CreateMarketCategoryDto {
   @ApiProperty({ example: 'Category Name' })
@@ -27,18 +25,6 @@ export class CreateMarketCategoryDto {
   @IsOptional()
   @IsString()
   avatar?: string;
-
-  @ApiProperty({ example: new Date() })
-  @IsOptional()
-  @IsDate()
-  @Type(() => Date)
-  created_at?: Date;
-
-  @ApiProperty({ example: new Date() })
-  @IsOptional()
-  @IsDate()
-  @Type(() => Date)
-  updated_at?: Date;
 }
 
 export class UpdateMarketCategoryDto extends PartialType(
