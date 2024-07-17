@@ -10,6 +10,7 @@ import { ProductReviewsModule } from './modules/product-reviews/product-reviews.
 import { MarketCategoriesModule } from './modules/market-categories/market-categories.module';
 import { ChannelModule } from './modules/channel/channel.module';
 import { BadgeModule } from './modules/badge/badge.module';
+import { TransactionModule } from './transaction/transaction.module';
 import { LevelModule } from './modules/level/level.module';
 import { FullStreaksModule } from './modules/full-streaks/full-streaks.module';
 
@@ -27,6 +28,7 @@ import { FullStreaksModule } from './modules/full-streaks/full-streaks.module';
     MarketCategoriesModule,
     ChannelModule,
     BadgeModule,
+    TransactionModule,
     LevelModule,
     FullStreaksModule,
   ],
