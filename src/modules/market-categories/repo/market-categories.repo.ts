@@ -5,7 +5,7 @@ import {
   ICreateMarketCategory,
   IFindAllCategoriesMarkets,
   IUpdateMarketCategory,
-} from '../interface/market-categories.interface';
+} from '../entity/market-categories.interface';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()

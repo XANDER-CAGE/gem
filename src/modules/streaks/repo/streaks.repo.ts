@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { ICreateStreak, IFindAllStreaks } from '../intefrace/streaks.interface';
-import { IUpdateLevel } from 'src/modules/level/interface/level.intefrace';
+import { ICreateStreak, IFindAllStreaks } from '../entity/streaks.interface';
+import { IUpdateLevel } from 'src/modules/level/entity/level.intefrace';
 
 @Injectable()
 export class StreaksRepo {

@@ -1,8 +1,8 @@
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
-import { IBadge, IFindAllBadge } from '../interface/badge.interface';
 import { CreateBadgeDto, UpdateBadgeDto } from '../dto/badge.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { IBadge, IFindAllBadge } from '../entity/badge.entity';
 
 export class BadgeRepo {
   private readonly table = 'badges';

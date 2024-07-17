@@ -2,7 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { ICreateFullStreak, IFindAllFullStreak, IUpdateFullStreak } from '../interface/full-streak.interface';
+import {
+  ICreateFullStreak,
+  IFindAllFullStreak,
+  IUpdateFullStreak,
+} from '../entity/full-streak.interface';
 
 @Injectable()
 export class FullStreakRepo {

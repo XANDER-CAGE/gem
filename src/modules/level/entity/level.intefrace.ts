@@ -1,20 +1,18 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 
-export class ICreateStudentProfile {
+export class ICreateLevel {
   @ApiProperty()
   id?: string;
   @ApiProperty()
-  avatar?: string;
+  name: string;
   @ApiProperty()
   level: number;
   @ApiProperty()
-  student_id?: string;
+  reward_point: number;
   @ApiProperty()
-  streak_id?: string;
+  badge_id?: string;
   @ApiProperty()
-  level_id?: string;
-  @ApiProperty()
-  gem: number;
+  free_gem: number;
   @ApiProperty()
   deleted_at?: Date;
   @ApiProperty()
@@ -22,9 +20,9 @@ export class ICreateStudentProfile {
   @ApiProperty()
   updated_at?: Date;
 }
-export class IFindAllStudentProfile {
+export class IFindAllLevel {
   total: number;
-  data: ICreateStudentProfile[];
+  data: ICreateLevel[];
 }
 
-export class IUpdateStudentProfile extends PartialType(ICreateStudentProfile) {}
+export class IUpdateLevel extends PartialType(ICreateLevel) {}

@@ -2,7 +2,11 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { MarketCategoriesRepo } from './repo/market-categories.repo';
-import { ICreateMarketCategory, IFindAllCategoriesMarkets, IUpdateMarketCategory } from './interface/market-categories.interface';
+import {
+  ICreateMarketCategory,
+  IFindAllCategoriesMarkets,
+  IUpdateMarketCategory,
+} from './entity/market-categories.interface';
 
 @Injectable()
 export class MarketCategoriesService {
@@ -12,7 +16,9 @@ export class MarketCategoriesService {
     return this.marketCategoryRepo.create(createMarketDto);
   }
 
-  async findAll(findAllMarketCategoriesDto: PaginationDto): Promise<IFindAllCategoriesMarkets> {
+  async findAll(
+    findAllMarketCategoriesDto: PaginationDto,
+  ): Promise<IFindAllCategoriesMarkets> {
     return await this.marketCategoryRepo.findAll(findAllMarketCategoriesDto);
   }
 

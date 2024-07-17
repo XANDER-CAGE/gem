@@ -3,7 +3,7 @@ import { FullStreakRepo } from './repo/full-streak.repo';
 import {
   ICreateFullStreak,
   IUpdateFullStreak,
-} from './interface/full-streak.interface';
+} from './entity/full-streak.interface';
 import { BadgeService } from '../badge/badge.service';
 import { ChannelService } from '../channel/channel.service';
 import { PaginationDto } from 'src/common/dto/pagination.dto';

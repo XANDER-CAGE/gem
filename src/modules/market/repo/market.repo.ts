@@ -5,7 +5,7 @@ import {
   ICreateMarket,
   IFindAllMarkets,
   IUpdateMarket,
-} from '../interface/market.interface';
+} from '../entity/market.interface';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { CreateMarketDto } from '../dto/market.dto';
 

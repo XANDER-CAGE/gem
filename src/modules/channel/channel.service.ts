@@ -3,7 +3,7 @@ import { ChannelRepo } from './repo/channel.repo';
 import { BadgeService } from '../badge/badge.service';
 import { CreateChannelDto, UpdateChannelDto } from './dto/channel.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { IFindAllChannel } from './interface/channel.interface';
+import { IFindAllChannel } from './entity/channel.interface';
 
 @Injectable()
 export class ChannelService {

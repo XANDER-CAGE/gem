@@ -4,7 +4,7 @@ import {
   ICreateProductReview,
   IFindAllProductReview,
   IUpdateProductReview,
-} from './interface/product-reviews.interface';
+} from './entity/product-reviews.interface';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { ProductsService } from '../market-products/market-products.service';
 import { StudentProfilesService } from '../student-profiles/student-profiles.service';

@@ -1,6 +1,6 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { MarketRepo } from './repo/market.repo';
-import { IUpdateMarket } from './interface/market.interface';
+import { IUpdateMarket } from './entity/market.interface';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { MarketCategoriesService } from '../market-categories/market-categories.service';
 import { CreateMarketDto } from './dto/market.dto';

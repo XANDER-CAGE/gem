@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
 import { CreateProductDto, UpdateProductDto } from '../dto/market-products.dto';
-import { IFindAllProduct, IProduct } from '../interface/product.interface';
+import { IFindAllProduct, IProduct } from '../entity/product.interface';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()
