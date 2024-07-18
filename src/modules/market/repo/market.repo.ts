@@ -2,8 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { CreateMarketDto, UpdateMarketDto } from '../dto/market.dto';
 import { IFindAllMarkets } from '../interface/find_all.interface';
+import { CreateMarketDto } from '../dto/create-market.dto';
+import { UpdateMarketDto } from '../dto/update-market.dto';
 
 @Injectable()
 export class MarketRepo {

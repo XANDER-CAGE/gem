@@ -1,8 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { BadgeRepo } from './repo/badge.repo';
-import { CreateBadgeDto, UpdateBadgeDto } from './dto/badge.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { IFindAllBadge } from './entity/badge.entity';
+import { IFindAllBadge } from './interface/find_all.interface';
+import { CreateBadgeDto } from './dto/create-badge.dto';
+import { UpdateBadgeDto } from './dto/update-badge.dto';
 
 @Injectable()
 export class BadgeService {
