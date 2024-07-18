@@ -1,12 +1,12 @@
 import {
-  ExceptionFilter,
   Catch,
   ArgumentsHost,
+  ExceptionFilter,
   HttpException,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { CoreApiResponse } from '../response-class/core-api.response';
 import { Response } from 'express';
-import { CoreApiResponse } from '../util/core-api-response.util';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {

@@ -10,11 +10,8 @@ import {
 } from '@nestjs/common';
 import { FullStreaksService } from './full-streaks.service';
 import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CoreApiResponse } from 'src/common/util/core-api-response.util';
-import {
-  CreateFullStreakDto,
-  UpdateFullStreakDto,
-} from './dto/full-streaks.dto';
+import { CoreApiResponse } from 'src/common/response-class/core-api.response';
+import { CreateFullStreakDto, UpdateFullStreakDto } from './dto/full-streaks.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @ApiTags('Full-Streak')

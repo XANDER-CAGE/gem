@@ -11,7 +11,7 @@ import {
 import { ChannelService } from './channel.service';
 import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateChannelDto, UpdateChannelDto } from './dto/channel.dto';
-import { CoreApiResponse } from 'src/common/util/core-api-response.util';
+import { CoreApiResponse } from 'src/common/response-class/core-api.response';
 import { IdDto } from 'src/common/dto/id.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 

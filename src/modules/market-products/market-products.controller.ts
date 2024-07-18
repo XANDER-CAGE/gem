@@ -11,7 +11,7 @@ import {
 import { CreateProductDto, UpdateProductDto } from './dto/market-products.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { ProductsService } from './market-products.service';
-import { CoreApiResponse } from 'src/common/util/core-api-response.util';
+import { CoreApiResponse } from 'src/common/response-class/core-api.response';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { IdDto } from 'src/common/dto/id.dto';
 
