@@ -1,10 +1,4 @@
-interface IpaginationRes {
-  total_items: number;
-  total_pages: number;
-  current_page: number;
-  limit: number;
-  offset: number;
-}
+import { ApiProperty } from '@nestjs/swagger';
 
 interface IpaginationArg {
   total: number;
@@ -12,16 +6,23 @@ interface IpaginationArg {
   limit: number;
 }
 
-export class CoreApiResponse<Data> {
-  readonly success: boolean;
+export class CoreApiResponse {
+  @ApiProperty({ example: '17.07.2024, 18:06:33' })
   readonly timestamp: string;
-  readonly data: Data | null;
-  readonly error: any;
-  readonly pagination: IpaginationRes;
 
-  private constructor(
+  @ApiProperty()
+  readonly success: boolean;
+
+  @ApiProperty({ type: Object, example: null })
+  readonly error: any;
+
+  @ApiProperty({ type: Object, example: null })
+  readonly pagination: any;
+  readonly data: any;
+
+  constructor(
     success: boolean,
-    data?: Data,
+    data?: any,
     pagination?: IpaginationArg,
     error?: any,
   ) {
@@ -34,14 +35,11 @@ export class CoreApiResponse<Data> {
     this.pagination = pagination ? this.paginate(pagination) : null;
   }
 
-  public static success<TData>(
-    data: TData,
-    pagination?: IpaginationArg,
-  ): CoreApiResponse<TData> {
+  public static success(data: any, pagination?: IpaginationArg) {
     return new CoreApiResponse(true, data, pagination, null);
   }
 
-  public static error<TData>(error?: any): CoreApiResponse<TData> {
+  public static error(error?: any) {
     return new CoreApiResponse(false, null, null, error);
   }
 

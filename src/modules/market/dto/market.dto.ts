@@ -24,13 +24,13 @@ export class CreateMarketDto {
   @ApiProperty({ example: '{}' })
   @IsOptional()
   @IsJSON()
-  background: string; 
+  background: string;
 
   @ApiProperty({ example: '{}' })
   @IsOptional()
   @IsJSON()
   avatar: string;
-  
+
   @ApiProperty({ default: '507f1f77bcf86cd799439011' })
   @IsOptional()
   @MinLength(1)

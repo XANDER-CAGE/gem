@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestj
 import { StreaksService } from './streaks.service';
 import { CreateStreakDto, UpdateStreakDto } from './dto/streaks.dto';
 import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CoreApiResponse } from 'src/common/util/core-api-response.util';
+import { CoreApiResponse } from 'src/common/response-class/core-api.response';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 

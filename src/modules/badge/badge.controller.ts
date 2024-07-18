@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { BadgeService } from './badge.service';
 import { CreateBadgeDto, UpdateBadgeDto } from './dto/badge.dto';
-import { CoreApiResponse } from 'src/common/util/core-api-response.util';
+import { CoreApiResponse } from 'src/common/response-class/core-api.response';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { IdDto } from 'src/common/dto/id.dto';
 import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
