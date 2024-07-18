@@ -1,6 +1,6 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
-export class IBadge {
+export class BadgeEntity {
   @ApiProperty()
   id: string;
   @ApiProperty()
@@ -13,9 +13,4 @@ export class IBadge {
   created_at: Date;
   @ApiProperty()
   updated_at: Date;
-}
-
-export class IFindAllBadge {
-  total: number;
-  data: IBadge[];
 }

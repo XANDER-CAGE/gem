@@ -1,14 +1,16 @@
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
-import { CreateBadgeDto, UpdateBadgeDto } from '../dto/badge.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { IBadge, IFindAllBadge } from '../entity/badge.entity';
+import { BadgeEntity } from '../entity/badge.entity';
+import { IFindAllBadge } from '../interface/find_all.interface';
+import { CreateBadgeDto } from '../dto/create-badge.dto';
+import { UpdateBadgeDto } from '../dto/update-badge.dto';
 
 export class BadgeRepo {
   private readonly table = 'badges';
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
-  async create(dto: CreateBadgeDto, knex = this.knex): Promise<IBadge> {
+  async create(dto: CreateBadgeDto, knex = this.knex): Promise<BadgeEntity> {
     const [data] = await knex
       .insert({
         ...dto,
@@ -38,7 +40,7 @@ export class BadgeRepo {
     return { total: +total, data };
   }
 
-  async findOne(id: string, knex = this.knex): Promise<IBadge> {
+  async findOne(id: string, knex = this.knex): Promise<BadgeEntity> {
     return await knex
       .select('*')
       .from(this.table)
@@ -51,7 +53,7 @@ export class BadgeRepo {
     id: string,
     dto: UpdateBadgeDto,
     knex = this.knex,
-  ): Promise<IBadge> {
+  ): Promise<BadgeEntity> {
     const [data] = await knex(this.table)
       .update({
         ...dto,

@@ -1,10 +1,5 @@
-import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
-import {
-  IsNotEmpty,
-  IsObject,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator';
 
 export class CreateBadgeDto {
   @ApiProperty({
@@ -31,4 +26,3 @@ export class CreateBadgeDto {
   // @IsOptional()
   // course_id?: string;
 }
-export class UpdateBadgeDto extends PartialType(CreateBadgeDto) {}

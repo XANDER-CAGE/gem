@@ -9,14 +9,15 @@ import {
   Query,
 } from '@nestjs/common';
 import { MarketService } from './market.service';
-import { CreateMarketDto, UpdateMarketDto } from './dto/market.dto';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { CoreApiResponse } from 'src/common/response-class/core-api.response';
-import { ErrorApiResponse } from 'src/common/response-class/errror.response';
+import { ErrorApiResponse } from 'src/common/response-class/error.response';
 import { CreateMarketResponse } from './response/create-market.response';
-import { ListMarketRes } from './response/list-market.response';
+import { ListMarketResponse } from './response/list-market.response';
 import { DeleteApiResponse } from 'src/common/response-class/all-null.response';
+import { CreateMarketDto } from './dto/create-market.dto';
+import { UpdateMarketDto } from './dto/update-market.dto';
 
 @ApiTags('Market')
 @Controller('market')
@@ -36,17 +37,19 @@ export class MarketController {
   @ApiOperation({ summary: 'Find all' })
   @Get('/list')
   @ApiResponse({ type: ErrorApiResponse, status: 500 })
-  @ApiResponse({ type: ListMarketRes, status: 200 })
-  findAll(@Query() dto: PaginationDto) {
-    return this.marketService.findAll(dto);
+  @ApiResponse({ type: ListMarketResponse, status: 200 })
+  async findAll(@Query() dto: PaginationDto) {
+    const data = await this.marketService.findAll(dto);
+    return CoreApiResponse.success(data);
   }
 
   @ApiOperation({ summary: 'Get one' })
   @Get(':id')
   @ApiResponse({ type: ErrorApiResponse, status: 500 })
   @ApiResponse({ type: CreateMarketResponse, status: 200 })
-  findOne(@Param('id') id: string) {
-    return this.marketService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    const data = await this.marketService.findOne(id);
+    return CoreApiResponse.success(data);
   }
 
   @ApiOperation({ summary: 'Update one' })
@@ -54,15 +57,20 @@ export class MarketController {
   @ApiBody({ type: UpdateMarketDto })
   @ApiResponse({ type: ErrorApiResponse, status: 500 })
   @ApiResponse({ type: CreateMarketResponse, status: 200 })
-  update(@Param('id') id: string, @Body() updateMarketDto: UpdateMarketDto) {
-    return this.marketService.update(id, updateMarketDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updateMarketDto: UpdateMarketDto,
+  ) {
+    const data = await this.marketService.update(id, updateMarketDto);
+    return CoreApiResponse.success(data);
   }
 
   @ApiOperation({ summary: 'Delete one' })
   @Delete(':id')
   @ApiResponse({ type: ErrorApiResponse, status: 500 })
   @ApiResponse({ type: DeleteApiResponse, status: 200 })
-  remove(@Param('id') id: string) {
-    return this.marketService.remove(id);
+  async remove(@Param('id') id: string) {
+    const data = await this.marketService.remove(id);
+    return CoreApiResponse.success(data);
   }
 }

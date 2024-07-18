@@ -1,4 +1,4 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsOptional,
@@ -42,5 +42,3 @@ export class CreateMarketDto {
   @IsNumber({ maxDecimalPlaces: 2 })
   rating: number;
 }
-
-export class UpdateMarketDto extends PartialType(CreateMarketDto) {}
