@@ -23,37 +23,45 @@ export class MarketController {
   @Post('/create')
   @ApiBody({ type: CreateMarketDto })
   @ApiOkResponse({ type: CoreApiResponse })
-  create(@Body() createMarketDto: CreateMarketDto) {
-    const data = this.marketService.create(createMarketDto);
+  async create(@Body() createMarketDto: CreateMarketDto) {
+    const data = await this.marketService.create(createMarketDto);
     return CoreApiResponse.success(data);
   }
 
   @ApiOperation({ summary: 'Find all' })
   @Get('/list')
   @ApiOkResponse({ type: CoreApiResponse })
-  findAll(@Query() dto: PaginationDto) {
-    return this.marketService.findAll(dto);
+  async indAll(@Query() dto: PaginationDto) {
+    const { total, data } = await this.marketService.findAll(dto);
+    const pagination = { total, limit: dto.limit, page: dto.page };
+    return CoreApiResponse.success(data, pagination);
   }
 
   @ApiOperation({ summary: 'Get one' })
   @Get(':id')
   @ApiOkResponse({ type: CoreApiResponse })
-  findOne(@Param('id') id: string) {
-    return this.marketService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    const data = await this.marketService.findOne(id);
+    return CoreApiResponse.success(data);
   }
 
   @ApiOperation({ summary: 'Update one' })
   @Patch(':id')
   @ApiBody({ type: UpdateMarketDto })
   @ApiOkResponse({ type: CoreApiResponse })
-  update(@Param('id') id: string, @Body() updateMarketDto: UpdateMarketDto) {
-    return this.marketService.update(id, updateMarketDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updateMarketDto: UpdateMarketDto,
+  ) {
+    const data = await this.marketService.update(id, updateMarketDto);
+    return CoreApiResponse.success(data);
   }
 
   @ApiOperation({ summary: 'Delete one' })
   @Delete(':id')
   @ApiOkResponse({ type: CoreApiResponse })
-  remove(@Param('id') id: string) {
-    return this.marketService.remove(id);
+  async remove(@Param('id') id: string) {
+    await this.marketService.remove(id);
+    return CoreApiResponse.success(null);
   }
 }
