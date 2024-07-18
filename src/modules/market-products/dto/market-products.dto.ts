@@ -11,13 +11,13 @@ import {
 } from 'class-validator';
 
 export class CreateProductDto {
-  @ApiProperty({ default: '507f1f77bcf86cd799439011' })
+  @ApiProperty({ example: '507f1f77bcf86cd799439011' })
   @IsNotEmpty()
   @MinLength(1)
   @MaxLength(24)
   market_id: string;
 
-  @ApiProperty({ default: '507f1f77bcf86cd799439011' })
+  @ApiProperty({ example: '507f1f77bcf86cd799439011' })
   @IsOptional()
   @MinLength(1)
   @MaxLength(24)

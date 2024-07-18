@@ -8,13 +8,13 @@ import {
 } from 'class-validator';
 
 export class CreateSpendingDto {
-  @ApiProperty({ default: '507f1f77bcf86cd799439011' })
+  @ApiProperty({ example: '507f1f77bcf86cd799439011' })
   @IsNotEmpty()
   @IsString()
   @Length(24)
   profile_id: string;
 
-  @ApiProperty({ default: '507f1f77bcf86cd799439011' })
+  @ApiProperty({ example: '507f1f77bcf86cd799439011' })
   @IsNotEmpty()
   @IsString()
   @Length(24)
@@ -32,13 +32,13 @@ export class CreateSpendingDto {
 }
 
 export class CreateEarningDto {
-  @ApiProperty({ default: '507f1f77bcf86cd799439011' })
+  @ApiProperty({ example: '507f1f77bcf86cd799439011' })
   @IsNotEmpty()
   @IsString()
   @Length(24)
   profile_id: string;
 
-  @ApiPropertyOptional({ default: '507f1f77bcf86cd799439011' })
+  @ApiPropertyOptional({ example: '507f1f77bcf86cd799439011' })
   @IsNotEmpty()
   @IsString()
   @Length(24)

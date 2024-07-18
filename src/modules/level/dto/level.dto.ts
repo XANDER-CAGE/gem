@@ -10,7 +10,7 @@ import {
 } from 'class-validator';
 
 export class CreateLevelDto {
-  @ApiProperty({ default: '507f1f77bcf86cd799439011' })
+  @ApiProperty({ example: '507f1f77bcf86cd799439011' })
   @IsOptional()
   @IsString()
   @MinLength(1)
@@ -32,7 +32,7 @@ export class CreateLevelDto {
   @IsInt()
   reward_point: number;
 
-  @ApiProperty({ default: '507f1f77bcf86cd799439012' })
+  @ApiProperty({ example: '507f1f77bcf86cd799439012' })
   @IsOptional()
   @IsString()
   @MinLength(1)

@@ -11,7 +11,7 @@ import {
 } from 'class-validator';
 
 export class CreateStudentProfileDto {
-  @ApiProperty({ default: '507f1f77bcf86cd799439011' })
+  @ApiProperty({ example: '507f1f77bcf86cd799439011' })
   @IsOptional()
   @IsString()
   @MinLength(1)
@@ -28,21 +28,21 @@ export class CreateStudentProfileDto {
   @IsInt()
   level: number;
 
-  @ApiProperty({ default: '507f1f77bcf86cd799439012' })
+  @ApiProperty({ example: '507f1f77bcf86cd799439012' })
   @IsOptional()
   @IsString()
   @MinLength(1)
   @MaxLength(24)
   student_id?: string;
 
-  @ApiProperty({ default: '507f1f77bcf86cd799439013' })
+  @ApiProperty({ example: '507f1f77bcf86cd799439013' })
   @IsOptional()
   @IsString()
   @MinLength(1)
   @MaxLength(24)
   streak_id?: string;
 
-  @ApiProperty({ default: '507f1f77bcf86cd799439014' })
+  @ApiProperty({ example: '507f1f77bcf86cd799439014' })
   @IsOptional()
   @IsString()
   @MinLength(1)
