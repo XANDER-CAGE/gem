@@ -3,14 +3,14 @@ import { Type } from 'class-transformer';
 import { IsNumber, IsOptional, Min } from 'class-validator';
 
 export class PaginationDto {
-  @ApiPropertyOptional({ default: 10 })
+  @ApiPropertyOptional({ example: 10 })
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
   @Min(1)
   limit: number;
 
-  @ApiPropertyOptional({ default: 1 })
+  @ApiPropertyOptional({ example: 1 })
   @IsOptional()
   @Type(() => Number)
   @IsNumber()

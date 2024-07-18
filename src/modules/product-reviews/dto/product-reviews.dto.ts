@@ -9,13 +9,13 @@ import {
 } from 'class-validator';
 
 export class CreateProductReviewDto {
-  @ApiProperty({ default: '507f1f77bcf86cd799439011' })
+  @ApiProperty({ example: '507f1f77bcf86cd799439011' })
   @IsNotEmpty()
   @MinLength(1)
   @MaxLength(24)
   profile_id: string;
 
-  @ApiProperty({ default: '507f1f77bcf86cd799439011' })
+  @ApiProperty({ example: '507f1f77bcf86cd799439011' })
   @IsNotEmpty()
   @MinLength(1)
   @MaxLength(24)

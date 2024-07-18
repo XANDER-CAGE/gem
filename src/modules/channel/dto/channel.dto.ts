@@ -9,27 +9,27 @@ import {
 } from 'class-validator';
 
 export class CreateChannelDto {
-  @ApiProperty({ default: 'Attendance' })
+  @ApiProperty({ example: 'Attendance' })
   @IsNotEmpty()
   @MinLength(1)
   @MaxLength(255)
   name: string;
 
   @ApiPropertyOptional({
-    default: 'Attendance is one of the ways where u can earn gem',
+    example: 'Attendance is one of the ways where u can earn gem',
   })
   @IsOptional()
   @MinLength(1)
   @MaxLength(255)
   description?: string;
 
-  @ApiProperty({ default: 10 })
+  @ApiProperty({ example: 10 })
   @IsNotEmpty()
   @IsNumber()
   @Min(0)
   reward_gem: number;
 
-  @ApiPropertyOptional({ default: '507f1f77bcf86cd799439011' })
+  @ApiPropertyOptional({ example: '507f1f77bcf86cd799439011' })
   @IsOptional()
   @MinLength(1)
   @MaxLength(255)

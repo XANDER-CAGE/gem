@@ -3,7 +3,7 @@ import { IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator';
 
 export class CreateBadgeDto {
   @ApiProperty({
-    default: {
+    example: {
       url: 'https://www.girlscoutshop.com/site/Product_Images/61225_main-01.default.jpg?resizeid=22&resizeh=1200&resizew=1200',
     },
   })
@@ -11,12 +11,12 @@ export class CreateBadgeDto {
   @IsObject()
   view: object;
 
-  @ApiProperty({ default: 'Conqueror' })
+  @ApiProperty({ example: 'Conqueror' })
   @IsNotEmpty()
   @IsString()
   name: string;
 
-  @ApiPropertyOptional({ default: 'Given when students conquer other faculty' })
+  @ApiPropertyOptional({ example: 'Given when students conquer other faculty' })
   @IsString()
   @IsOptional()
   description?: string;
