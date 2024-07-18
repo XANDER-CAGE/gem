@@ -1,27 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-// class PaginationRes {
-//   @ApiProperty()
-//   total_items: number;
-//   @ApiProperty()
-//   total_pages: number;
-//   @ApiProperty()
-//   current_page: number;
-//   @ApiProperty()
-//   limit: number;
-//   @ApiProperty()
-//   offset: number;
-// }
-
-class ErrorRes {
-  @ApiProperty()
-  message: string;
-  @ApiProperty()
-  error: string;
-  @ApiProperty()
-  statusCode: number;
-}
-
 interface IpaginationArg {
   total: number;
   page: number;
@@ -31,10 +9,16 @@ interface IpaginationArg {
 export class CoreApiResponse {
   @ApiProperty({ example: '17.07.2024, 18:06:33' })
   readonly timestamp: string;
+
+  @ApiProperty()
   readonly success: boolean;
+
+  @ApiProperty({ type: Object, example: null })
   readonly error: any;
-  readonly data: any;
+
+  @ApiProperty({ type: Object, example: null })
   readonly pagination: any;
+  readonly data: any;
 
   constructor(
     success: boolean,
@@ -69,18 +53,4 @@ export class CoreApiResponse {
       offset: (page - 1) * limit,
     };
   }
-}
-
-export class ErrorApiResponse extends CoreApiResponse {
-  @ApiProperty({ example: false })
-  success: boolean;
-
-  @ApiProperty({ type: Object, example: null })
-  data: null;
-
-  @ApiProperty({ type: Object, example: null })
-  pagination: null;
-
-  @ApiProperty({ type: ErrorRes })
-  error: ErrorRes;
 }

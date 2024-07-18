@@ -19,8 +19,8 @@ async function bootstrap() {
     SwaggerModule.setup('swagger', app, document);
     console.log(`Swagger -  ${api}/swagger`);
   }
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.useGlobalFilters(new HttpExceptionFilter());
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   await app.listen(env.PORT || 3000);
 }
 bootstrap().then(() => console.log('API runnning on port ', env.PORT));
