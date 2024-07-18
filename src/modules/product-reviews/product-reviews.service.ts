@@ -30,8 +30,8 @@ export class ProductReviewsService {
     return await this.productReviewRepo.findAll(dto);
   }
 
-  findOne(id: string) {
-    return this.productReviewRepo.findOne(id);
+  async findOne(id: string) {
+    return await this.productReviewRepo.findOne(id);
   }
 
   async update(id: string, dto: IUpdateProductReview) {
@@ -45,7 +45,7 @@ export class ProductReviewsService {
     return this.productReviewRepo.update(id, dto);
   }
 
-  remove(id: string) {
-    return this.productReviewRepo.deleteOne(id);
+  async remove(id: string) {
+    await this.productReviewRepo.deleteOne(id);
   }
 }

@@ -17,29 +17,29 @@ export class MarketService {
         throw new NotFoundException('This category_id does not exist');
       }
     }
-    return this.marketRepo.create(createMarketDto);
+    return await this.marketRepo.create(createMarketDto);
   }
 
-  findAll(findAllMarketsDto: PaginationDto) {
-    return this.marketRepo.findAll(findAllMarketsDto);
+  async findAll(findAllMarketsDto: PaginationDto) {
+    return await this.marketRepo.findAll(findAllMarketsDto);
   }
 
-  findOne(id: string) {
-    return this.marketRepo.findOne(id);
+  async findOne(id: string) {
+    return await this.marketRepo.findOne(id);
   }
 
-  update(id: string, updateMarketDto: UpdateMarketDto) {
+  async update(id: string, updateMarketDto: UpdateMarketDto) {
     const { category_id } = updateMarketDto;
     if (category_id) {
-      const exist = this.categoryService.findOne(category_id);
+      const exist = await this.categoryService.findOne(category_id);
       if (!exist) {
         throw new NotFoundException('This category_id does not exist');
       }
     }
-    return this.marketRepo.update(id, updateMarketDto);
+    return await this.marketRepo.update(id, updateMarketDto);
   }
 
-  remove(id: string) {
-    return this.marketRepo.deleteOne(id);
+  async remove(id: string) {
+    return await this.marketRepo.deleteOne(id);
   }
 }

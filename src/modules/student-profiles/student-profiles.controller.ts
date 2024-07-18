@@ -1,10 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { StudentProfilesService } from './student-profiles.service';
 import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CoreApiResponse } from 'src/common/response-class/core-api.response';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { CreateStudentProfileDto, UpdateStudentProfileDto } from './dto/student-profile.dto';
-
+import {
+  CreateStudentProfileDto,
+  UpdateStudentProfileDto,
+} from './dto/student-profile.dto';
 
 @ApiTags('Student-Profiles')
 @Controller('student-profiles')
@@ -15,8 +26,8 @@ export class StudentProfilesController {
   @Post('/create')
   @ApiBody({ type: CreateStudentProfileDto })
   @ApiOkResponse({ type: CoreApiResponse })
-  create(@Body() createStudent: CreateStudentProfileDto) {
-    const data = this.studentProfileService.create(createStudent);
+  async create(@Body() createStudent: CreateStudentProfileDto) {
+    const data = await this.studentProfileService.create(createStudent);
     return CoreApiResponse.success(data);
   }
 
@@ -32,25 +43,31 @@ export class StudentProfilesController {
   @ApiOperation({ summary: 'Get one' })
   @Get(':id')
   @ApiOkResponse({ type: CoreApiResponse })
-  findOne(@Param('id') id: string) {
-    return this.studentProfileService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    const data = await this.studentProfileService.findOne(id);
+    return CoreApiResponse.success(data);
   }
 
   @ApiOperation({ summary: 'Update one' })
   @Patch(':id')
   @ApiBody({ type: UpdateStudentProfileDto })
   @ApiOkResponse({ type: CoreApiResponse })
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateProductReview: UpdateStudentProfileDto,
   ) {
-    return this.studentProfileService.update(id, updateProductReview);
+    const data = await this.studentProfileService.update(
+      id,
+      updateProductReview,
+    );
+    return CoreApiResponse.success(data);
   }
 
   @ApiOperation({ summary: 'Delete one' })
   @Delete(':id')
   @ApiOkResponse({ type: CoreApiResponse })
-  remove(@Param('id') id: string) {
-    return this.studentProfileService.remove(id);
+  async remove(@Param('id') id: string) {
+    const data = await this.studentProfileService.remove(id);
+    return CoreApiResponse.success(data);
   }
 }

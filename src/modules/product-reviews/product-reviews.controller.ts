@@ -26,8 +26,10 @@ export class ProductReviewsController {
   @Post('/create')
   @ApiBody({ type: CreateProductReviewDto })
   @ApiOkResponse({ type: CoreApiResponse })
-  create(@Body() createProductReview: CreateProductReviewDto): any {
-    const data = this.productReviewService.create(createProductReview);
+  async create(
+    @Body() createProductReview: CreateProductReviewDto,
+  ): Promise<any> {
+    const data = await this.productReviewService.create(createProductReview);
     return CoreApiResponse.success(data);
   }
 
@@ -43,25 +45,31 @@ export class ProductReviewsController {
   @ApiOperation({ summary: 'Get one' })
   @Get(':id')
   @ApiOkResponse({ type: CoreApiResponse })
-  findOne(@Param('id') id: string) {
-    return this.productReviewService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    const data = await this.productReviewService.findOne(id);
+    return CoreApiResponse.success(data);
   }
 
   @ApiOperation({ summary: 'Update one' })
   @Patch(':id')
   @ApiBody({ type: UpdateProductReviewDto })
   @ApiOkResponse({ type: CoreApiResponse })
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateProductReview: UpdateProductReviewDto,
   ) {
-    return this.productReviewService.update(id, updateProductReview);
+    const data = await this.productReviewService.update(
+      id,
+      updateProductReview,
+    );
+    return CoreApiResponse.success(data);
   }
 
   @ApiOperation({ summary: 'Delete one' })
   @Delete(':id')
   @ApiOkResponse({ type: CoreApiResponse })
-  remove(@Param('id') id: string) {
-    return this.productReviewService.remove(id);
+  async remove(@Param('id') id: string) {
+    await this.productReviewService.remove(id);
+    return CoreApiResponse.success(null);
   }
 }

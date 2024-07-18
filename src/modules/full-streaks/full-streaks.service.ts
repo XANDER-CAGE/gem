@@ -38,12 +38,12 @@ export class FullStreaksService {
     return this.fullStreakRepo.create(fullStreakRepo);
   }
 
-  findAll(findAllMarketsDto: PaginationDto) {
-    return this.fullStreakRepo.findAll(findAllMarketsDto);
+  async findAll(findAllMarketsDto: PaginationDto) {
+    return await this.fullStreakRepo.findAll(findAllMarketsDto);
   }
 
-  findOne(id: string) {
-    return this.fullStreakRepo.findOne(id);
+  async findOne(id: string) {
+    return await this.fullStreakRepo.findOne(id);
   }
 
   async update(id: string, updateFullStreak: IUpdateFullStreak) {
@@ -68,7 +68,7 @@ export class FullStreaksService {
     return this.fullStreakRepo.update(id, updateFullStreak);
   }
 
-  remove(id: string) {
-    return this.fullStreakRepo.deleteOne(id);
+  async remove(id: string) {
+    return await this.fullStreakRepo.deleteOne(id);
   }
 }

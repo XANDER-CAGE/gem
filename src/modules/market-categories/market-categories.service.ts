@@ -22,15 +22,15 @@ export class MarketCategoriesService {
     return await this.marketCategoryRepo.findAll(findAllMarketCategoriesDto);
   }
 
-  findOne(id: string) {
+  async findOne(id: string) {
     return this.marketCategoryRepo.findOne(id);
   }
 
-  update(id: string, updateMarketDto: IUpdateMarketCategory) {
-    return this.marketCategoryRepo.update(id, updateMarketDto);
+  async update(id: string, updateMarketDto: IUpdateMarketCategory) {
+    return await this.marketCategoryRepo.update(id, updateMarketDto);
   }
 
-  remove(id: string) {
-    return this.marketCategoryRepo.deleteOne(id);
+  async remove(id: string) {
+    return await this.marketCategoryRepo.deleteOne(id);
   }
 }
