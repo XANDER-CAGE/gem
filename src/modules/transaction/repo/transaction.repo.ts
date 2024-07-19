@@ -1,9 +1,5 @@
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
-import {
-  UpdateEarningDto,
-  UpdateSpendingDto,
-} from '../dto/create-transaction.dto';
 import { TransactionEntity } from '../entity/transaction.entity';
 import { ICreateEarn } from '../interface/create-earn-transaction.interface';
 import { ICreateSpending } from '../interface/create-spending-transaction.interface';
@@ -73,29 +69,29 @@ export class TransactionRepo {
       .first();
   }
 
-  async update(
-    id: string,
-    dto: UpdateEarningDto | UpdateSpendingDto,
-    knex = this.knex,
-  ) {
-    const [data] = await knex(this.table)
-      .update({
-        ...dto,
-        updated_at: new Date(),
-      })
-      .where('id', id)
-      .andWhere('deleted_at', null)
-      .returning('*');
-    return data;
-  }
+  // async update(
+  //   id: string,
+  //   dto: UpdateEarningDto | UpdateSpendingDto,
+  //   knex = this.knex,
+  // ) {
+  //   const [data] = await knex(this.table)
+  //     .update({
+  //       ...dto,
+  //       updated_at: new Date(),
+  //     })
+  //     .where('id', id)
+  //     .andWhere('deleted_at', null)
+  //     .returning('*');
+  //   return data;
+  // }
 
-  async delete(id: string, knex = this.knex): Promise<void> {
-    await knex(this.table)
-      .update({
-        deleted_at: new Date(),
-        updated_at: new Date(),
-      })
-      .where('id', id)
-      .andWhere('deleted_at', null);
-  }
+  // async delete(id: string, knex = this.knex): Promise<void> {
+  //   await knex(this.table)
+  //     .update({
+  //       deleted_at: new Date(),
+  //       updated_at: new Date(),
+  //     })
+  //     .where('id', id)
+  //     .andWhere('deleted_at', null);
+  // }
 }
