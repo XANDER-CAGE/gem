@@ -2,17 +2,15 @@ import { Inject, Injectable } from '@nestjs/common';
 
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { MarketCategoriesRepo } from './repo/market-categories.repo';
-import {
-  ICreateMarketCategory,
-  IFindAllCategoriesMarkets,
-  IUpdateMarketCategory,
-} from './entity/market-categories.interface';
+import { CreateMarketCategoryDto } from './dto/create-market-categories.dto';
+import { IFindAllCategoriesMarkets } from './interface/market-categories.interface';
+import { UpdateMarketCategoryDto } from './dto/update-market-categories.dto';
 
 @Injectable()
 export class MarketCategoriesService {
   @Inject() private readonly marketCategoryRepo: MarketCategoriesRepo;
 
-  create(createMarketDto: ICreateMarketCategory) {
+  create(createMarketDto: CreateMarketCategoryDto) {
     return this.marketCategoryRepo.create(createMarketDto);
   }
 
@@ -26,7 +24,7 @@ export class MarketCategoriesService {
     return this.marketCategoryRepo.findOne(id);
   }
 
-  async update(id: string, updateMarketDto: IUpdateMarketCategory) {
+  async update(id: string, updateMarketDto: UpdateMarketCategoryDto) {
     return await this.marketCategoryRepo.update(id, updateMarketDto);
   }
 
