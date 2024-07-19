@@ -1,6 +1,6 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 
-export class ICreateStreak {
+export class StreakEntity {
   @ApiProperty()
   channel_id: string;
   @ApiProperty()
@@ -16,9 +16,3 @@ export class ICreateStreak {
   @ApiProperty()
   deleted_at?: Date;
 }
-
-export class IFindAllStreaks {
-  total: number;
-  data: ICreateStreak[];
-}
-export class IUpdateStreak extends PartialType(ICreateStreak) {}

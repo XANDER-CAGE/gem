@@ -1,4 +1,4 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsString,
@@ -22,7 +22,7 @@ export class CreateStreakDto {
   @IsInt()
   streak_day: number;
 
-  @ApiProperty({ example: 10.00 })
+  @ApiProperty({ example: 10.0 })
   @IsNotEmpty()
   @IsNumber({ maxDecimalPlaces: 2 })
   streak_reward: number;
@@ -32,4 +32,3 @@ export class CreateStreakDto {
   @IsBoolean()
   is_last: boolean;
 }
-export class UpdateStreakDto extends PartialType(CreateStreakDto) {}
