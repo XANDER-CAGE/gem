@@ -14,9 +14,9 @@ import { CoreApiResponse } from 'src/common/response-class/core-api.response';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { CreateFullStreakDto } from './dto/create-full-streaks.dto';
 import { UpdateFullStreakDto } from './dto/update-full-streaks.dto';
-import { CreateFullStreakResponse } from './responce/create-full-streaks.response';
+import { CreateFullStreakResponse } from './response/create-full-streaks.response';
 import { ErrorApiResponse } from 'src/common/response-class/error.response';
-import { ListFullStreakResponse } from './responce/list-full-streaks.responce';
+import { ListFullStreakResponse } from './response/list-full-streaks.response';
 import { DeleteApiResponse } from 'src/common/response-class/all-null.response';
 
 @ApiTags('Full-Streak')

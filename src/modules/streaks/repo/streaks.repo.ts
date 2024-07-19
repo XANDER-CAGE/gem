@@ -2,8 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { ICreateStreak, IFindAllStreaks } from '../entity/streaks.interface';
-import { UpdateStreakDto } from '../dto/streaks.dto';
+import { IFindAllStreaks } from '../interface/streaks.interface';
+import { CreateStreakDto } from '../dto/create-streaks.dto';
+import { StreakEntity } from '../entity/streaks.entity';
+import { UpdateStreakDto } from '../dto/update-streaks.dto';
+
 
 @Injectable()
 export class StreaksRepo {
@@ -44,7 +47,7 @@ export class StreaksRepo {
       .first();
   }
 
-  async create(data: ICreateStreak, knex = this.knex): Promise<ICreateStreak> {
+  async create(data: CreateStreakDto, knex = this.knex): Promise<StreakEntity> {
     const [res] = await knex(this.table).insert(data).returning('*');
     return res;
   }
