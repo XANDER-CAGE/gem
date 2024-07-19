@@ -1,4 +1,4 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsOptional,
@@ -31,7 +31,3 @@ export class CreateProductReviewDto {
   @IsInt()
   rate: number;
 }
-
-export class UpdateProductReviewDto extends PartialType(
-  CreateProductReviewDto,
-) {}

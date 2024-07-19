@@ -1,13 +1,11 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { ProductReviewsRepo } from './repo/product-reviews.repo';
-import {
-  ICreateProductReview,
-  IFindAllProductReview,
-  IUpdateProductReview,
-} from './entity/product-reviews.interface';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { ProductsService } from '../market-products/market-products.service';
 import { StudentProfilesService } from '../student-profiles/student-profiles.service';
+import { CreateProductReviewDto } from './dto/create-product-review.dto';
+import { IFindAllProductReview } from './interface/product-review.interface';
+import { UpdateProductReviewDto } from './dto/update-prdouct-review.dto';
 
 @Injectable()
 export class ProductReviewsService {
@@ -15,7 +13,7 @@ export class ProductReviewsService {
   @Inject() private readonly productService: ProductsService;
   @Inject() private readonly profileService: StudentProfilesService;
 
-  async create(dto: ICreateProductReview) {
+  async create(dto: CreateProductReviewDto) {
     const { product_id: productId, profile_id: profileId } = dto;
     const product = await this.productService.findOne(productId);
     if (!product) throw new NotFoundException('Product does not exist');
@@ -34,7 +32,7 @@ export class ProductReviewsService {
     return await this.productReviewRepo.findOne(id);
   }
 
-  async update(id: string, dto: IUpdateProductReview) {
+  async update(id: string, dto: UpdateProductReviewDto) {
     const { product_id: productId, profile_id: profileId } = dto;
     const product = await this.productService.findOne(productId);
     if (!product) throw new NotFoundException('Product does not exist');
