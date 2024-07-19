@@ -4,6 +4,7 @@ import { ChannelService } from '../channel/channel.service';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { CreateStreakDto } from './dto/create-streaks.dto';
 import { UpdateStreakDto } from './dto/update-streaks.dto';
+import { StreakEntity } from './entity/streaks.entity';
 
 @Injectable()
 export class StreaksService {
@@ -20,12 +21,12 @@ export class StreaksService {
     return this.streakRepo.create(createStreak);
   }
 
-  findAll(findAllMarketsDto: PaginationDto) {
-    return this.streakRepo.findAll(findAllMarketsDto);
+  async findAll(findAllMarketsDto: PaginationDto) {
+    return await this.streakRepo.findAll(findAllMarketsDto);
   }
 
-  findOne(id: string) {
-    return this.streakRepo.findOne(id);
+  async findOne(id: string): Promise<StreakEntity> {
+    return await this.streakRepo.findOne(id);
   }
 
   async update(id: string, updateStreak: UpdateStreakDto) {
@@ -38,7 +39,7 @@ export class StreaksService {
     return this.streakRepo.update(id, updateStreak);
   }
 
-  remove(id: string) {
-    return this.streakRepo.deleteOne(id);
+  async remove(id: string) {
+    return await this.streakRepo.deleteOne(id);
   }
 }
