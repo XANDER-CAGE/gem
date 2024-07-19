@@ -1,4 +1,4 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsOptional,
@@ -53,5 +53,3 @@ export class CreateProductDto {
   @IsInt()
   remaining_count: number;
 }
-
-export class UpdateProductDto extends PartialType(CreateProductDto) {}
