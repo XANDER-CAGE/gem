@@ -2,11 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import {
-  ICreateFullStreak,
-  IFindAllFullStreak,
-  IUpdateFullStreak,
-} from '../entity/full-streak.interface';
+import { IFindAllFullStreak } from '../interface/full-streak.interface';
+import { CreateFullStreakDto } from '../dto/create-full-streaks.dto';
+import { UpdateFullStreakDto } from '../dto/update-full-streaks.dto';
 
 @Injectable()
 export class FullStreakRepo {
@@ -46,14 +44,14 @@ export class FullStreakRepo {
   }
 
   async create(
-    data: ICreateFullStreak,
+    data: CreateFullStreakDto,
     knex = this.knex,
-  ): Promise<ICreateFullStreak> {
+  ): Promise<CreateFullStreakDto> {
     const [res] = await knex(this.table).insert(data).returning('*');
     return res;
   }
 
-  async update(id: string, data: IUpdateFullStreak, knex = this.knex) {
+  async update(id: string, data: UpdateFullStreakDto, knex = this.knex) {
     const [updateMarket] = await knex(this.table)
       .update({
         ...data,

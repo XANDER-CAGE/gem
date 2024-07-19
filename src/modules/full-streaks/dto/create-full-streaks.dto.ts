@@ -1,4 +1,4 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsOptional,
@@ -47,5 +47,3 @@ export class CreateFullStreakDto {
   @IsOptional()
   updated_at?: Date;
 }
-
-export class UpdateFullStreakDto extends PartialType(CreateFullStreakDto) {}
