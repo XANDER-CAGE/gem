@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 
-export class IProduct {
+export class ProductEntity {
   @ApiProperty()
   market_id: string;
   @ApiProperty()
@@ -21,9 +21,4 @@ export class IProduct {
   created_at: Date;
   @ApiProperty()
   updated_at: Date;
-}
-
-export class IFindAllProduct {
-  total: number;
-  data: IProduct[];
 }

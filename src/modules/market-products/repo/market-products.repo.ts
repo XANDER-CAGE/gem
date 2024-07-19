@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
-import { CreateProductDto, UpdateProductDto } from '../dto/market-products.dto';
-import { IFindAllProduct, IProduct } from '../entity/product.interface';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { CreateProductDto } from '../dto/create-market-product.dto';
+import { ProductEntity } from '../entity/product.interface';
+import { IFindAllProduct } from '../interface/market-product.interface';
+import { UpdateProductDto } from '../dto/update-market-product.dto';
 
 @Injectable()
 export class ProductRepo {
@@ -11,7 +13,7 @@ export class ProductRepo {
 
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
-  async create(dto: CreateProductDto, knex = this.knex): Promise<IProduct> {
+  async create(dto: CreateProductDto, knex = this.knex): Promise<ProductEntity> {
     const [data] = await knex
       .insert({
         ...dto,
@@ -44,7 +46,7 @@ export class ProductRepo {
     return { total: +total, data };
   }
 
-  async findOne(id: string, knex = this.knex): Promise<IProduct> {
+  async findOne(id: string, knex = this.knex): Promise<ProductEntity> {
     return await knex
       .select('*')
       .from(this.table)
@@ -57,7 +59,7 @@ export class ProductRepo {
     id: string,
     dto: UpdateProductDto,
     knex = this.knex,
-  ): Promise<IProduct> {
+  ): Promise<ProductEntity> {
     const [data] = await knex(this.table)
       .update({
         ...dto,

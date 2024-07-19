@@ -1,10 +1,11 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateProductDto, UpdateProductDto } from './dto/market-products.dto';
 import { ProductRepo } from './repo/market-products.repo';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { IFindAllProduct } from './entity/product.interface';
 import { MarketCategoriesService } from '../market-categories/market-categories.service';
 import { MarketService } from '../market/market.service';
+import { CreateProductDto } from './dto/create-market-product.dto';
+import { IFindAllProduct } from './interface/market-product.interface';
+import { UpdateProductDto } from './dto/update-market-product.dto';
 
 @Injectable()
 export class ProductsService {
