@@ -1,9 +1,10 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { ChannelRepo } from './repo/channel.repo';
 import { BadgeService } from '../badge/badge.service';
-import { CreateChannelDto, UpdateChannelDto } from './dto/channel.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { IFindAllChannel } from './entity/channel.interface';
+import { IFindAllChannel } from './interface/channel.interface';
+import { CreateChannelDto } from './dto/channel-create.dto';
+import { UpdateChannelDto } from './dto/channel-update.dto';
 
 @Injectable()
 export class ChannelService {
