@@ -1,4 +1,4 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsInt,
   IsNotEmpty,
@@ -44,5 +44,3 @@ export class CreateLevelDto {
   @IsNumber({ maxDecimalPlaces: 2 })
   free_gem: number;
 }
-
-export class UpdateLevelDto extends PartialType(CreateLevelDto) {}

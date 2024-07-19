@@ -2,11 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import {
-  ICreateLevel,
-  IFindAllLevel,
-  IUpdateLevel,
-} from '../entity/level.intefrace';
+import { IFindAllLevel } from '../interface/level.interface';
+import { CreateLevelDto } from '../dto/create-level.dto';
+import { UpdateLevelDto } from '../dto/update-level.dto';
+import { LevelEntity } from '../entity/level.entity';
 
 @Injectable()
 export class LevelRepo {
@@ -44,12 +43,12 @@ export class LevelRepo {
       .first();
   }
 
-  async create(data: ICreateLevel, knex = this.knex): Promise<ICreateLevel> {
+  async create(data: CreateLevelDto, knex = this.knex): Promise<LevelEntity> {
     const [res] = await knex(this.table).insert(data).returning('*');
     return res;
   }
 
-  async update(id: string, data: IUpdateLevel, knex = this.knex) {
+  async update(id: string, data: UpdateLevelDto, knex = this.knex) {
     const [updateMarket] = await knex(this.table)
       .update({
         ...data,

@@ -3,7 +3,7 @@ import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { ICreateStreak, IFindAllStreaks } from '../entity/streaks.interface';
-import { IUpdateLevel } from 'src/modules/level/entity/level.intefrace';
+import { UpdateStreakDto } from '../dto/streaks.dto';
 
 @Injectable()
 export class StreaksRepo {
@@ -49,7 +49,7 @@ export class StreaksRepo {
     return res;
   }
 
-  async update(id: string, data: IUpdateLevel, knex = this.knex) {
+  async update(id: string, data: UpdateStreakDto, knex = this.knex) {
     const [updateMarket] = await knex(this.table)
       .update({
         ...data,
