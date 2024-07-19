@@ -10,10 +10,11 @@ import {
 } from '@nestjs/common';
 import { ChannelService } from './channel.service';
 import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CreateChannelDto, UpdateChannelDto } from './dto/channel.dto';
 import { CoreApiResponse } from 'src/common/response-class/core-api.response';
 import { IdDto } from 'src/common/dto/id.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { CreateChannelDto } from './dto/channel-create.dto';
+import { UpdateChannelDto } from './dto/channel-update.dto';
 
 @ApiTags('Channel')
 @Controller('channel')

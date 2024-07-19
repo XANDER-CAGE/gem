@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsNumber,
@@ -35,5 +35,3 @@ export class CreateChannelDto {
   @MaxLength(255)
   badge_id?: string;
 }
-
-export class UpdateChannelDto extends PartialType(CreateChannelDto) {}

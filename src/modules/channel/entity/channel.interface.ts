@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class IChannel {
+export class ChannelEntity {
   @ApiProperty()
   id: string;
   @ApiProperty()
@@ -17,9 +17,4 @@ export class IChannel {
   created_at: Date;
   @ApiProperty()
   updated_at: Date;
-}
-
-export class IFindAllChannel {
-  total: number;
-  data: IChannel[];
 }
