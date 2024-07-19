@@ -1,12 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
-import {
-  ICreateMarketCategory,
-  IFindAllCategoriesMarkets,
-  IUpdateMarketCategory,
-} from '../entity/market-categories.interface';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { IFindAllCategoriesMarkets } from '../interface/market-categories.interface';
+import { CreateMarketCategoryDto } from '../dto/create-market-categories.dto';
+import { UpdateMarketCategoryDto } from '../dto/update-market-categories.dto';
 
 @Injectable()
 export class MarketCategoriesRepo {
@@ -46,11 +44,11 @@ export class MarketCategoriesRepo {
       .andWhere('deleted_at', null)
       .first();
   }
-  async create(data: ICreateMarketCategory, knex = this.knex) {
+  async create(data: CreateMarketCategoryDto, knex = this.knex) {
     return await knex(this.table).insert(data).returning('*');
   }
 
-  async update(id: string, data: IUpdateMarketCategory, knex = this.knex) {
+  async update(id: string, data: UpdateMarketCategoryDto, knex = this.knex) {
     const [updateMarket] = await knex(this.table)
       .update({
         ...data,

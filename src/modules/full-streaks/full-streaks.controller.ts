@@ -14,6 +14,10 @@ import { CoreApiResponse } from 'src/common/response-class/core-api.response';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { CreateFullStreakDto } from './dto/create-full-streaks.dto';
 import { UpdateFullStreakDto } from './dto/update-full-streaks.dto';
+import { CreateFullStreakResponse } from './responce/create-full-streaks.response';
+import { ErrorApiResponse } from 'src/common/response-class/error.response';
+import { ListFullStreakResponse } from './responce/list-full-streaks.responce';
+import { DeleteApiResponse } from 'src/common/response-class/all-null.response';
 
 @ApiTags('Full-Streak')
 @Controller('full-streaks')
@@ -23,7 +27,8 @@ export class FullStreaksController {
   @ApiOperation({ summary: 'Create new one' })
   @Post('/create')
   @ApiBody({ type: CreateFullStreakDto })
-  @ApiOkResponse({ type: CoreApiResponse })
+  @ApiOkResponse({ type: CreateFullStreakResponse, status: 200 })
+  @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
   async create(@Body() createFullStreak: CreateFullStreakDto) {
     const data = await this.fullStreakService.create(createFullStreak);
     return CoreApiResponse.success(data);
@@ -31,7 +36,8 @@ export class FullStreaksController {
 
   @ApiOperation({ summary: 'Find all' })
   @Get('/list')
-  @ApiOkResponse({ type: CoreApiResponse })
+  @ApiOkResponse({ type: ListFullStreakResponse, status: 200 })
+  @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
   async findAll(@Query() dto: PaginationDto) {
     const { total, data } = await this.fullStreakService.findAll(dto);
     const pagination = { total, limit: dto.limit, page: dto.page };
@@ -40,7 +46,8 @@ export class FullStreaksController {
 
   @ApiOperation({ summary: 'Get one' })
   @Get(':id')
-  @ApiOkResponse({ type: CoreApiResponse })
+  @ApiOkResponse({ type: CreateFullStreakResponse, status: 200 })
+  @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
   async findOne(@Param('id') id: string) {
     const data = await this.fullStreakService.findOne(id);
     return CoreApiResponse.success(data);
@@ -49,7 +56,8 @@ export class FullStreaksController {
   @ApiOperation({ summary: 'Update one' })
   @Patch(':id')
   @ApiBody({ type: UpdateFullStreakDto })
-  @ApiOkResponse({ type: CoreApiResponse })
+  @ApiOkResponse({ type: CreateFullStreakResponse, status: 200 })
+  @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
   async update(
     @Param('id') id: string,
     @Body() updateMarketDto: UpdateFullStreakDto,
@@ -60,7 +68,8 @@ export class FullStreaksController {
 
   @ApiOperation({ summary: 'Delete one' })
   @Delete(':id')
-  @ApiOkResponse({ type: CoreApiResponse })
+  @ApiOkResponse({ type: DeleteApiResponse, status: 200 })
+  @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
   async remove(@Param('id') id: string) {
     await this.fullStreakService.remove(id);
     return CoreApiResponse.success(null);

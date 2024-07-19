@@ -1,9 +1,5 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
-import {
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateMarketCategoryDto {
   @ApiProperty({ example: 'Category Name' })
@@ -26,7 +22,3 @@ export class CreateMarketCategoryDto {
   @IsString()
   avatar?: string;
 }
-
-export class UpdateMarketCategoryDto extends PartialType(
-  CreateMarketCategoryDto,
-) {}
