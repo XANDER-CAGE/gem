@@ -1,13 +1,11 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import {
-  ICreateStudentProfile,
-  IFindAllStudentProfile,
-  IUpdateStudentProfile,
-} from './interface/student-profile.intefrace';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { StudentProfilesRepo } from './repo/student-profiles.repo';
 import { StreaksService } from '../streaks/streaks.service';
 import { LevelService } from '../level/level.service';
+import { CreateStudentProfileDto } from './dto/create-student-profile.dto';
+import { IFindAllStudentProfile } from './interface/student-profile.interface';
+import { UpdateStudentProfileDto } from './dto/update-student-profile.dto';
 
 @Injectable()
 export class StudentProfilesService {
@@ -16,7 +14,7 @@ export class StudentProfilesService {
   @Inject() private readonly levelService: LevelService;
   //Also i need to add StudentService
 
-  async create(createStudentProfile: ICreateStudentProfile) {
+  async create(createStudentProfile: CreateStudentProfileDto) {
     const { streak_id, level_id } = createStudentProfile;
 
     if (streak_id) {
@@ -38,7 +36,7 @@ export class StudentProfilesService {
     return await this.studentProfileService.findOne(id);
   }
 
-  async update(id: string, updateMarketDto: IUpdateStudentProfile) {
+  async update(id: string, updateMarketDto: UpdateStudentProfileDto) {
     const { streak_id, level_id } = updateMarketDto;
 
     if (streak_id) {

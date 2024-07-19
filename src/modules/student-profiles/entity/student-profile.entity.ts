@@ -1,6 +1,6 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 
-export class ICreateStudentProfile {
+export class StudentProfileEntity {
   @ApiProperty()
   id?: string;
   @ApiProperty()
@@ -22,9 +22,3 @@ export class ICreateStudentProfile {
   @ApiProperty()
   updated_at?: Date;
 }
-export class IFindAllStudentProfile {
-  total: number;
-  data: ICreateStudentProfile[];
-}
-
-export class IUpdateStudentProfile extends PartialType(ICreateStudentProfile) {}
