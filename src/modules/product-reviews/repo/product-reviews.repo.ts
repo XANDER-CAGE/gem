@@ -2,11 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import {
-  ICreateProductReview,
-  IFindAllProductReview,
-  IUpdateProductReview,
-} from '../entity/product-reviews.interface';
+import { IFindAllProductReview } from '../interface/product-review.interface';
+import { CreateProductReviewDto } from '../dto/create-product-review.dto';
+import { UpdateProductReviewDto } from '../dto/update-prdouct-review.dto';
 
 @Injectable()
 export class ProductReviewsRepo {
@@ -46,11 +44,11 @@ export class ProductReviewsRepo {
       .andWhere('deleted_at', null)
       .first();
   }
-  async create(data: ICreateProductReview, knex = this.knex) {
+  async create(data: CreateProductReviewDto, knex = this.knex) {
     return await knex(this.table).insert(data).returning('*');
   }
 
-  async update(id: string, data: IUpdateProductReview, knex = this.knex) {
+  async update(id: string, data: UpdateProductReviewDto, knex = this.knex) {
     const [updateMarket] = await knex(this.table)
       .update({
         ...data,
