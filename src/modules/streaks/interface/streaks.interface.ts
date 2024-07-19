@@ -1,6 +1,6 @@
 import { StreakEntity } from '../entity/streaks.entity';
 
-export class IFindAllStreaks {
+export interface IFindAllStreaks {
   total: number;
   data: StreakEntity[];
 }

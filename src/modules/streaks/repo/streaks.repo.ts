@@ -7,7 +7,6 @@ import { CreateStreakDto } from '../dto/create-streaks.dto';
 import { StreakEntity } from '../entity/streaks.entity';
 import { UpdateStreakDto } from '../dto/update-streaks.dto';
 
-
 @Injectable()
 export class StreaksRepo {
   private table = 'streaks';

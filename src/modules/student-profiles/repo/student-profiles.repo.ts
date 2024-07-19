@@ -2,7 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { ICreateStudentProfile, IFindAllStudentProfile, IUpdateStudentProfile } from '../interface/student-profile.intefrace';
+import {
+  ICreateStudentProfile,
+  IFindAllStudentProfile,
+  IUpdateStudentProfile,
+} from '../interface/student-profile.intefrace';
 
 @Injectable()
 export class StudentProfilesRepo {
