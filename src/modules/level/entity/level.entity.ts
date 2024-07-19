@@ -1,6 +1,6 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 
-export class ICreateLevel {
+export class LevelEntity {
   @ApiProperty()
   id?: string;
   @ApiProperty()
@@ -20,9 +20,3 @@ export class ICreateLevel {
   @ApiProperty()
   updated_at?: Date;
 }
-export class IFindAllLevel {
-  total: number;
-  data: ICreateLevel[];
-}
-
-export class IUpdateLevel extends PartialType(ICreateLevel) {}

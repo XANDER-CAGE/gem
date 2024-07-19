@@ -5,6 +5,7 @@ import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { IFindAllFullStreak } from '../interface/full-streak.interface';
 import { CreateFullStreakDto } from '../dto/create-full-streaks.dto';
 import { UpdateFullStreakDto } from '../dto/update-full-streaks.dto';
+import { FullStreakEntity } from '../entity/full-streak.entity';
 
 @Injectable()
 export class FullStreakRepo {
@@ -46,7 +47,7 @@ export class FullStreakRepo {
   async create(
     data: CreateFullStreakDto,
     knex = this.knex,
-  ): Promise<CreateFullStreakDto> {
+  ): Promise<FullStreakEntity> {
     const [res] = await knex(this.table).insert(data).returning('*');
     return res;
   }

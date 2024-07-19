@@ -1,4 +1,4 @@
-import { ChannelEntity } from '../entity/channel.interface';
+import { ChannelEntity } from '../entity/channel.entity';
 
 export interface IFindAllChannel {
   total: number;

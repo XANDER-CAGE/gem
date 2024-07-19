@@ -1,7 +1,7 @@
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { ChannelEntity } from '../entity/channel.interface';
+import { ChannelEntity } from '../entity/channel.entity';
 import { IFindAllChannel } from '../interface/channel.interface';
 import { CreateChannelDto } from '../dto/channel-create.dto';
 import { UpdateChannelDto } from '../dto/channel-update.dto';
@@ -10,7 +10,10 @@ export class ChannelRepo {
   private readonly table = 'channels';
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
-  async create(dto: CreateChannelDto, knex = this.knex): Promise<ChannelEntity> {
+  async create(
+    dto: CreateChannelDto,
+    knex = this.knex,
+  ): Promise<ChannelEntity> {
     const [data] = await knex
       .insert({
         ...dto,

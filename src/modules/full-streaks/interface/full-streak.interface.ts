@@ -1,4 +1,4 @@
-import { FullStreakEntity } from '../entity/full-streak.interface';
+import { FullStreakEntity } from '../entity/full-streak.entity';
 
 export interface IFindAllFullStreak {
   total: number;
