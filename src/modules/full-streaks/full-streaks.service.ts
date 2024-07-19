@@ -1,13 +1,11 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { FullStreakRepo } from './repo/full-streak.repo';
-import {
-  ICreateFullStreak,
-  IUpdateFullStreak,
-} from './entity/full-streak.interface';
 import { BadgeService } from '../badge/badge.service';
 import { ChannelService } from '../channel/channel.service';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { ProductsService } from '../market-products/market-products.service';
+import { CreateFullStreakDto } from './dto/create-full-streaks.dto';
+import { UpdateFullStreakDto } from './dto/update-full-streaks.dto';
 
 @Injectable()
 export class FullStreaksService {
@@ -16,7 +14,7 @@ export class FullStreaksService {
   @Inject() private readonly badgeService: BadgeService;
   @Inject() private readonly chanelService: ChannelService;
 
-  async create(fullStreakRepo: ICreateFullStreak) {
+  async create(fullStreakRepo: CreateFullStreakDto) {
     const { badge_id, channel_id, product_id } = fullStreakRepo;
     if (badge_id) {
       const badgeExist = await this.badgeService.findOne(badge_id);
@@ -46,7 +44,7 @@ export class FullStreaksService {
     return await this.fullStreakRepo.findOne(id);
   }
 
-  async update(id: string, updateFullStreak: IUpdateFullStreak) {
+  async update(id: string, updateFullStreak: UpdateFullStreakDto) {
     const { badge_id, channel_id, product_id } = updateFullStreak;
     if (badge_id) {
       const badgeExist = await this.badgeService.findOne(badge_id);

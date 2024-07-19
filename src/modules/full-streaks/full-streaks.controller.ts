@@ -11,8 +11,9 @@ import {
 import { FullStreaksService } from './full-streaks.service';
 import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CoreApiResponse } from 'src/common/response-class/core-api.response';
-import { CreateFullStreakDto, UpdateFullStreakDto } from './dto/full-streaks.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { CreateFullStreakDto } from './dto/create-full-streaks.dto';
+import { UpdateFullStreakDto } from './dto/update-full-streaks.dto';
 
 @ApiTags('Full-Streak')
 @Controller('full-streaks')
