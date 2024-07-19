@@ -2,11 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import {
-  ICreateStudentProfile,
-  IFindAllStudentProfile,
-  IUpdateStudentProfile,
-} from '../interface/student-profile.intefrace';
+import { IFindAllStudentProfile } from '../interface/student-profile.interface';
+import { CreateStudentProfileDto } from '../dto/create-student-profile.dto';
+import { UpdateStudentProfileDto } from '../dto/update-student-profile.dto';
 
 @Injectable()
 export class StudentProfilesRepo {
@@ -46,11 +44,11 @@ export class StudentProfilesRepo {
       .andWhere('deleted_at', null)
       .first();
   }
-  async create(data: ICreateStudentProfile, knex = this.knex) {
+  async create(data: CreateStudentProfileDto, knex = this.knex) {
     return await knex(this.table).insert(data).returning('*');
   }
 
-  async update(id: string, data: IUpdateStudentProfile, knex = this.knex) {
+  async update(id: string, data: UpdateStudentProfileDto, knex = this.knex) {
     const [updateStudent] = await knex(this.table)
       .update({
         ...data,
