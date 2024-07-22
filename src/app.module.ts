@@ -13,6 +13,7 @@ import { BadgeModule } from './modules/badge/badge.module';
 import { TransactionModule } from './modules/transaction/transaction.module';
 import { LevelModule } from './modules/level/level.module';
 import { FullStreaksModule } from './modules/full-streaks/full-streaks.module';
+import { ChannelCategoriesModule } from './modules/channel_categories/channel-categories.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { FullStreaksModule } from './modules/full-streaks/full-streaks.module';
     TransactionModule,
     LevelModule,
     FullStreaksModule,
+    ChannelCategoriesModule,
   ],
 })
 export class AppModule {}

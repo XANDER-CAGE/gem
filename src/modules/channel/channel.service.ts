@@ -5,19 +5,28 @@ import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { IFindAllChannel } from './interface/channel.interface';
 import { CreateChannelDto } from './dto/channel-create.dto';
 import { UpdateChannelDto } from './dto/channel-update.dto';
+import { ChannelCategoriesService } from '../channel_categories/channel-categories.service';
 
 @Injectable()
 export class ChannelService {
-  constructor(
-    @Inject() private readonly channelRepo: ChannelRepo,
-    private readonly badgeService: BadgeService,
-  ) {}
+  @Inject() private readonly channelRepo: ChannelRepo;
+  @Inject() private readonly badgeService: BadgeService;
+  @Inject() private readonly channelCategoriesService: ChannelCategoriesService;
+
   async create(createChannelDto: CreateChannelDto) {
-    const { badge_id: badgeId } = createChannelDto;
+    const { badge_id: badgeId, channel_categories_id: channelCategoriesId } =
+      createChannelDto;
     if (badgeId) {
       const badge = await this.badgeService.findOne(badgeId);
       if (!badge) throw new NotFoundException('Badge not found');
     }
+    if (channelCategoriesId) {
+      const channel_categories =
+        await this.channelCategoriesService.findOne(channelCategoriesId);
+      if (!channel_categories)
+        throw new NotFoundException('Channel categories not found');
+    }
+
     return this.channelRepo.create(createChannelDto);
   }
 
@@ -30,10 +39,17 @@ export class ChannelService {
   }
 
   async update(id: string, updateChannelDto: UpdateChannelDto) {
-    const { badge_id: badgeId } = updateChannelDto;
+    const { badge_id: badgeId, channel_categories_id: channelCategoriesId } =
+      updateChannelDto;
     if (badgeId) {
       const badge = await this.badgeService.findOne(badgeId);
       if (!badge) throw new NotFoundException('Badge not found');
+    }
+    if (channelCategoriesId) {
+      const channel_categories =
+        await this.channelCategoriesService.findOne(channelCategoriesId);
+      if (!channel_categories)
+        throw new NotFoundException('Channel categories not found');
     }
     return this.channelRepo.update(id, updateChannelDto);
   }

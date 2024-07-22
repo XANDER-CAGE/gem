@@ -34,4 +34,10 @@ export class CreateChannelDto {
   @MinLength(1)
   @MaxLength(255)
   badge_id?: string;
+
+  @ApiPropertyOptional({ example: '507f1f77bcf86cd799439011' })
+  @IsOptional()
+  @MinLength(1)
+  @MaxLength(255)
+  channel_categories_id?: string;
 }

@@ -1,18 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class ChannelEntity {
+export class ChannelCategoriesEntity {
   @ApiProperty()
   id: string;
   @ApiProperty()
   name: string;
-  @ApiProperty()
-  desctription?: string;
-  @ApiProperty()
-  reward_gem: number;
-  @ApiProperty()
-  badge_id?: string;
-  @ApiProperty()
-  channel_categories_id?: string;
   @ApiProperty()
   deleted_at: Date;
   @ApiProperty()
