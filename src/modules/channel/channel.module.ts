@@ -3,9 +3,10 @@ import { ChannelService } from './channel.service';
 import { ChannelController } from './channel.controller';
 import { BadgeModule } from '../badge/badge.module';
 import { ChannelRepo } from './repo/channel.repo';
+import { ChannelCategoriesModule } from '../channel_categories/channel-categories.module';
 
 @Module({
-  imports: [BadgeModule],
+  imports: [BadgeModule, ChannelCategoriesModule],
   controllers: [ChannelController],
   providers: [ChannelService, ChannelRepo],
   exports: [ChannelService],
