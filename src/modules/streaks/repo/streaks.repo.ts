@@ -46,6 +46,15 @@ export class StreaksRepo {
       .first();
   }
 
+  async findOneByChannelId(channelId: string, knex = this.knex) {
+    return await knex
+      .select('*')
+      .from(this.table)
+      .where('channel_id', channelId)
+      .andWhere('deleted_at', null)
+      .first();
+  }
+
   async create(data: CreateStreakDto, knex = this.knex): Promise<StreakEntity> {
     const [res] = await knex(this.table).insert(data).returning('*');
     return res;

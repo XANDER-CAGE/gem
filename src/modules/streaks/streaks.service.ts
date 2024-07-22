@@ -29,6 +29,10 @@ export class StreaksService {
     return await this.streakRepo.findOne(id);
   }
 
+  async findOneByChannelId(channelId: string): Promise<StreakEntity> {
+    return await this.streakRepo.findOneByChannelId(channelId);
+  }
+
   async update(id: string, updateStreak: UpdateStreakDto) {
     const { channel_id } = updateStreak;
     const chanelExist = await this.chanelService.findOne(channel_id);
