@@ -14,6 +14,7 @@ import { TransactionModule } from './modules/transaction/transaction.module';
 import { LevelModule } from './modules/level/level.module';
 import { FullStreaksModule } from './modules/full-streaks/full-streaks.module';
 import { ChannelCategoriesModule } from './modules/channel_categories/channel-categories.module';
+import { AssignModule } from './modules/assign/assign.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { ChannelCategoriesModule } from './modules/channel_categories/channel-ca
     LevelModule,
     FullStreaksModule,
     ChannelCategoriesModule,
+    AssignModule,
   ],
 })
 export class AppModule {}

@@ -47,7 +47,7 @@ export class ChannelRepo {
       ])
       .from(innerQuery);
 
-    return { total: +total, data };
+    return { total: +total, data: data || [] };
   }
 
   async findOne(id: string, knex = this.knex): Promise<ChannelEntity> {
@@ -85,11 +85,10 @@ export class ChannelRepo {
       .andWhere('deleted_at', null);
   }
 
-  async assignProfile(dto: IAssignChannelArg, knex = this.knex) {
+  async connectToProfile(dto: IAssignChannelArg, knex: Knex) {
     const [data] = await knex('channels_on_profiles')
       .insert({ ...dto })
       .returning('*');
     return data;
   }
-
 }

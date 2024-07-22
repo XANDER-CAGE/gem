@@ -9,12 +9,8 @@ import {
 import { CreateChannelDto } from './dto/channel-create.dto';
 import { UpdateChannelDto } from './dto/channel-update.dto';
 import { ChannelCategoriesService } from '../channel_categories/channel-categories.service';
-import { AssignChannelDto } from './dto/assign-channel.dto';
-import { StudentProfilesService } from '../student-profiles/student-profiles.service';
-import { StreaksService } from '../streaks/streaks.service';
 import { InjectConnection } from 'nest-knexjs';
 import { Knex } from 'knex';
-import { TransactionService } from '../transaction/transaction.service';
 
 @Injectable()
 export class ChannelService {
@@ -22,9 +18,6 @@ export class ChannelService {
     private readonly channelRepo: ChannelRepo,
     private readonly channelCategoriesService: ChannelCategoriesService,
     private readonly badgeService: BadgeService,
-    private readonly profileService: StudentProfilesService,
-    private readonly streakService: StreaksService,
-    private readonly transactionService: TransactionService,
     @InjectConnection() private readonly knex: Knex,
   ) {}
   async create(createChannelDto: CreateChannelDto) {
@@ -72,24 +65,7 @@ export class ChannelService {
     await this.channelRepo.delete(id);
   }
 
-  async assign(dto: AssignChannelDto) {
-    const profile = await this.profileService.findOne(dto.student_profile_id);
-    if (!profile) throw new NotFoundException('Student profile not found');
-    const channel = await this.findOne(dto.channel_id);
-    if (!channel) throw new NotFoundException('Channel not found');
-    const streak = await this.getStreak(channel.id);
-    const streakId = streak ? streak.id : null;
-    const assignChannelToProfileArg: IAssignChannelArg = {
-      channel_id: channel.id,
-      streak_id: streakId,
-      profile_id: profile.id,
-    };
-    await this.channelRepo.assignProfile(assignChannelToProfileArg, this.knex);
-    const earning = await this.transactionService.sumAllEarning(profile.id);
-  }
-
-  // TODO: Implement logic
-  async getStreak(channelId: string) {
-    return await this.streakService.findOneByChannelId(channelId);
+  async connectToProfile(arg: IAssignChannelArg, knex = this.knex) {
+    return await this.channelRepo.connectToProfile(arg, knex);
   }
 }

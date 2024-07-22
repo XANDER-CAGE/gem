@@ -46,6 +46,15 @@ export class StreaksRepo {
       .first();
   }
 
+  async channelExists(id: string, knex = this.knex) {
+    return await knex
+      .select('*')
+      .from('channels')
+      .where('id', id)
+      .andWhere('deleted_at', null)
+      .first();
+  }
+
   async findOneByChannelId(channelId: string, knex = this.knex) {
     return await knex
       .select('*')
