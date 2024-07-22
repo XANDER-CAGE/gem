@@ -21,7 +21,7 @@ export class ChannelService {
     @InjectConnection() private readonly knex: Knex,
   ) {}
   async create(createChannelDto: CreateChannelDto) {
-    const { badge_id: badgeId, channel_categories_id: channelCategoriesId } =
+    const { badge_id: badgeId, channel_category_id: channelCategoriesId } =
       createChannelDto;
     if (badgeId) {
       const badge = await this.badgeService.findOne(badgeId);
@@ -46,7 +46,7 @@ export class ChannelService {
   }
 
   async update(id: string, updateChannelDto: UpdateChannelDto) {
-    const { badge_id: badgeId, channel_categories_id: channelCategoriesId } =
+    const { badge_id: badgeId, channel_category_id: channelCategoriesId } =
       updateChannelDto;
     if (badgeId) {
       const badge = await this.badgeService.findOne(badgeId);
