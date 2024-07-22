@@ -14,6 +14,8 @@ export class ChannelEntity {
   @ApiProperty()
   channel_categories_id?: string;
   @ApiProperty()
+  has_streak: boolean;
+  @ApiProperty()
   deleted_at: Date;
   @ApiProperty()
   created_at: Date;

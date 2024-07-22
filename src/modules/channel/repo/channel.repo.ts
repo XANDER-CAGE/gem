@@ -2,7 +2,10 @@ import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { ChannelEntity } from '../entity/channel.entity';
-import { IFindAllChannel } from '../interface/channel.interface';
+import {
+  IAssignChannelArg,
+  IFindAllChannel,
+} from '../interface/channel.interface';
 import { CreateChannelDto } from '../dto/channel-create.dto';
 import { UpdateChannelDto } from '../dto/channel-update.dto';
 
@@ -81,4 +84,12 @@ export class ChannelRepo {
       .where('id', id)
       .andWhere('deleted_at', null);
   }
+
+  async assignProfile(dto: IAssignChannelArg, knex = this.knex) {
+    const [data] = await knex('channels_on_profiles')
+      .insert({ ...dto })
+      .returning('*');
+    return data;
+  }
+
 }

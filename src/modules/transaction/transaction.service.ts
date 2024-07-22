@@ -63,6 +63,10 @@ export class TransactionService {
     return await this.transactionRepo.findOne(id);
   }
 
+  async sumAllEarning(profileId: string) {
+    return this.transactionRepo.sumAllEarning(profileId);
+  }
+
   // async update(id: string, dto: any) {
   //   return await this.transactionRepo.update(id, dto);
   // }

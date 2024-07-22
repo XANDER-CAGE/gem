@@ -69,6 +69,14 @@ export class TransactionRepo {
       .first();
   }
 
+  async sumAllEarning(profileId: string, knex = this.knex) {
+    return knex
+      .select(knex.raw(['sum(total_gem) as totalEarned']))
+      .where('profile_id', profileId)
+      .andWhere('deleted_at', null)
+      .andWhereNot('channel_id', null);
+  }
+
   // async update(
   //   id: string,
   //   dto: UpdateEarningDto | UpdateSpendingDto,

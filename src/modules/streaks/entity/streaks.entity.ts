@@ -2,6 +2,8 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class StreakEntity {
   @ApiProperty()
+  id: string;
+  @ApiProperty()
   channel_id: string;
   @ApiProperty()
   streak_day: number;

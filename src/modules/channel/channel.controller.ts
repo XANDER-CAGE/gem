@@ -19,6 +19,7 @@ import { CreateChannelResponse } from './responce/create-channel.responce';
 import { ErrorApiResponse } from 'src/common/response-class/error.response';
 import { DeleteApiResponse } from 'src/common/response-class/all-null.response';
 import { ListChannelResponse } from './responce/list-channel.responce';
+import { AssignChannelDto } from './dto/assign-channel.dto';
 
 @ApiTags('Channel')
 @Controller('channel')
@@ -32,6 +33,15 @@ export class ChannelController {
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
   async create(@Body() dto: CreateChannelDto) {
     const data = await this.channelService.create(dto);
+    return CoreApiResponse.success(data);
+  }
+
+  @ApiOperation({ summary: 'Assign channel to student and give awards' })
+  @Post('/assign')
+  @ApiOkResponse({ type: ListChannelResponse, status: 200 })
+  @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
+  async assign(@Body() dto: AssignChannelDto) {
+    const data = await this.channelService.assign(dto);
     return CoreApiResponse.success(data);
   }
 
