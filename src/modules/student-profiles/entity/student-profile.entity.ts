@@ -2,23 +2,21 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class StudentProfileEntity {
   @ApiProperty()
-  id?: string;
+  id: string;
   @ApiProperty()
   avatar?: string;
   @ApiProperty()
   level: number;
   @ApiProperty()
-  student_id?: string;
+  student_id: string;
   @ApiProperty()
-  streak_id?: string;
-  @ApiProperty()
-  level_id?: string;
+  level_id: string;
   @ApiProperty()
   gem: number;
   @ApiProperty()
   deleted_at?: Date;
   @ApiProperty()
-  created_at?: Date;
+  created_at: Date;
   @ApiProperty()
-  updated_at?: Date;
+  updated_at: Date;
 }

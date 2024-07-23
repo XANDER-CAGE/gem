@@ -60,14 +60,10 @@ export class TransactionRepo {
     return { total: +total, data };
   }
 
-  async findOne(
-    id: string,
-    table?: string,
-    knex = this.knex,
-  ): Promise<TransactionEntity> {
+  async findOne(id: string, knex = this.knex): Promise<TransactionEntity> {
     return await knex
       .select('*')
-      .from(table || this.table)
+      .from(this.table)
       .where('id', id)
       .andWhere('deleted_at', null)
       .first();
