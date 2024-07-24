@@ -11,6 +11,7 @@ import { UpdateChannelDto } from './dto/channel-update.dto';
 import { ChannelCategoriesService } from '../channel_categories/channel-categories.service';
 import { InjectConnection } from 'nest-knexjs';
 import { Knex } from 'knex';
+import { ChannelEntity } from './entity/channel.entity';
 
 @Injectable()
 export class ChannelService {
@@ -41,7 +42,7 @@ export class ChannelService {
     return this.channelRepo.findAll(findAllChannelDto);
   }
 
-  async findOne(id: string) {
+  async findOne(id: string): Promise<ChannelEntity> {
     return await this.channelRepo.findOne(id);
   }
 
@@ -67,5 +68,21 @@ export class ChannelService {
 
   async connectToProfile(arg: IAssignChannelArg, knex = this.knex) {
     return await this.channelRepo.connectToProfile(arg, knex);
+  }
+
+  async getLastFailedChannel(
+    profileId: string,
+    channelId: string,
+    knex = this.knex,
+  ) {
+    return await this.channelRepo.getLastFailedChannel(
+      profileId,
+      channelId,
+      knex,
+    );
+  }
+
+  async countAfterFail(profileId: string, channelId: string, date: Date) {
+    return await this.channelRepo.countAfterFail(profileId, channelId, date);
   }
 }

@@ -10,6 +10,6 @@ import { StudentProfilesModule } from '../student-profiles/student-profiles.modu
   imports: [BadgeModule, ChannelCategoriesModule, StudentProfilesModule],
   controllers: [ChannelController],
   providers: [ChannelService, ChannelRepo],
-  exports: [ChannelService, ChannelRepo],
+  exports: [ChannelService],
 })
 export class ChannelModule {}

@@ -9,4 +9,5 @@ export interface IAssignChannelArg {
   channel_id: string;
   profile_id: string;
   streak_id: string;
+  is_done: boolean;
 }

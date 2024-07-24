@@ -5,6 +5,7 @@ import { StudentProfilesModule } from '../student-profiles/student-profiles.modu
 import { ChannelModule } from '../channel/channel.module';
 import { StreaksModule } from '../streaks/streaks.module';
 import { TransactionModule } from '../transaction/transaction.module';
+import { FullStreaksModule } from '../full-streaks/full-streaks.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { TransactionModule } from '../transaction/transaction.module';
     ChannelModule,
     StreaksModule,
     TransactionModule,
+    FullStreaksModule,
   ],
   controllers: [AssignController],
   providers: [AssignService],

@@ -55,13 +55,15 @@ export class StreaksRepo {
       .first();
   }
 
-  async findOneByChannelId(channelId: string, knex = this.knex) {
-    return await knex
+  async findOneByChannelId(channelId: string, level: number, knex = this.knex) {
+    const data = await knex
       .select('*')
       .from(this.table)
       .where('channel_id', channelId)
       .andWhere('deleted_at', null)
+      .andWhere('streak', level)
       .first();
+    return data || null;
   }
 
   async create(data: CreateStreakDto, knex = this.knex): Promise<StreakEntity> {

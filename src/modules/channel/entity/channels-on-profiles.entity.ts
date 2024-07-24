@@ -1,20 +1,22 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class StreakEntity {
+export class ChannelsOnProfilesEntity {
   @ApiProperty()
   id: string;
   @ApiProperty()
+  profile_id: string;
+  @ApiProperty()
   channel_id: string;
   @ApiProperty()
-  streak: number;
+  streak_id: string;
   @ApiProperty()
-  streak_reward: number;
+  is_done: boolean;
   @ApiProperty()
-  is_last: boolean;
+  joined_at: Date;
   @ApiProperty()
-  created_at?: Date;
+  deleted_at: Date;
   @ApiProperty()
-  updated_at?: Date;
+  created_at: Date;
   @ApiProperty()
-  deleted_at?: Date;
+  updated_at: Date;
 }

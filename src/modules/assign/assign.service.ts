@@ -8,6 +8,8 @@ import { TransactionService } from '../transaction/transaction.service';
 import { StreaksService } from '../streaks/streaks.service';
 import { IAssignChannelArg } from '../channel/interface/channel.interface';
 import { CreateEarningDto } from '../transaction/dto/create-earning-transaction.dto';
+import { ChannelEntity } from '../channel/entity/channel.entity';
+import { FullStreaksService } from '../full-streaks/full-streaks.service';
 
 @Injectable()
 export class AssignService {
@@ -17,21 +19,30 @@ export class AssignService {
     private readonly channelService: ChannelService,
     private readonly transactionService: TransactionService,
     private readonly streakService: StreaksService,
+    private readonly fullStreakService: FullStreaksService,
   ) {}
 
   async assignChannel(dto: AssignChannelDto) {
-    const profile = await this.profileService.findOne(dto.student_profile_id);
+    const profile = await this.profileService.findOne(dto.profile_id);
     if (!profile) throw new NotFoundException('Student profile not found');
+    let totalGem = +profile.gem;
     const channel = await this.channelService.findOne(dto.channel_id);
     if (!channel) throw new NotFoundException('Channel not found');
+    totalGem += +channel.reward_gem;
+    if (channel.streaks.length) {
+    }
+    const streak = await this.calculateStreak(channel, profile.id);
+    console.log('STREAK', streak);
 
+    if (streak) totalGem += +streak.streak_reward;
+    return channel;
+    const streakId = streak ? streak.id : null;
     await this.knex.transaction(async (trx) => {
-      const streak = await this.getStreak(channel.id, trx);
-      const streakId = streak ? streak.id : null;
       const assignChannelToProfileArg: IAssignChannelArg = {
         channel_id: channel.id,
         streak_id: streakId,
         profile_id: profile.id,
+        is_done: true,
       };
       await this.channelService.connectToProfile(
         assignChannelToProfileArg,
@@ -43,13 +54,35 @@ export class AssignService {
         profile_id: profile.id,
       };
       await this.transactionService.createEarning(createEarningArg);
+      await this.profileService.update(profile.id, { gem: totalGem }, trx);
     });
-    const earning = await this.transactionService.sumAllEarning(profile.id);
-    return earning;
+    // const earning = await this.transactionService.sumAllEarning(profile.id);
+    return 'chlen';
   }
 
-  // TODO: Implement logic
-  async getStreak(channelId: string, knex = this.knex) {
-    return await this.streakService.findOneByChannelId(channelId, knex);
+  async calculateStreak(channel: ChannelEntity, profileId: string) {
+    const lastFailedChannel = await this.channelService.getLastFailedChannel(
+      profileId,
+      channel.id,
+    );
+    const lastFullStreak = await this.fullStreakService.getLastFullStreak(
+      profileId,
+      channel.id,
+    );
+    const startStreakDate =
+      new Date(lastFullStreak.joined_at) >
+      new Date(lastFailedChannel.created_at)
+        ? new Date(lastFullStreak.joined_at)
+        : new Date(lastFailedChannel.created_at);
+    const successChannelCount = await this.channelService.countAfterFail(
+      profileId,
+      channel.id,
+      new Date(startStreakDate),
+    );
+    const streak = await this.streakService.findOneByChannelId(
+      channel.id,
+      successChannelCount + 1,
+    );
+    return streak;
   }
 }

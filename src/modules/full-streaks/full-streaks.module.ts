@@ -10,5 +10,6 @@ import { BadgeModule } from '../badge/badge.module';
   imports: [MarketProductsModule, ChannelModule, BadgeModule],
   controllers: [FullStreaksController],
   providers: [FullStreaksService, FullStreakRepo],
+  exports: [FullStreaksService],
 })
 export class FullStreaksModule {}

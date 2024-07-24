@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { StreakEntity } from 'src/modules/streaks/entity/streaks.entity';
 
 export class ChannelEntity {
   @ApiProperty()
@@ -14,7 +15,7 @@ export class ChannelEntity {
   @ApiProperty()
   channel_categories_id?: string;
   @ApiProperty()
-  has_streak: boolean;
+  streaks: StreakEntity[];
   @ApiProperty()
   deleted_at: Date;
   @ApiProperty()

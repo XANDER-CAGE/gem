@@ -4,14 +4,11 @@ import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { CreateStreakDto } from './dto/create-streaks.dto';
 import { UpdateStreakDto } from './dto/update-streaks.dto';
 import { StreakEntity } from './entity/streaks.entity';
-import { InjectConnection } from 'nest-knexjs';
-import { Knex } from 'knex';
 import { ChannelService } from '../channel/channel.service';
 
 @Injectable()
 export class StreaksService {
   constructor(
-    @InjectConnection() private readonly knex: Knex,
     private readonly streakRepo: StreaksRepo,
     private readonly channelService: ChannelService,
   ) {}
@@ -36,9 +33,9 @@ export class StreaksService {
 
   async findOneByChannelId(
     channelId: string,
-    knex = this.knex,
+    level: number,
   ): Promise<StreakEntity> {
-    return await this.streakRepo.findOneByChannelId(channelId, knex);
+    return await this.streakRepo.findOneByChannelId(channelId, level);
   }
 
   async update(id: string, updateStreak: UpdateStreakDto) {
