@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { AssignService } from './assign.service';
-import { AssignController } from './assign.controller';
+import { AssignController } from './home.controller';
 import { StudentProfilesModule } from '../student-profiles/student-profiles.module';
 import { ChannelModule } from '../channel/channel.module';
 import { StreaksModule } from '../streaks/streaks.module';
 import { TransactionModule } from '../transaction/transaction.module';
 import { FullStreaksModule } from '../full-streaks/full-streaks.module';
+import { HomeService } from './home.service';
 
 @Module({
   imports: [
@@ -16,6 +16,6 @@ import { FullStreaksModule } from '../full-streaks/full-streaks.module';
     FullStreaksModule,
   ],
   controllers: [AssignController],
-  providers: [AssignService],
+  providers: [HomeService],
 })
-export class AssignModule {}
+export class HomeModule {}

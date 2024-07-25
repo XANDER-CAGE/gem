@@ -80,17 +80,18 @@ export class FullStreakRepo {
     profileId: string,
     channelId: string,
     knex = this.knex,
-  ): Promise<FullStreaksOnProfiles> {
-    return knex
+  ): Promise<FullStreaksOnProfiles | null> {
+    const fullStreak = await knex
       .select(knex.raw(['fs.*', 'fsp.joined_at as joined_at']))
-      .leftJoin('full_streak as fs', function () {
+      .leftJoin('full_streaks as fs', function () {
         this.on('fs.id', 'fsp.full_streak_id')
-          .andOn('fs.channel_id', channelId)
+          .andOn(knex.raw(`fs.channel_id = '${channelId}'`))
           .andOn(knex.raw('fs.deleted_at is null'));
       })
       .from(`${tableName.fullStreaksM2Mprofiles} as fsp`)
       .where('fsp.profile_id', profileId)
       .orderBy('fsp.joined_at', 'desc')
       .first();
+    return fullStreak || null;
   }
 }

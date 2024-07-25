@@ -12,7 +12,7 @@ import { ChannelEntity } from '../channel/entity/channel.entity';
 import { FullStreaksService } from '../full-streaks/full-streaks.service';
 
 @Injectable()
-export class AssignService {
+export class HomeService {
   constructor(
     @InjectConnection() private readonly knex: Knex,
     private readonly profileService: StudentProfilesService,
@@ -69,11 +69,15 @@ export class AssignService {
       profileId,
       channel.id,
     );
-    const startStreakDate =
-      new Date(lastFullStreak.joined_at) >
-      new Date(lastFailedChannel.created_at)
-        ? new Date(lastFullStreak.joined_at)
-        : new Date(lastFailedChannel.created_at);
+    let startStreakDate: Date;
+    if (lastFailedChannel && lastFailedChannel) {
+      startStreakDate =
+        new Date(lastFullStreak.joined_at) >
+        new Date(lastFailedChannel.created_at)
+          ? new Date(lastFullStreak.joined_at)
+          : new Date(lastFailedChannel.created_at);
+    } else {
+    }
     const successChannelCount = await this.channelService.countAfterFail(
       profileId,
       channel.id,
