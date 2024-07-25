@@ -16,6 +16,7 @@ import { FullStreaksModule } from './modules/full-streaks/full-streaks.module';
 import { ChannelCategoriesModule } from './modules/channel_categories/channel-categories.module';
 import { AssignModule } from './modules/assign/assign.module';
 
+//leadership module
 @Module({
   imports: [
     KnexModule.forRootAsync({
