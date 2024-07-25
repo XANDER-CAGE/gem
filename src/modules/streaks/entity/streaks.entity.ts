@@ -6,7 +6,7 @@ export class StreakEntity {
   @ApiProperty()
   channel_id: string;
   @ApiProperty()
-  streak_day: number;
+  streak: number;
   @ApiProperty()
   streak_reward: number;
   @ApiProperty()

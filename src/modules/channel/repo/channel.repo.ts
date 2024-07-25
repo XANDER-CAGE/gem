@@ -8,6 +8,8 @@ import {
 } from '../interface/channel.interface';
 import { CreateChannelDto } from '../dto/channel-create.dto';
 import { UpdateChannelDto } from '../dto/channel-update.dto';
+import { tableName } from 'src/common/var/table-name.var';
+import { ChannelsOnProfilesEntity } from '../entity/channels-on-profiles.entity';
 
 export class ChannelRepo {
   private readonly table = 'channels';
@@ -47,15 +49,24 @@ export class ChannelRepo {
       ])
       .from(innerQuery);
 
-    return { total: +total, data };
+    return { total: +total, data: data || [] };
   }
 
   async findOne(id: string, knex = this.knex): Promise<ChannelEntity> {
     return await knex
-      .select('*')
-      .from(this.table)
-      .where('id', id)
-      .andWhere('deleted_at', null)
+      .select(
+        knex.raw([
+          'c.*',
+          `CASE WHEN s.id IS NULL THEN ARRAY[]::json[] ELSE ARRAY_AGG(ROW_TO_JSON(s)) END as streaks`,
+        ]),
+      )
+      .leftJoin(`${tableName.streaks} as s`, function () {
+        this.on('s.channel_id', 'c.id').andOn(knex.raw('s.deleted_at is null'));
+      })
+      .from(`${this.table} as c`)
+      .where('c.id', id)
+      .andWhere('c.deleted_at', null)
+      .groupBy('c.id', 's.id')
       .first();
   }
 
@@ -85,11 +96,38 @@ export class ChannelRepo {
       .andWhere('deleted_at', null);
   }
 
-  async assignProfile(dto: IAssignChannelArg, knex = this.knex) {
-    const [data] = await knex('channels_on_profiles')
+  async connectToProfile(dto: IAssignChannelArg, knex = this.knex) {
+    const [data] = await knex(tableName.channelsM2Mprofiles)
       .insert({ ...dto })
       .returning('*');
     return data;
   }
 
+  async getLastFailedChannel(
+    profileId: string,
+    channelId: string,
+    knex = this.knex,
+  ): Promise<ChannelsOnProfilesEntity> {
+    return await knex(tableName.channelsM2Mprofiles)
+      .select('*')
+      .where('profile_id', profileId)
+      .andWhere('channel_id', channelId)
+      .andWhere('is_done', false)
+      .orderBy('created_at', 'desc')
+      .first();
+  }
+
+  async countAfterFail(
+    profileId: string,
+    channelId: string,
+    date: Date,
+    knex = this.knex,
+  ): Promise<number> {
+    return await knex(tableName.channelsM2Mprofiles)
+      .select(knex.raw('count(id)'))
+      .where('profile_id', profileId)
+      .andWhere('channel_id', channelId)
+      .andWhere('is_done', true)
+      .andWhereRaw(`joined_at::date > ${date}::date`);
+  }
 }

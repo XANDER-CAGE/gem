@@ -1,20 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class StudentProfileEntity {
+export class ChannelsOnProfilesEntity {
   @ApiProperty()
   id: string;
   @ApiProperty()
-  avatar?: string;
+  profile_id: string;
   @ApiProperty()
-  level: number;
+  channel_id: string;
   @ApiProperty()
-  student_id: string;
+  streak_id: string;
   @ApiProperty()
-  level_id: string;
+  is_done: boolean;
   @ApiProperty()
-  gem: number;
+  joined_at: Date;
   @ApiProperty()
-  deleted_at?: Date;
+  deleted_at: Date;
   @ApiProperty()
   created_at: Date;
   @ApiProperty()

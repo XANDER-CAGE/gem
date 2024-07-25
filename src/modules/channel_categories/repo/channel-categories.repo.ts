@@ -43,8 +43,7 @@ export class ChannelCategoriesRepo {
         knex.raw('jsonb_agg(c.*) AS data'),
       ])
       .from(innerQuery);
-
-    return { total: +total, data };
+    return { total: +total, data: data || [] };
   }
 
   async findOne(

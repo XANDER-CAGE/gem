@@ -39,5 +39,5 @@ export class CreateChannelDto {
   @IsOptional()
   @MinLength(1)
   @MaxLength(255)
-  channel_categories_id?: string;
+  channel_category_id?: string;
 }

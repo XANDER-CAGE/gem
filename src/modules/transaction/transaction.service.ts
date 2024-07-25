@@ -1,7 +1,6 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { TransactionRepo } from './repo/transaction.repo';
 import { StudentProfilesService } from '../student-profiles/student-profiles.service';
-import { ChannelService } from '../channel/channel.service';
 import { StreaksService } from '../streaks/streaks.service';
 import { TransactionEntity } from './entity/transaction.entity';
 import { ProductsService } from '../market-products/market-products.service';
@@ -9,35 +8,40 @@ import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { IFindAllTransaction } from './interface/find-all-transaction.interface';
 import { CreateEarningDto } from './dto/create-earning-transaction.dto';
 import { CreateSpendingDto } from './dto/create-spending-transaction.dto';
+import { InjectConnection } from 'nest-knexjs';
+import { Knex } from 'knex';
+import { ChannelService } from '../channel/channel.service';
 
 @Injectable()
 export class TransactionService {
   constructor(
-    @Inject() private readonly transactionRepo: TransactionRepo,
+    @InjectConnection() private readonly knex: Knex,
+    private readonly transactionRepo: TransactionRepo,
     private readonly profileService: StudentProfilesService,
-    private readonly channelService: ChannelService,
     private readonly streakService: StreaksService,
     private readonly productService: ProductsService,
+    private readonly channelService: ChannelService,
   ) {}
 
-  async createEarning(dto: CreateEarningDto): Promise<TransactionEntity> {
+  async createEarning(
+    dto: CreateEarningDto,
+    knex = this.knex,
+  ): Promise<TransactionEntity> {
     let totalGem = 0;
     const profile = await this.profileService.findOne(dto.profile_id);
     if (!profile) throw new NotFoundException('Profile not found');
     const channel = await this.channelService.findOne(dto.channel_id);
     if (!channel) throw new NotFoundException('Channel not found');
-    totalGem += channel.reward_gem;
+    totalGem += +channel.reward_gem;
     if (dto.streak_id) {
       const streak = await this.streakService.findOne(dto.streak_id);
       if (!streak) throw new NotFoundException('Streak not found');
       totalGem += +streak.streak_reward;
     }
-    return totalGem
-      ? await this.transactionRepo.createEarning({
-          ...dto,
-          total_gem: totalGem,
-        })
-      : null;
+    return await this.transactionRepo.createEarning(
+      { ...dto, total_gem: totalGem },
+      knex,
+    );
   }
 
   async createSpending(dto: CreateSpendingDto): Promise<TransactionEntity> {

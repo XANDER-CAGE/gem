@@ -3,12 +3,11 @@ import { StudentProfilesService } from './student-profiles.service';
 import { StudentProfilesController } from './student-profiles.controller';
 import { StudentProfilesRepo } from './repo/student-profiles.repo';
 import { LevelModule } from '../level/level.module';
-import { StreaksModule } from '../streaks/streaks.module';
 
 @Module({
-  imports: [LevelModule, StreaksModule],
+  imports: [LevelModule],
   controllers: [StudentProfilesController],
   providers: [StudentProfilesService, StudentProfilesRepo],
-  exports: [StudentProfilesService],
+  exports: [StudentProfilesService, StudentProfilesRepo],
 })
 export class StudentProfilesModule {}

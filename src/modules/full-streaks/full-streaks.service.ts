@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { FullStreakRepo } from './repo/full-streak.repo';
 import { BadgeService } from '../badge/badge.service';
 import { ChannelService } from '../channel/channel.service';
@@ -9,10 +9,12 @@ import { UpdateFullStreakDto } from './dto/update-full-streaks.dto';
 
 @Injectable()
 export class FullStreaksService {
-  @Inject() private readonly fullStreakRepo: FullStreakRepo;
-  @Inject() private readonly productService: ProductsService;
-  @Inject() private readonly badgeService: BadgeService;
-  @Inject() private readonly chanelService: ChannelService;
+  constructor(
+    private readonly fullStreakRepo: FullStreakRepo,
+    private readonly productService: ProductsService,
+    private readonly badgeService: BadgeService,
+    private readonly chanelService: ChannelService,
+  ) {}
 
   async create(fullStreakRepo: CreateFullStreakDto) {
     const { badge_id, channel_id, product_id } = fullStreakRepo;
@@ -68,5 +70,9 @@ export class FullStreaksService {
 
   async remove(id: string) {
     return await this.fullStreakRepo.deleteOne(id);
+  }
+
+  async getLastFullStreak(profileId: string, channelId: string) {
+    return await this.fullStreakRepo.getLastFullStreak(profileId, channelId);
   }
 }

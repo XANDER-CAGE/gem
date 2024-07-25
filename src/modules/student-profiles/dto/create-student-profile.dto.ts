@@ -35,13 +35,6 @@ export class CreateStudentProfileDto {
   @MaxLength(24)
   student_id?: string;
 
-  @ApiProperty({ example: '507f1f77bcf86cd799439013' })
-  @IsOptional()
-  @IsString()
-  @MinLength(1)
-  @MaxLength(24)
-  streak_id?: string;
-
   @ApiProperty({ example: '507f1f77bcf86cd799439014' })
   @IsOptional()
   @IsString()

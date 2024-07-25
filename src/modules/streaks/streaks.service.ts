@@ -1,20 +1,22 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { StreaksRepo } from './repo/streaks.repo';
-import { ChannelService } from '../channel/channel.service';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { CreateStreakDto } from './dto/create-streaks.dto';
 import { UpdateStreakDto } from './dto/update-streaks.dto';
 import { StreakEntity } from './entity/streaks.entity';
+import { ChannelService } from '../channel/channel.service';
 
 @Injectable()
 export class StreaksService {
-  @Inject() private readonly streakRepo: StreaksRepo;
-  @Inject() private readonly chanelService: ChannelService;
+  constructor(
+    private readonly streakRepo: StreaksRepo,
+    private readonly channelService: ChannelService,
+  ) {}
 
   async create(createStreak: CreateStreakDto) {
     const { channel_id } = createStreak;
-    const chanelExist = await this.chanelService.findOne(channel_id);
-    if (!chanelExist) {
+    const channel = await this.channelService.findOne(channel_id);
+    if (!channel) {
       throw new NotFoundException('This chanel does not exist');
     }
 
@@ -29,13 +31,16 @@ export class StreaksService {
     return await this.streakRepo.findOne(id);
   }
 
-  async findOneByChannelId(channelId: string): Promise<StreakEntity> {
-    return await this.streakRepo.findOneByChannelId(channelId);
+  async findOneByChannelId(
+    channelId: string,
+    level: number,
+  ): Promise<StreakEntity> {
+    return await this.streakRepo.findOneByChannelId(channelId, level);
   }
 
   async update(id: string, updateStreak: UpdateStreakDto) {
     const { channel_id } = updateStreak;
-    const chanelExist = await this.chanelService.findOne(channel_id);
+    const chanelExist = await this.streakRepo.channelExists(channel_id);
     if (!chanelExist) {
       throw new NotFoundException('This chanel does not exist');
     }

@@ -6,13 +6,15 @@ export class FullStreakEntity {
   @ApiProperty()
   streak_level: number;
   @ApiProperty()
-  badge_id: string;
+  badge_id?: string;
   @ApiProperty()
-  product_id: string;
+  product_id?: string;
+  @ApiProperty()
+  last_streak_day: Date;
   @ApiProperty()
   deleted_at?: Date;
   @ApiProperty()
-  created_at?: Date;
+  created_at: Date;
   @ApiProperty()
-  updated_at?: Date;
+  updated_at: Date;
 }
