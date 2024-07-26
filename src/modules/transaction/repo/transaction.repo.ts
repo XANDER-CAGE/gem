@@ -70,11 +70,45 @@ export class TransactionRepo {
   }
 
   async sumAllEarning(profileId: string, knex = this.knex) {
-    return knex
-      .select(knex.raw(['sum(total_gem) as totalEarned']))
+    return knex('transactions')
+      .select(knex.raw('SUM(total_gem) as totalEarned'))
       .where('profile_id', profileId)
       .andWhere('deleted_at', null)
       .andWhereNot('channel_id', null);
+  }
+  async sumTopEarning(
+    dto: PaginationDto,
+    knex = this.knex,
+  ): Promise<IFindAllTransaction> {
+    const { limit = 50, page = 1 } = dto;
+
+    const innerQuery = knex(this.table)
+      .select('profile_id')
+      .select(knex.raw('SUM(total_gem) as totalEarned'))
+      .select(
+        knex.raw(
+          'ROW_NUMBER() OVER (ORDER BY SUM(total_gem) DESC) AS position',
+        ),
+      )
+      .where('deleted_at', null)
+      .andWhereNot('channel_id', null)
+      .groupBy('profile_id')
+      .orderBy('totalEarned', 'desc')
+      .limit(limit)
+      .offset((page - 1) * limit)
+      .as('c');
+
+    const [{ total, data }] = await knex
+      .select([
+        knex.raw(
+          '(SELECT COUNT(DISTINCT profile_id) FROM ?? WHERE deleted_at is null AND channel_id is not null) AS total',
+          'transactions',
+        ),
+        knex.raw('jsonb_agg(c.*) AS data'),
+      ])
+      .from(innerQuery);
+
+    return { total: +total, data };
   }
 
   // async update(

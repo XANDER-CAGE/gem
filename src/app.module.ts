@@ -15,6 +15,7 @@ import { LevelModule } from './modules/level/level.module';
 import { FullStreaksModule } from './modules/full-streaks/full-streaks.module';
 import { ChannelCategoriesModule } from './modules/channel_categories/channel-categories.module';
 import { HomeModule } from './modules/home/home.module';
+import { LeadershipModule } from './modules/leadership/leadership.module';
 
 //leadership module
 @Module({
@@ -36,6 +37,7 @@ import { HomeModule } from './modules/home/home.module';
     FullStreaksModule,
     ChannelCategoriesModule,
     HomeModule,
+    LeadershipModule,
   ],
 })
 export class AppModule {}

@@ -68,7 +68,13 @@ export class TransactionService {
   }
 
   async sumAllEarning(profileId: string) {
-    return this.transactionRepo.sumAllEarning(profileId);
+    return await this.transactionRepo.sumAllEarning(profileId);
+  }
+
+
+
+  async listTopEarning(dto: PaginationDto) {
+    return await this.transactionRepo.sumTopEarning(dto);
   }
 
   // async update(id: string, dto: any) {

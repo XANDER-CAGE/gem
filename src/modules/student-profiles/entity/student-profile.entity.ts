@@ -6,8 +6,6 @@ export class StudentProfileEntity {
   @ApiProperty()
   avatar?: string;
   @ApiProperty()
-  level: number;
-  @ApiProperty()
   student_id: string;
   @ApiProperty()
   level_id: string;

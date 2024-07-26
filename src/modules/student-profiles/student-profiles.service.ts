@@ -11,7 +11,6 @@ import { Knex } from 'knex';
 
 @Injectable()
 export class StudentProfilesService {
-  //Also i need to add StudentService
   constructor(
     @InjectConnection() private readonly knex: Knex,
     private readonly studentProfileRepo: StudentProfilesRepo,
@@ -29,6 +28,11 @@ export class StudentProfilesService {
     findAllStudentProfiles: PaginationDto,
   ): Promise<IFindAllStudentProfile> {
     return await this.studentProfileRepo.findAll(findAllStudentProfiles);
+  }
+  async findTopList(
+    findTopStudentProfile: PaginationDto,
+  ): Promise<IFindAllStudentProfile> {
+    return await this.studentProfileRepo.findTopList(findTopStudentProfile);
   }
 
   async findOne(id: string): Promise<StudentProfileEntity> {

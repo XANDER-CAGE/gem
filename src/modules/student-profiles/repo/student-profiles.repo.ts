@@ -36,6 +36,34 @@ export class StudentProfilesRepo {
     return { total: +total, data };
   }
 
+  async findTopList(
+    dto: PaginationDto,
+    knex = this.knex,
+  ): Promise<IFindAllStudentProfile> {
+    const { limit = 50, page = 1 } = dto;
+
+    const innerQuery = knex(this.table)
+      .select('*')
+      .select(knex.raw('ROW_NUMBER() OVER (ORDER BY gem DESC) AS position'))
+      .where('deleted_at', null)
+      .orderBy('gem', 'desc')
+      .limit(limit)
+      .offset((page - 1) * limit)
+      .as('c');
+
+    const [{ total, data }] = await knex
+      .select([
+        knex.raw(
+          '(SELECT COUNT(id) FROM ?? WHERE deleted_at is null) AS total',
+          'student_profiles',
+        ),
+        knex.raw('jsonb_agg(c.*) AS data'),
+      ])
+      .from(innerQuery);
+
+    return { total: +total, data };
+  }
+
   async findOne(id: string, knex = this.knex) {
     return await knex
       .select('*')
