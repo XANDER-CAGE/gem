@@ -57,7 +57,7 @@ export class ChannelRepo {
       .select(
         knex.raw([
           'c.*',
-          `CASE WHEN s.id IS NULL THEN ARRAY[]::json[] ELSE ARRAY_AGG(ROW_TO_JSON(s)) END as streaks`,
+          `case when s.id is not null then true else false end as has_streak`,
         ]),
       )
       .leftJoin(`${tableName.streaks} as s`, function () {
@@ -66,7 +66,6 @@ export class ChannelRepo {
       .from(`${this.table} as c`)
       .where('c.id', id)
       .andWhere('c.deleted_at', null)
-      .groupBy('c.id', 's.id')
       .first();
   }
 
@@ -123,11 +122,15 @@ export class ChannelRepo {
     date: Date,
     knex = this.knex,
   ): Promise<number> {
-    return await knex(tableName.channelsM2Mprofiles)
-      .select(knex.raw('count(id)'))
+    const data: any = await knex(tableName.channelsM2Mprofiles)
+      .select(knex.raw('count(id)::integer'))
       .where('profile_id', profileId)
       .andWhere('channel_id', channelId)
       .andWhere('is_done', true)
-      .andWhereRaw(`joined_at::date > ${date}::date`);
+      .andWhereRaw(`joined_at > ?::timestamp`, [
+        date.toISOString().replace('T', ' ').replace('Z', ''),
+      ])
+      .first();
+    return data.count;
   }
 }

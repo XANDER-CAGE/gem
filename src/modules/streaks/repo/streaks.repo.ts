@@ -6,10 +6,11 @@ import { IFindAllStreaks } from '../interface/streaks.interface';
 import { CreateStreakDto } from '../dto/create-streaks.dto';
 import { StreakEntity } from '../entity/streaks.entity';
 import { UpdateStreakDto } from '../dto/update-streaks.dto';
+import { tableName } from 'src/common/var/table-name.var';
 
 @Injectable()
 export class StreaksRepo {
-  private table = 'streaks';
+  private table = tableName.streaks;
 
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
@@ -57,11 +58,17 @@ export class StreaksRepo {
 
   async findOneByChannelId(channelId: string, level: number, knex = this.knex) {
     const data = await knex
-      .select('*')
-      .from(this.table)
+      .select(
+        knex.raw([
+          '*',
+          'streak_reward::double precision as streak_reward',
+          `((select count(*) from ${this.table} where channel_id = '${channelId}' and deleted_at is null) = level) as is_last`,
+        ]),
+      )
+      .from(`${this.table}`)
       .where('channel_id', channelId)
       .andWhere('deleted_at', null)
-      .andWhere('streak', level)
+      .andWhere('level', level)
       .first();
     return data || null;
   }

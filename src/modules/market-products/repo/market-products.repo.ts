@@ -6,14 +6,19 @@ import { CreateProductDto } from '../dto/create-market-product.dto';
 import { ProductEntity } from '../entity/product.interface';
 import { IFindAllProduct } from '../interface/market-product.interface';
 import { UpdateProductDto } from '../dto/update-market-product.dto';
+import { tableName } from 'src/common/var/table-name.var';
 
 @Injectable()
 export class ProductRepo {
-  private table = 'market_products';
+  private readonly table = tableName.marketProducts;
+  private readonly relationToProfile = tableName.profilesM2MProducts;
 
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
-  async create(dto: CreateProductDto, knex = this.knex): Promise<ProductEntity> {
+  async create(
+    dto: CreateProductDto,
+    knex = this.knex,
+  ): Promise<ProductEntity> {
     const [data] = await knex
       .insert({
         ...dto,
@@ -79,5 +84,29 @@ export class ProductRepo {
       })
       .where('id', id)
       .andWhere('deleted_at', null);
+  }
+
+  async getConnectionToProfile(
+    profileId: string,
+    productId: string,
+    knex = this.knex,
+  ) {
+    return await knex
+      .select('*')
+      .from(this.relationToProfile)
+      .where('profile_id', profileId)
+      .andWhere('product_id', productId)
+      .first();
+  }
+
+  async connectToProfile(
+    profileId: string,
+    productId: string,
+    knex = this.knex,
+  ) {
+    return await knex
+      .insert({ profile_id: profileId, product_id: productId })
+      .into(this.relationToProfile)
+      .returning('*');
   }
 }

@@ -82,7 +82,17 @@ export class ChannelService {
     );
   }
 
-  async countAfterFail(profileId: string, channelId: string, date: Date) {
-    return await this.channelRepo.countAfterFail(profileId, channelId, date);
+  async countAfterFail(
+    profileId: string,
+    channelId: string,
+    date: Date,
+    knex = this.knex,
+  ) {
+    return await this.channelRepo.countAfterFail(
+      profileId,
+      channelId,
+      date,
+      knex,
+    );
   }
 }

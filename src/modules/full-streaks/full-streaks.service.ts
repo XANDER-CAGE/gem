@@ -6,6 +6,8 @@ import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { ProductsService } from '../market-products/market-products.service';
 import { CreateFullStreakDto } from './dto/create-full-streaks.dto';
 import { UpdateFullStreakDto } from './dto/update-full-streaks.dto';
+import { InjectConnection } from 'nest-knexjs';
+import { Knex } from 'knex';
 
 @Injectable()
 export class FullStreaksService {
@@ -14,6 +16,7 @@ export class FullStreaksService {
     private readonly productService: ProductsService,
     private readonly badgeService: BadgeService,
     private readonly chanelService: ChannelService,
+    @InjectConnection() private readonly knex: Knex,
   ) {}
 
   async create(fullStreakRepo: CreateFullStreakDto) {
@@ -72,7 +75,48 @@ export class FullStreaksService {
     return await this.fullStreakRepo.deleteOne(id);
   }
 
-  async getLastFullStreak(profileId: string, channelId: string) {
-    return await this.fullStreakRepo.getLastFullStreak(profileId, channelId);
+  async getLastFullStreak(
+    profileId: string,
+    channelId: string,
+    knex = this.knex,
+  ) {
+    return await this.fullStreakRepo.getLastFullStreak(
+      profileId,
+      channelId,
+      knex,
+    );
+  }
+
+  async assignFullStreak(
+    profileId: string,
+    channelId: string,
+    level: number,
+    knex = this.knex,
+  ) {
+    const nextFullStreak = await this.fullStreakRepo.getOneByLevel(
+      channelId,
+      level,
+      knex,
+    );
+    await this.fullStreakRepo.assignFullStreak(
+      profileId,
+      nextFullStreak.id,
+      knex,
+    );
+    if (nextFullStreak.badge_id) {
+      await this.badgeService.connectToProfile(
+        profileId,
+        nextFullStreak.badge_id,
+        knex,
+      );
+    }
+    if (nextFullStreak.product_id) {
+      await this.productService.connectToProfile(
+        profileId,
+        nextFullStreak.product_id,
+        knex,
+      );
+    }
+    return nextFullStreak;
   }
 }

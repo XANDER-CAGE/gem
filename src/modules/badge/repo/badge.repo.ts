@@ -5,9 +5,11 @@ import { BadgeEntity } from '../entity/badge.entity';
 import { IFindAllBadge } from '../interface/find_all.interface';
 import { CreateBadgeDto } from '../dto/create-badge.dto';
 import { UpdateBadgeDto } from '../dto/update-badge.dto';
+import { tableName } from 'src/common/var/table-name.var';
 
 export class BadgeRepo {
-  private readonly table = 'badges';
+  private readonly table = tableName.badges;
+  private readonly relationToProfile = tableName.profilesM2Mbadges;
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
   async create(dto: CreateBadgeDto, knex = this.knex): Promise<BadgeEntity> {
@@ -73,5 +75,28 @@ export class BadgeRepo {
       })
       .where('id', id)
       .andWhere('deleted_at', null);
+  }
+
+  async connectToProfile(profileId: string, badgeId: string, knex = this.knex) {
+    return await knex
+      .insert({
+        profile_id: profileId,
+        badge_id: badgeId,
+      })
+      .into(this.relationToProfile)
+      .returning('*');
+  }
+
+  async findConnectionToProfile(
+    profileId: string,
+    badgeId: string,
+    knex = this.knex,
+  ) {
+    return await knex
+      .select('*')
+      .from(this.relationToProfile)
+      .where('profile_id', profileId)
+      .andWhere('badge_id', badgeId)
+      .first();
   }
 }

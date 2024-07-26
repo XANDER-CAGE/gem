@@ -26,7 +26,7 @@ export class CreateFullStreakDto {
   @ApiProperty({ example: 1 })
   @IsNotEmpty()
   @IsInt()
-  streak_level: number;
+  level: number;
 
   @ApiProperty({ example: '507f1f77bcf86cd799439011' })
   @IsNotEmpty()

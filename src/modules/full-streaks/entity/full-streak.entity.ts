@@ -2,15 +2,17 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class FullStreakEntity {
   @ApiProperty()
+  id: string;
+  @ApiProperty()
   channel_id: string;
   @ApiProperty()
-  streak_level: number;
+  level: number;
+  @ApiProperty()
+  is_last: boolean;
   @ApiProperty()
   badge_id?: string;
   @ApiProperty()
   product_id?: string;
-  @ApiProperty()
-  last_streak_day: Date;
   @ApiProperty()
   deleted_at?: Date;
   @ApiProperty()

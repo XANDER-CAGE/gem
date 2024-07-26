@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { BadgeService } from '../badge/badge.service';
 import { LevelRepo } from './repo/level.repo';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
@@ -7,8 +7,10 @@ import { UpdateLevelDto } from './dto/update-level.dto';
 
 @Injectable()
 export class LevelService {
-  @Inject() private readonly badgeService: BadgeService;
-  @Inject() private readonly levelRepo: LevelRepo;
+  constructor(
+    private readonly badgeService: BadgeService,
+    private readonly levelRepo: LevelRepo,
+  ) {}
 
   async create(createLevelDto: CreateLevelDto) {
     const { badge_id } = createLevelDto;

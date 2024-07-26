@@ -5,12 +5,14 @@ import { CreateStreakDto } from './dto/create-streaks.dto';
 import { UpdateStreakDto } from './dto/update-streaks.dto';
 import { StreakEntity } from './entity/streaks.entity';
 import { ChannelService } from '../channel/channel.service';
+import { InjectConnection } from 'nest-knexjs';
 
 @Injectable()
 export class StreaksService {
   constructor(
     private readonly streakRepo: StreaksRepo,
     private readonly channelService: ChannelService,
+    @InjectConnection() private readonly knex = this.knex,
   ) {}
 
   async create(createStreak: CreateStreakDto) {
@@ -34,8 +36,9 @@ export class StreaksService {
   async findOneByChannelId(
     channelId: string,
     level: number,
+    knex = this.knex,
   ): Promise<StreakEntity> {
-    return await this.streakRepo.findOneByChannelId(channelId, level);
+    return await this.streakRepo.findOneByChannelId(channelId, level, knex);
   }
 
   async update(id: string, updateStreak: UpdateStreakDto) {

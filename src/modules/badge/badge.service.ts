@@ -1,13 +1,18 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BadgeRepo } from './repo/badge.repo';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { IFindAllBadge } from './interface/find_all.interface';
 import { CreateBadgeDto } from './dto/create-badge.dto';
 import { UpdateBadgeDto } from './dto/update-badge.dto';
+import { InjectConnection } from 'nest-knexjs';
+import { Knex } from 'knex';
 
 @Injectable()
 export class BadgeService {
-  constructor(@Inject() private readonly badgeRepo: BadgeRepo) {}
+  constructor(
+    private readonly badgeRepo: BadgeRepo,
+    @InjectConnection() private readonly knex: Knex,
+  ) {}
 
   async create(createChannelDto: CreateBadgeDto) {
     return this.badgeRepo.create(createChannelDto);
@@ -27,5 +32,15 @@ export class BadgeService {
 
   async remove(id: string) {
     await this.badgeRepo.delete(id);
+  }
+
+  async connectToProfile(profileId: string, badgeId: string, knex = this.knex) {
+    const connection = await this.badgeRepo.findConnectionToProfile(
+      profileId,
+      badgeId,
+      knex,
+    );
+    if (connection) return connection;
+    return await this.badgeRepo.connectToProfile(profileId, badgeId, knex);
   }
 }
