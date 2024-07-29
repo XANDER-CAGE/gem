@@ -14,7 +14,7 @@ export const tableName = {
   profilesM2MProducts: 'profiles_on_products',
   badges: 'badges',
   profilesM2Mbadges: 'profiles_on_badges',
-  level: 'level',
+  levels: 'levels',
   levelsM2MProfiles: 'levels_on_profiles',
   levelsM2MProducts: 'levels_on_products',
   stories: 'stories',

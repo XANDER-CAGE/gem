@@ -6,6 +6,7 @@ import { StreaksModule } from '../streaks/streaks.module';
 import { TransactionModule } from '../transaction/transaction.module';
 import { FullStreaksModule } from '../full-streaks/full-streaks.module';
 import { HomeService } from './home.service';
+import { LevelModule } from '../level/level.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { HomeService } from './home.service';
     StreaksModule,
     TransactionModule,
     FullStreaksModule,
+    LevelModule,
   ],
   controllers: [AssignController],
   providers: [HomeService],

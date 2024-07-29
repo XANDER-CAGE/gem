@@ -10,6 +10,7 @@ import { IAssignChannelArg } from '../channel/interface/channel.interface';
 import { CreateEarningDto } from '../transaction/dto/create-earning-transaction.dto';
 import { ChannelEntity } from '../channel/entity/channel.entity';
 import { FullStreaksService } from '../full-streaks/full-streaks.service';
+import { LevelService } from '../level/level.service';
 
 @Injectable()
 export class HomeService {
@@ -20,6 +21,7 @@ export class HomeService {
     private readonly transactionService: TransactionService,
     private readonly streakService: StreaksService,
     private readonly fullStreakService: FullStreaksService,
+    private readonly levelService: LevelService,
   ) {}
 
   async assignChannel(dto: AssignChannelDto) {
@@ -68,6 +70,11 @@ export class HomeService {
         streak_id: streakId,
         profile_id: profile.id,
       };
+      const levels = await this.levelService.connectToProfile(
+        profile.id,
+        totalGem,
+      );
+      
       await this.transactionService.createEarning(createEarningArg, trx);
       await this.profileService.update(profile.id, { gem: totalGem }, trx);
     });
@@ -113,7 +120,6 @@ export class HomeService {
       new Date(startStreakDate),
       knex,
     );
-    console.log(successChannelCount);
 
     const streak = await this.streakService.findOneByChannelId(
       channel.id,
