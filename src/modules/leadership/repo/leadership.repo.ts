@@ -1,72 +1,55 @@
 import { Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { IFindAllLeadership } from '../interface/leadership.interface';
-import { CreateLeadershipDto } from '../dto/create-leadership.dto';
-import { LeadershipEntity } from '../entities/leadership.entity';
-import { UpdateLeadershipDto } from '../dto/update-leadership.dto';
 
 @Injectable()
 export class LeadershipRepo {
-  private table = 'leadership';
-
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
-  async findAll(dto: PaginationDto, knex = this.knex): Promise<IFindAllLeadership> {
-    const { limit = 10, page = 1 } = dto;
-    const innerQuery = knex(this.table)
-      .select('*')
-      .where('deleted_at', null)
-      .limit(limit)
-      .offset((page - 1) * limit)
-      .as('c');
-    const [{ total, data }] = await knex
-      .select([
+  async saveLeadership(knex = this.knex) {
+    const subQuery = knex('student_profiles as p')
+      .leftJoin('transactions as t', function () {
+        this.on('t.profile_id', '=', 'p.id')
+          .andOnNull('t.deleted_at')
+          .andOnNotNull('t.channel_id');
+      })
+      .whereNull('p.deleted_at')
+      .select(
+        'p.id',
+        'p.gem',
+        knex.raw('SUM(t.total_gem) AS total'),
         knex.raw(
-          '(SELECT COUNT(id) FROM ?? WHERE deleted_at is null) AS total',
-          this.table,
+          'ROW_NUMBER() OVER (ORDER BY p.gem DESC) AS last_position_by_gem',
         ),
-        knex.raw('jsonb_agg(c.*) AS data'),
-      ])
-      .from(innerQuery);
+      )
+      .groupBy('p.id', 'p.gem')
+      .as('sub');
 
-    return { total: +total, data };
-  }
-
-  async findOne(id: string, knex = this.knex) {
-    return await knex
-      .select('*')
-      .from(this.table)
-      .where('id', id)
-      .andWhere('deleted_at', null)
-      .first();
-  }
-
-  async create(data: CreateLeadershipDto, knex = this.knex): Promise<LeadershipEntity> {
-    const [res] = await knex(this.table).insert(data).returning('*');
-    return res;
-  }
-
-  async update(id: string, data: UpdateLeadershipDto, knex = this.knex) {
-    const [updateMarket] = await knex(this.table)
-      .update({
-        ...data,
-        updated_at: new Date(),
+    const mainQuery = knex('leadership')
+      .insert(function () {
+        this.select(
+          knex.raw('generate_object_id() AS id'),
+          'sub.id AS profile_id',
+          'sub.last_position_by_gem',
+          knex.raw(
+            'ROW_NUMBER() OVER (ORDER BY sub.total DESC, sub.gem DESC) AS last_position_by_earning',
+          ),
+        )
+          .from(subQuery)
+          .orderByRaw('sub.total DESC, sub.gem DESC')
+          .limit(10);
       })
-      .where('id', id)
-      .andWhere('deleted_at', null)
-      .returning('*');
-    return updateMarket;
-  }
-
-  async deleteOne(id: string, knex = this.knex) {
-    await knex(this.table)
-      .update({
-        deleted_at: new Date(),
-        updated_at: new Date(),
+      .onConflict('profile_id')
+      .merge({
+        last_position_by_gem: knex.raw('EXCLUDED.last_position_by_gem'),
+        last_position_by_earning: knex.raw('EXCLUDED.last_position_by_earning'),
       })
-      .where('id', id)
-      .andWhere('deleted_at', null);
+      .returning([
+        'profile_id',
+        'last_position_by_gem',
+        'last_position_by_earning',
+      ]);
+
+    return await mainQuery;
   }
 }

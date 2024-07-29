@@ -76,39 +76,32 @@ export class TransactionRepo {
       .andWhere('deleted_at', null)
       .andWhereNot('channel_id', null);
   }
-  async sumTopEarning(
-    dto: PaginationDto,
-    knex = this.knex,
-  ): Promise<IFindAllTransaction> {
-    const { limit = 50, page = 1 } = dto;
-
-    const innerQuery = knex(this.table)
-      .select('profile_id')
-      .select(knex.raw('SUM(total_gem) as totalEarned'))
+  async sumTopEarning(limit: number, knex = this.knex) {
+    const data = knex
+      .select('sub.*')
       .select(
         knex.raw(
-          'ROW_NUMBER() OVER (ORDER BY SUM(total_gem) DESC) AS position',
+          'ROW_NUMBER() OVER (ORDER BY sub.total DESC, sub.gem DESC) AS position',
         ),
       )
-      .where('deleted_at', null)
-      .andWhereNot('channel_id', null)
-      .groupBy('profile_id')
-      .orderBy('totalEarned', 'desc')
-      .limit(limit)
-      .offset((page - 1) * limit)
-      .as('c');
+      .from(function () {
+        this.select('p.*')
+          .sum('t.total_gem as total')
+          .from('student_profiles as p')
+          .leftJoin('transactions as t', function () {
+            this.on('t.profile_id', '=', 'p.id')
+              .andOnNull('t.deleted_at')
+              .andOnNotNull('t.channel_id');
+          })
+          .whereNull('p.deleted_at')
+          .groupBy('p.id', 'p.gem')
+          .as('sub');
+      })
+      .orderBy('sub.total', 'desc')
+      .orderBy('sub.gem', 'desc')
+      .limit(limit);
 
-    const [{ total, data }] = await knex
-      .select([
-        knex.raw(
-          '(SELECT COUNT(DISTINCT profile_id) FROM ?? WHERE deleted_at is null AND channel_id is not null) AS total',
-          'transactions',
-        ),
-        knex.raw('jsonb_agg(c.*) AS data'),
-      ])
-      .from(innerQuery);
-
-    return { total: +total, data };
+    return data;
   }
 
   // async update(

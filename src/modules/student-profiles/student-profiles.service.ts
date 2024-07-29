@@ -29,10 +29,8 @@ export class StudentProfilesService {
   ): Promise<IFindAllStudentProfile> {
     return await this.studentProfileRepo.findAll(findAllStudentProfiles);
   }
-  async findTopList(
-    findTopStudentProfile: PaginationDto,
-  ): Promise<IFindAllStudentProfile> {
-    return await this.studentProfileRepo.findTopList(findTopStudentProfile);
+  async findTopList(limit: number) {
+    return await this.studentProfileRepo.findTopList(limit);
   }
 
   async findOne(id: string): Promise<StudentProfileEntity> {

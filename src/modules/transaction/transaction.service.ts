@@ -73,8 +73,8 @@ export class TransactionService {
 
 
 
-  async listTopEarning(dto: PaginationDto) {
-    return await this.transactionRepo.sumTopEarning(dto);
+  async listTopEarning(limit:number) {
+    return await this.transactionRepo.sumTopEarning(limit);
   }
 
   // async update(id: string, dto: any) {
