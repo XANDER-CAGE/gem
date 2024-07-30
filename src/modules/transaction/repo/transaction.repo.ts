@@ -5,9 +5,10 @@ import { ICreateEarn } from '../interface/create-earn-transaction.interface';
 import { ICreateSpending } from '../interface/create-spending-transaction.interface';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { IFindAllTransaction } from '../interface/find-all-transaction.interface';
+import { tableName } from 'src/common/var/table-name.var';
 
 export class TransactionRepo {
-  private readonly table = 'transactions';
+  private readonly table = tableName.transactions;
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
   async createEarning(
@@ -69,12 +70,15 @@ export class TransactionRepo {
       .first();
   }
 
-  async sumAllEarning(profileId: string, knex = this.knex) {
-    return knex
-      .select(knex.raw(['sum(total_gem) as totalEarned']))
+  async sumAllEarning(profileId: string, knex = this.knex): Promise<number> {
+    const { totalearned } = await knex
+      .select(knex.raw(['sum(total_gem)::double precision as totalEarned']))
+      .from(this.table)
       .where('profile_id', profileId)
       .andWhere('deleted_at', null)
-      .andWhereNot('channel_id', null);
+      .andWhereNot('channel_id', null)
+      .first();
+    return totalearned;
   }
 
   // async update(

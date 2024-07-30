@@ -103,7 +103,7 @@ export class LevelRepo {
         knex.raw([
           'l.*',
           'l.free_gem::double precision as free_gem',
-          `jsonb_agg(p.*) FILTER (WHERE p.id IS NOT NULL) as products`,
+          `coalesce(jsonb_agg(p.*) filter (where p.id is not null), '[]') as products`,
         ]),
       )
       .groupBy('l.id');

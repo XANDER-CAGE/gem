@@ -70,16 +70,21 @@ export class HomeService {
         streak_id: streakId,
         profile_id: profile.id,
       };
-      const levels = await this.levelService.connectToProfile(
-        profile.id,
-        totalGem,
-      );
-      
       await this.transactionService.createEarning(createEarningArg, trx);
+      const totalEarned = await this.transactionService.sumAllEarning(
+        profile.id,
+        trx,
+      );
+      console.log('TOTAL EARNED', totalEarned);
+      const gemsFromLevels = await this.levelService.connectToProfile(
+        profile.id,
+        totalEarned,
+        trx,
+      );
+      totalGem += gemsFromLevels;
       await this.profileService.update(profile.id, { gem: totalGem }, trx);
     });
-    // const earning = await this.transactionService.sumAllEarning(profile.id);
-    return 'chlen';
+    return 'huypizda123';
   }
 
   async calculateStreak(
@@ -98,7 +103,6 @@ export class HomeService {
       channel.id,
       knex,
     );
-    console.log('Last FULL STREAk', lastFullStreak);
     let startStreakDate: Date;
     if (lastFailedChannel && lastFullStreak) {
       startStreakDate =
@@ -113,14 +117,12 @@ export class HomeService {
           ? lastFullStreak.joined_at
           : new Date('1970');
     }
-    console.log('START STREAK DATE', startStreakDate);
     const successChannelCount = await this.channelService.countAfterFail(
       profileId,
       channel.id,
       new Date(startStreakDate),
       knex,
     );
-
     const streak = await this.streakService.findOneByChannelId(
       channel.id,
       successChannelCount + 1,

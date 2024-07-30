@@ -67,8 +67,8 @@ export class TransactionService {
     return await this.transactionRepo.findOne(id);
   }
 
-  async sumAllEarning(profileId: string) {
-    return this.transactionRepo.sumAllEarning(profileId);
+  async sumAllEarning(profileId: string, knex = this.knex) {
+    return await this.transactionRepo.sumAllEarning(profileId, knex);
   }
 
   // async update(id: string, dto: any) {

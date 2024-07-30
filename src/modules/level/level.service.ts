@@ -51,13 +51,18 @@ export class LevelService {
     return await this.levelRepo.deleteOne(id);
   }
 
-  async connectToProfile(profileId: string, gems: number, knex = this.knex) {
+  async connectToProfile(
+    profileId: string,
+    gems: number,
+    knex = this.knex,
+  ): Promise<number> {
     let totalGem = 0;
     const levels = await this.levelRepo.getUnreachedLevels(
       profileId,
       gems,
       knex,
     );
+    console.log(levels);
     for (const level of levels) {
       await this.levelRepo.connectToProfile(profileId, level.id, knex);
       for (const product of level.products) {
@@ -74,6 +79,7 @@ export class LevelService {
     }
     return totalGem == 0
       ? 0
-      : totalGem + (await this.connectToProfile(profileId, gems + totalGem));
+      : totalGem +
+          (await this.connectToProfile(profileId, gems + totalGem, knex));
   }
 }
