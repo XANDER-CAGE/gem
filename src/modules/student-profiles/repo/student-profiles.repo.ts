@@ -36,6 +36,50 @@ export class StudentProfilesRepo {
     return { total: +total, data };
   }
 
+  async findTopList(limit: number, knex = this.knex) {
+    const data = knex
+      .with('RankedProfiles', (qb) => {
+        qb.select(
+          '*',
+          knex.raw(
+            'ROW_NUMBER() OVER (ORDER BY p.gem DESC) AS position_by_gem',
+          ),
+        )
+          .from('student_profiles AS p')
+          .whereNull('p.deleted_at');
+      })
+      .select(
+        'rp.*',
+        knex.raw(
+          '(COALESCE(l.last_position_by_gem, rp.position_by_gem) - rp.position_by_gem) AS status',
+        ),
+      )
+      .from('RankedProfiles AS rp')
+      .leftJoin('leadership AS l', function () {
+        this.on('l.profile_id', '=', 'rp.id').andOnNull('l.deleted_at');
+      })
+      .where(function () {
+        this.where(
+          'l.last_position_by_gem',
+          '>',
+          knex.ref('rp.position_by_gem'),
+        )
+          .orWhere(
+            'l.last_position_by_gem',
+            '<',
+            knex.ref('rp.position_by_gem'),
+          )
+          .orWhere(
+            'l.last_position_by_gem',
+            '=',
+            knex.ref('rp.position_by_gem'),
+          );
+      })
+      .orderBy('rp.gem', 'desc')
+      .limit(limit);
+    return data;
+  }
+
   async findOne(id: string, knex = this.knex) {
     return await knex
       .select('*')

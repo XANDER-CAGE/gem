@@ -70,11 +70,45 @@ export class TransactionRepo {
   }
 
   async sumAllEarning(profileId: string, knex = this.knex) {
-    return knex
-      .select(knex.raw(['sum(total_gem) as totalEarned']))
+    return knex('transactions')
+      .select(knex.raw('SUM(total_gem) as totalEarned'))
       .where('profile_id', profileId)
       .andWhere('deleted_at', null)
       .andWhereNot('channel_id', null);
+  }
+  async sumTopEarning(limit: number, knex = this.knex) {
+    const data = knex
+      .with('RankedProfiles', (qb) => {
+        qb.select(
+          'p.*',
+          knex.raw('SUM(t.total_gem) AS total'),
+          knex.raw(
+            'ROW_NUMBER() OVER (ORDER BY SUM(t.total_gem) DESC, p.gem DESC) AS last_position_by_earning',
+          ),
+        )
+          .from('student_profiles AS p')
+          .leftJoin('transactions AS t', function () {
+            this.on('t.profile_id', '=', 'p.id')
+              .andOnNull('t.deleted_at')
+              .andOnNotNull('t.channel_id');
+          })
+          .whereNull('p.deleted_at')
+          .groupBy('p.id', 'p.gem');
+      })
+      .select(
+        'rp.*',
+        knex.raw(
+          '(COALESCE(l.last_position_by_earning, rp.last_position_by_earning) - rp.last_position_by_earning) AS status',
+        ),
+      )
+      .from('RankedProfiles AS rp')
+      .leftJoin('leadership AS l', function () {
+        this.on('l.profile_id', '=', 'rp.id').andOnNull('l.deleted_at');
+      })
+      .orderBy('rp.last_position_by_earning')
+      .limit(limit);
+
+    return data;
   }
 
   // async update(

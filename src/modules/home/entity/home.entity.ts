@@ -1,8 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class StudentProfileEntity {
+export class RankedStudentEntity {
   @ApiProperty()
   id: string;
+  @ApiProperty()
+  position: number;
   @ApiProperty()
   avatar?: string;
   @ApiProperty()
