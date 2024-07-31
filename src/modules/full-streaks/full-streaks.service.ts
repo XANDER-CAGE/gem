@@ -68,8 +68,8 @@ export class FullStreaksService {
     return this.fullStreakRepo.update(id, updateFullStreak);
   }
 
-  async remove(id: string) {
-    return await this.fullStreakRepo.deleteOne(id);
+  async remove() {
+    return await this.fullStreakRepo.deleteOne();
   }
 
   async getLastFullStreak(profileId: string, channelId: string) {
