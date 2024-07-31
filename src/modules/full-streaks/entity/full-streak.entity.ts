@@ -4,7 +4,7 @@ export class FullStreakEntity {
   @ApiProperty()
   channel_id: string;
   @ApiProperty()
-  streak_level: number;
+  level: number;
   @ApiProperty()
   badge_id?: string;
   @ApiProperty()

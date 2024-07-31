@@ -67,11 +67,11 @@ export class FullStreaksController {
   }
 
   @ApiOperation({ summary: 'Delete one' })
-  @Delete(':id')
+  @Delete()
   @ApiOkResponse({ type: DeleteApiResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
-  async remove(@Param('id') id: string) {
-    await this.fullStreakService.remove(id);
+  async remove() {
+    await this.fullStreakService.remove();
     return CoreApiResponse.success(null);
   }
 }

@@ -67,11 +67,11 @@ export class LevelController {
   }
 
   @ApiOperation({ summary: 'Delete one' })
-  @Delete(':id')
+  @Delete()
   @ApiOkResponse({ type: DeleteApiResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
-  async remove(@Param('id') id: string) {
-    await this.levelService.remove(id);
+  async remove() {
+    await this.levelService.remove();
     return CoreApiResponse.success(null);
   }
 }

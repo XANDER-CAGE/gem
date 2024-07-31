@@ -67,7 +67,12 @@ export class StreaksRepo {
   }
 
   async create(data: CreateStreakDto, knex = this.knex): Promise<StreakEntity> {
-    const [res] = await knex(this.table).insert(data).returning('*');
+    const maxResult = await knex(this.table).max('level as max_level');
+    const maxLevel = maxResult[0].max_level;
+
+    const [res] = await knex(this.table)
+      .insert({ ...data, level: maxLevel + 1 })
+      .returning('*');
     return res;
   }
 
@@ -83,13 +88,17 @@ export class StreaksRepo {
     return updateMarket;
   }
 
-  async deleteOne(id: string, knex = this.knex) {
+  async deleteOne(knex = this.knex) {
+    const maxResult = await knex(this.table)
+      .max('level as max_level')
+      .where('deleted_at', null);
+    const maxLevel = maxResult[0].max_level;
     await knex(this.table)
       .update({
         deleted_at: new Date(),
         updated_at: new Date(),
       })
-      .where('id', id)
+      .where('level', maxLevel)
       .andWhere('deleted_at', null);
   }
 }

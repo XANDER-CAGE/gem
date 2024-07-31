@@ -40,7 +40,7 @@ export class LevelService {
     return await this.levelRepo.update(id, updateLevelDto);
   }
 
-  async remove(id: string) {
-    return await this.levelRepo.deleteOne(id);
+  async remove() {
+    return await this.levelRepo.deleteOne();
   }
 }
