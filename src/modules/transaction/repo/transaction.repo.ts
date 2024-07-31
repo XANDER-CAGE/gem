@@ -1,27 +1,22 @@
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
 import { TransactionEntity } from '../entity/transaction.entity';
-import { ICreateEarn } from '../interface/create-earn-transaction.interface';
 import { ICreateSpending } from '../interface/create-spending-transaction.interface';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { IFindAllTransaction } from '../interface/find-all-transaction.interface';
 import { tableName } from 'src/common/var/table-name.var';
+import { CreateEarningDto } from '../dto/create-earning-transaction.dto';
 
 export class TransactionRepo {
   private readonly table = tableName.transactions;
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
   async createEarning(
-    dto: ICreateEarn,
+    dto: CreateEarningDto[],
     knex = this.knex,
-  ): Promise<TransactionEntity> {
-    const [data] = await knex
-      .insert({
-        ...dto,
-      })
-      .into(this.table)
-      .returning('*');
-    return data;
+  ): Promise<TransactionEntity[]> {
+    const data = await knex.batchInsert(this.table, dto).returning('*');
+    return data as TransactionEntity[];
   }
 
   async createSpending(

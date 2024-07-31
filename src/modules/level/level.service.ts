@@ -7,6 +7,7 @@ import { UpdateLevelDto } from './dto/update-level.dto';
 import { InjectConnection } from 'nest-knexjs';
 import { Knex } from 'knex';
 import { ProductsService } from '../market-products/market-products.service';
+import { LevelEntity } from './entity/level.entity';
 
 @Injectable()
 export class LevelService {
@@ -55,14 +56,13 @@ export class LevelService {
     profileId: string,
     gems: number,
     knex = this.knex,
-  ): Promise<number> {
+  ): Promise<LevelEntity[]> {
     let totalGem = 0;
     const levels = await this.levelRepo.getUnreachedLevels(
       profileId,
       gems,
       knex,
     );
-    console.log(levels);
     for (const level of levels) {
       await this.levelRepo.connectToProfile(profileId, level.id, knex);
       for (const product of level.products) {
@@ -78,8 +78,10 @@ export class LevelService {
       totalGem += level.free_gem;
     }
     return totalGem == 0
-      ? 0
-      : totalGem +
-          (await this.connectToProfile(profileId, gems + totalGem, knex));
+      ? levels
+      : [
+          ...levels,
+          ...(await this.connectToProfile(profileId, gems + totalGem, knex)),
+        ];
   }
 }

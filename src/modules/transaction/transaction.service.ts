@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { TransactionRepo } from './repo/transaction.repo';
 import { StudentProfilesService } from '../student-profiles/student-profiles.service';
-import { StreaksService } from '../streaks/streaks.service';
 import { TransactionEntity } from './entity/transaction.entity';
 import { ProductsService } from '../market-products/market-products.service';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
@@ -10,7 +9,6 @@ import { CreateEarningDto } from './dto/create-earning-transaction.dto';
 import { CreateSpendingDto } from './dto/create-spending-transaction.dto';
 import { InjectConnection } from 'nest-knexjs';
 import { Knex } from 'knex';
-import { ChannelService } from '../channel/channel.service';
 
 @Injectable()
 export class TransactionService {
@@ -18,30 +16,14 @@ export class TransactionService {
     @InjectConnection() private readonly knex: Knex,
     private readonly transactionRepo: TransactionRepo,
     private readonly profileService: StudentProfilesService,
-    private readonly streakService: StreaksService,
     private readonly productService: ProductsService,
-    private readonly channelService: ChannelService,
   ) {}
 
   async createEarning(
-    dto: CreateEarningDto,
+    dto: CreateEarningDto[],
     knex = this.knex,
-  ): Promise<TransactionEntity> {
-    let totalGem = 0;
-    const profile = await this.profileService.findOne(dto.profile_id);
-    if (!profile) throw new NotFoundException('Profile not found');
-    const channel = await this.channelService.findOne(dto.channel_id);
-    if (!channel) throw new NotFoundException('Channel not found');
-    totalGem += +channel.reward_gem;
-    if (dto.streak_id) {
-      const streak = await this.streakService.findOne(dto.streak_id);
-      if (!streak) throw new NotFoundException('Streak not found');
-      totalGem += +streak.streak_reward;
-    }
-    return await this.transactionRepo.createEarning(
-      { ...dto, total_gem: totalGem },
-      knex,
-    );
+  ): Promise<TransactionEntity[]> {
+    return await this.transactionRepo.createEarning(dto, knex);
   }
 
   async createSpending(dto: CreateSpendingDto): Promise<TransactionEntity> {

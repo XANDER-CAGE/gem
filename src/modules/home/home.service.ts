@@ -27,16 +27,29 @@ export class HomeService {
   async assignChannel(dto: AssignChannelDto) {
     let streakId = null;
     let totalGem = 0;
+    const transactions: CreateEarningDto[] = [];
     const profile = await this.profileService.findOne(dto.profile_id);
     if (!profile) throw new NotFoundException('Student profile not found');
     totalGem = +profile.gem;
     const channel = await this.channelService.findOne(dto.channel_id);
     if (!channel) throw new NotFoundException('Channel not found');
+    channel.reward_gem &&
+      transactions.push({
+        profile_id: profile.id,
+        channel_id: channel.id,
+        total_gem: channel.reward_gem,
+      });
     totalGem += +channel.reward_gem;
     await this.knex.transaction(async (trx) => {
       if (channel.has_streak) {
         const streak = await this.calculateStreak(channel, profile.id, trx);
         if (streak) {
+          streak.streak_reward &&
+            transactions.push({
+              profile_id: profile.id,
+              streak_id: streak.id,
+              total_gem: streak.streak_reward,
+            });
           totalGem += +streak.streak_reward;
           streakId = streak.id;
           if (streak.is_last) {
@@ -76,12 +89,14 @@ export class HomeService {
         trx,
       );
       console.log('TOTAL EARNED', totalEarned);
-      const gemsFromLevels = await this.levelService.connectToProfile(
+      const levels = await this.levelService.connectToProfile(
         profile.id,
         totalEarned,
         trx,
       );
-      totalGem += gemsFromLevels;
+      throw levels;
+      throw streak;
+      // totalGem += gemsFromLevels;
       await this.profileService.update(profile.id, { gem: totalGem }, trx);
     });
     return 'huypizda123';
