@@ -19,13 +19,32 @@ export class ChannelRepo {
     dto: CreateChannelDto,
     knex = this.knex,
   ): Promise<ChannelEntity> {
-    const [data] = await knex
-      .insert({
-        ...dto,
-      })
-      .into(this.table)
-      .returning('*');
-    return data;
+    const maxResult = knex(this.table)
+      .max('level as max_level')
+      .where('channel_category_id', dto.channel_category_id);
+    const maxLevel = maxResult[0].max_level;
+
+    if (maxLevel === null) {
+      const [data] = await knex
+        .insert({
+          ...dto,
+          level: 1,
+          progress: 1,
+        })
+        .into(this.table)
+        .returning('*');
+      return data;
+    } else {
+      const [data] = await knex
+        .insert({
+          ...dto,
+          level: maxLevel + 1,
+          progress: 1,
+        })
+        .into(this.table)
+        .returning('*');
+      return data;
+    }
   }
 
   async findAll(
@@ -86,13 +105,19 @@ export class ChannelRepo {
     return data;
   }
 
-  async delete(id: string, knex = this.knex): Promise<void> {
+  async delete(category_id: string, knex = this.knex): Promise<void> {
+    const maxResult = await knex(this.table)
+      .max('level as max_level')
+      .where('channel_category_id', category_id);
+    const maxLevel = maxResult[0].max_level;
+
     await knex(this.table)
       .update({
         deleted_at: new Date(),
         updated_at: new Date(),
       })
-      .where('id', id)
+      .where('channel_category_id', category_id)
+      .where('level', maxLevel)
       .andWhere('deleted_at', null);
   }
 

@@ -68,8 +68,8 @@ export class ChannelController {
   @Delete(':id')
   @ApiOkResponse({ type: DeleteApiResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
-  async remove(@Param() { id }: IdDto) {
-    await this.channelService.remove(id);
+  async remove(@Param() { channel_category_id }: CreateChannelDto) {
+    await this.channelService.remove(channel_category_id);
     return CoreApiResponse.success(null);
   }
 }

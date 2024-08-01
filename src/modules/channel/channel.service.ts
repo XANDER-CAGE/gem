@@ -12,6 +12,7 @@ import { ChannelCategoriesService } from '../channel_categories/channel-categori
 import { InjectConnection } from 'nest-knexjs';
 import { Knex } from 'knex';
 import { ChannelEntity } from './entity/channel.entity';
+import { ProductsService } from '../market-products/market-products.service';
 
 @Injectable()
 export class ChannelService {
@@ -19,14 +20,19 @@ export class ChannelService {
     private readonly channelRepo: ChannelRepo,
     private readonly channelCategoriesService: ChannelCategoriesService,
     private readonly badgeService: BadgeService,
+    private readonly productService: ProductsService,
     @InjectConnection() private readonly knex: Knex,
   ) {}
   async create(createChannelDto: CreateChannelDto) {
-    const { badge_id: badgeId, channel_category_id: channelCategoriesId } =
+    const { badge_id: badgeId, channel_category_id: channelCategoriesId, product_id:productId } =
       createChannelDto;
     if (badgeId) {
       const badge = await this.badgeService.findOne(badgeId);
       if (!badge) throw new NotFoundException('Badge not found');
+    }
+    if(productId){
+      const product = await this.productService.findOne(productId);
+      if(!product) throw new NotFoundException("Product does not exist");
     }
     if (channelCategoriesId) {
       const channel_categories =
@@ -62,8 +68,8 @@ export class ChannelService {
     return this.channelRepo.update(id, updateChannelDto);
   }
 
-  async remove(id: string) {
-    await this.channelRepo.delete(id);
+  async remove(category_id: string) {
+    await this.channelRepo.delete(category_id);
   }
 
   async connectToProfile(arg: IAssignChannelArg, knex = this.knex) {
