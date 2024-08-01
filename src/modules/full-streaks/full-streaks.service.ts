@@ -90,14 +90,19 @@ export class FullStreaksService {
   async assignFullStreak(
     profileId: string,
     channelId: string,
-    level: number,
     knex = this.knex,
   ) {
-    const nextFullStreak = await this.fullStreakRepo.getOneByLevel(
+    const lastFullStreak = await this.fullStreakRepo.getLastFullStreak(
+      profileId,
       channelId,
-      level,
       knex,
     );
+    const nextFullStreak = await this.fullStreakRepo.getOneByLevel(
+      channelId,
+      lastFullStreak?.level + 1 || 1,
+      knex,
+    );
+    if (!nextFullStreak) return null;
     await this.fullStreakRepo.assignFullStreak(
       profileId,
       nextFullStreak.id,

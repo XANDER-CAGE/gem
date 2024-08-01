@@ -10,6 +10,8 @@ export class FullStreakEntity {
   @ApiProperty()
   is_last: boolean;
   @ApiProperty()
+  reward_gem: number;
+  @ApiProperty()
   badge_id?: string;
   @ApiProperty()
   product_id?: string;

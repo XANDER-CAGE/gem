@@ -87,6 +87,7 @@ export class FullStreakRepo {
         knex.raw([
           'fs.*',
           'fsp.joined_at as joined_at',
+          'fs.reward_gem::double precision as reward_gem',
           `((select count(*) from ${this.table} where deleted_at is null and channel_id = '${channelId}') = level) as is_last`,
         ]),
       )
