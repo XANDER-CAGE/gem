@@ -10,8 +10,6 @@ import { IAssignChannelArg } from '../channel/interface/channel.interface';
 import { CreateEarningDto } from '../transaction/dto/create-earning-transaction.dto';
 import { ChannelEntity } from '../channel/entity/channel.entity';
 import { FullStreaksService } from '../full-streaks/full-streaks.service';
-import { TopListTypeEnum } from './enum/top-list.enum';
-import { LimitWithTopListDto } from './dto/home.dto';
 
 @Injectable()
 export class HomeService {
@@ -90,11 +88,4 @@ export class HomeService {
     return streak;
   }
 
-  async listOfLeadership(dto: LimitWithTopListDto) {
-    if (dto.listType === TopListTypeEnum.STUDENT_TOP_BY_GEM) {
-      return await this.profileService.findTopList(dto.limit);
-    } else {
-      return await this.transactionService.listTopEarning(dto.limit);
-    }
-  }
 }
