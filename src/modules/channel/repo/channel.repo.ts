@@ -19,7 +19,7 @@ export class ChannelRepo {
     dto: CreateChannelDto,
     knex = this.knex,
   ): Promise<ChannelEntity> {
-    const maxResult = knex(this.table)
+    const maxResult = await knex(this.table)
       .max('level as max_level')
       .where('channel_category_id', dto.channel_category_id);
     const maxLevel = maxResult[0].max_level;
