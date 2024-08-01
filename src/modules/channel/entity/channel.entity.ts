@@ -16,6 +16,12 @@ export class ChannelEntity {
   @ApiProperty()
   has_streak: boolean;
   @ApiProperty()
+  type: string;
+  @ApiProperty()
+  level: number;
+  @ApiProperty()
+  progress: number;
+  @ApiProperty()
   deleted_at: Date;
   @ApiProperty()
   created_at: Date;

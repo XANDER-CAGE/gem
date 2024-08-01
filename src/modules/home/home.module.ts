@@ -7,6 +7,7 @@ import { TransactionModule } from '../transaction/transaction.module';
 import { FullStreaksModule } from '../full-streaks/full-streaks.module';
 import { HomeService } from './home.service';
 import { LevelModule } from '../level/level.module';
+import { ChannelCategoriesModule } from '../channel_categories/channel-categories.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { LevelModule } from '../level/level.module';
     TransactionModule,
     FullStreaksModule,
     LevelModule,
+    ChannelCategoriesModule,
   ],
   controllers: [AssignController],
   providers: [HomeService],

@@ -10,7 +10,7 @@ import { CreateEarningDto } from '../transaction/dto/create-earning-transaction.
 import { ChannelEntity } from '../channel/entity/channel.entity';
 import { FullStreaksService } from '../full-streaks/full-streaks.service';
 import { LevelService } from '../level/level.service';
-import { StreakEntity } from '../streaks/entity/streaks.entity';
+import { ChannelCategoriesService } from '../channel_categories/channel-categories.service';
 
 @Injectable()
 export class HomeService {
@@ -22,19 +22,19 @@ export class HomeService {
     private readonly streakService: StreaksService,
     private readonly fullStreakService: FullStreaksService,
     private readonly levelService: LevelService,
+    private readonly channelCategoryService: ChannelCategoriesService,
   ) {}
 
   async assignChannel(dto: AssignChannelDto) {
+    let streakId = null;
     let totalGem = 0;
     const transactions: CreateEarningDto[] = [];
     const profile = await this.profileService.findOne(dto.profile_id);
     if (!profile) throw new NotFoundException('Student profile not found');
     totalGem = +profile.gem;
-    let channel: ChannelEntity;
-    let streak: StreakEntity;
     await this.knex.transaction(async (trx) => {
       if (dto.channel_id) {
-        channel = await this.channelService.findOne(dto.channel_id);
+        const channel = await this.channelService.findOne(dto.channel_id);
         if (!channel) throw new NotFoundException('Channel not found');
         channel.reward_gem &&
           transactions.push({
@@ -44,7 +44,8 @@ export class HomeService {
           });
         totalGem += +channel.reward_gem;
         if (channel.has_streak) {
-          streak = await this.calculateStreak(channel, profile.id);
+          const streak = await this.calculateStreak(channel, profile.id);
+          streakId = streak.id;
           if (streak?.streak_reward) {
             transactions.push({
               profile_id: profile.id,
@@ -69,15 +70,23 @@ export class HomeService {
             }
           }
         }
+        await this.channelService.connectToProfile({
+          channel_id: channel.id,
+          streak_id: streakId,
+          profile_id: profile.id,
+          is_done: true,
+        });
       }
       const totalEarned = await this.transactionService.sumAllEarning(
         profile.id,
         trx,
       );
+      await this.transactionService.createEarning(transactions, trx);
+      transactions.length = 0;
       console.log('TOTAL EARNED', totalEarned);
       const levels = await this.levelService.connectToProfile(
         profile.id,
-        totalEarned + totalGem,
+        totalEarned || 0 + totalGem,
         trx,
       );
       for (const level of levels) {
@@ -85,11 +94,16 @@ export class HomeService {
           totalGem += +level.free_gem;
           transactions.push({
             profile_id: profile.id,
+            level_id: level.id,
             total_gem: level.free_gem,
           });
         }
       }
-      await this.transactionService.createEarning(transactions, trx);
+      console.log(transactions.length);
+
+      if (transactions.length) {
+        await this.transactionService.createEarning(transactions, trx);
+      }
       await this.profileService.update(profile.id, { gem: totalGem }, trx);
     });
     return null;
@@ -105,7 +119,6 @@ export class HomeService {
       channel.id,
       knex,
     );
-
     const lastFullStreak = await this.fullStreakService.getLastFullStreak(
       profileId,
       channel.id,
@@ -137,5 +150,12 @@ export class HomeService {
       knex,
     );
     return streak;
+  }
+
+  async assignChannelCategory(channelCategoryId: string, profileId: string) {
+    const channelCategory =
+      await this.channelCategoryService.findOne(channelCategoryId);
+    if (!channelCategory) throw new NotFoundException('Category not found');
+    
   }
 }

@@ -12,7 +12,8 @@ import { tableName } from 'src/common/var/table-name.var';
 import { ChannelsOnProfilesEntity } from '../entity/channels-on-profiles.entity';
 
 export class ChannelRepo {
-  private readonly table = 'channels';
+  private readonly table = tableName.channels;
+  private readonly relationToProfiles = tableName.channelsM2Mprofiles;
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
   async create(
@@ -57,7 +58,9 @@ export class ChannelRepo {
       .select(
         knex.raw([
           'c.*',
+          'c.reward_gem::double precision as reward_gem',
           `case when s.id is not null then true else false end as has_streak`,
+          '(select count(id) from channels where channel_category_id = c.channel_category_id) > 1 as is_serial',
         ]),
       )
       .leftJoin(`${tableName.streaks} as s`, function () {
@@ -96,10 +99,18 @@ export class ChannelRepo {
   }
 
   async connectToProfile(dto: IAssignChannelArg, knex = this.knex) {
-    const [data] = await knex(tableName.channelsM2Mprofiles)
+    const [data] = await knex(this.relationToProfiles)
       .insert({ ...dto })
       .returning('*');
     return data;
+  }
+
+  async getProgress(profileId: string, channelId: string, knex = this.knex) {
+    return knex
+      .select('*')
+      .from(this.relationToProfiles)
+      .where('profile_id', profileId)
+      .andWhere('channel_id', channelId);
   }
 
   async getLastFailedChannel(
