@@ -31,8 +31,6 @@ export class HomeService {
     const channel = await this.channelService.findOne(dto.channel_id);
     if (!channel) throw new NotFoundException('Channel not found');
     totalGem += +channel.reward_gem;
-    if (channel.streaks.length) {
-    }
     const streak = await this.calculateStreak(channel, profile.id);
     console.log('STREAK', streak);
 

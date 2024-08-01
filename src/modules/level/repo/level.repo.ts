@@ -9,7 +9,7 @@ import { LevelEntity } from '../entity/level.entity';
 
 @Injectable()
 export class LevelRepo {
-  private table = 'level';
+  private table = 'levels';
 
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
