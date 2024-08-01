@@ -54,13 +54,13 @@ export class LevelService {
 
   async connectToProfile(
     profileId: string,
-    gems: number,
+    totalEarned: number,
     knex = this.knex,
   ): Promise<LevelEntity[]> {
     let totalGem = 0;
     const levels = await this.levelRepo.getUnreachedLevels(
       profileId,
-      gems,
+      totalEarned,
       knex,
     );
     for (const level of levels) {
@@ -77,11 +77,12 @@ export class LevelService {
       }
       totalGem += level.free_gem;
     }
-    return totalGem == 0
-      ? levels
-      : [
-          ...levels,
-          ...(await this.connectToProfile(profileId, gems + totalGem, knex)),
-        ];
+    if (totalGem == 0) return levels;
+    const checkForNewLevel = await this.connectToProfile(
+      profileId,
+      totalEarned + totalGem,
+      knex,
+    );
+    return [...levels, ...checkForNewLevel];
   }
 }
