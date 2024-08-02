@@ -6,8 +6,15 @@ export interface IFindAllChannel {
 }
 
 export interface IAssignChannelArg {
+  progress?: number;
   channel_id: string;
   profile_id: string;
-  streak_id: string;
+  streak_id?: string;
   is_done: boolean;
+}
+
+export interface IUpdateRelationToProfile {
+  progress?: number;
+  is_done?: boolean;
+  relationId: string;
 }

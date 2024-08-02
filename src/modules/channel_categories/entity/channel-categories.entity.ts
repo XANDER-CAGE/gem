@@ -6,6 +6,8 @@ export class ChannelCategoriesEntity {
   @ApiProperty()
   name: string;
   @ApiProperty()
+  is_serial: boolean;
+  @ApiProperty()
   deleted_at: Date;
   @ApiProperty()
   created_at: Date;

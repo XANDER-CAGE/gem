@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotAcceptableException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
 import { StudentProfilesService } from '../student-profiles/student-profiles.service';
@@ -11,6 +15,7 @@ import { ChannelEntity } from '../channel/entity/channel.entity';
 import { FullStreaksService } from '../full-streaks/full-streaks.service';
 import { LevelService } from '../level/level.service';
 import { ChannelCategoriesService } from '../channel_categories/channel-categories.service';
+import { CoreApiResponse } from 'src/common/response-class/core-api.response';
 
 @Injectable()
 export class HomeService {
@@ -22,61 +27,66 @@ export class HomeService {
     private readonly streakService: StreaksService,
     private readonly fullStreakService: FullStreaksService,
     private readonly levelService: LevelService,
-    private readonly channelCategoryService: ChannelCategoriesService,
+    private readonly chanCategoryService: ChannelCategoriesService,
   ) {}
 
   async assignChannel(dto: AssignChannelDto) {
+    const profile = await this.profileService.findOne(dto.profile_id);
+    if (!profile) throw new NotFoundException('Student profile not found');
+    const channel = await this.channelService.findOne(dto.channel_id);
+    if (!channel) throw new NotFoundException('Channel not found');
+    if (!dto.is_done) {
+      return await this.channelService.connectToProfile({
+        channel_id: channel.id,
+        profile_id: profile.id,
+        is_done: false,
+      });
+    }
     let streakId = null;
     let totalGem = 0;
     const transactions: CreateEarningDto[] = [];
-    const profile = await this.profileService.findOne(dto.profile_id);
-    if (!profile) throw new NotFoundException('Student profile not found');
     totalGem = +profile.gem;
     await this.knex.transaction(async (trx) => {
-      if (dto.channel_id) {
-        const channel = await this.channelService.findOne(dto.channel_id);
-        if (!channel) throw new NotFoundException('Channel not found');
-        channel.reward_gem &&
+      channel.reward_gem &&
+        transactions.push({
+          profile_id: profile.id,
+          channel_id: channel.id,
+          total_gem: channel.reward_gem,
+        });
+      totalGem += +channel.reward_gem;
+      if (channel.has_streak) {
+        const streak = await this.calculateStreak(channel, profile.id);
+        streakId = streak.id;
+        if (streak?.streak_reward) {
           transactions.push({
             profile_id: profile.id,
-            channel_id: channel.id,
-            total_gem: channel.reward_gem,
+            streak_id: streak.id,
+            total_gem: streak.streak_reward,
           });
-        totalGem += +channel.reward_gem;
-        if (channel.has_streak) {
-          const streak = await this.calculateStreak(channel, profile.id);
-          streakId = streak.id;
-          if (streak?.streak_reward) {
+          totalGem += streak.streak_reward;
+        }
+        if (streak?.is_last) {
+          const fullStreak = await this.fullStreakService.assignFullStreak(
+            profile.id,
+            channel.id,
+            trx,
+          );
+          if (fullStreak?.reward_gem) {
             transactions.push({
               profile_id: profile.id,
-              streak_id: streak.id,
-              total_gem: streak.streak_reward,
+              full_streak_id: fullStreak.id,
+              total_gem: fullStreak.reward_gem,
             });
-            totalGem += streak.streak_reward;
-          }
-          if (streak?.is_last) {
-            const fullStreak = await this.fullStreakService.assignFullStreak(
-              profile.id,
-              channel.id,
-              trx,
-            );
-            if (fullStreak?.reward_gem) {
-              transactions.push({
-                profile_id: profile.id,
-                full_streak_id: fullStreak.id,
-                total_gem: fullStreak.reward_gem,
-              });
-              totalGem += +fullStreak.reward_gem;
-            }
+            totalGem += +fullStreak.reward_gem;
           }
         }
-        await this.channelService.connectToProfile({
-          channel_id: channel.id,
-          streak_id: streakId,
-          profile_id: profile.id,
-          is_done: true,
-        });
       }
+      await this.channelService.connectToProfile({
+        channel_id: channel.id,
+        streak_id: streakId,
+        profile_id: profile.id,
+        is_done: true,
+      });
       const totalEarned = await this.transactionService.sumAllEarning(
         profile.id,
         trx,
@@ -114,7 +124,7 @@ export class HomeService {
     profileId: string,
     knex = this.knex,
   ) {
-    const lastFailedChannel = await this.channelService.getLastFailedChannel(
+    const lastFailedChannel = await this.channelService.getLastUnderdoneChannel(
       profileId,
       channel.id,
       knex,
@@ -138,7 +148,7 @@ export class HomeService {
           ? lastFullStreak.joined_at
           : new Date('1970');
     }
-    const successChannelCount = await this.channelService.countAfterFail(
+    const successChannelCount = await this.channelService.countSuccessChannel(
       profileId,
       channel.id,
       new Date(startStreakDate),
@@ -153,9 +163,40 @@ export class HomeService {
   }
 
   async assignChannelCategory(channelCategoryId: string, profileId: string) {
-    const channelCategory =
-      await this.channelCategoryService.findOne(channelCategoryId);
-    if (!channelCategory) throw new NotFoundException('Category not found');
-    
+    const category = await this.chanCategoryService.findOne(channelCategoryId);
+    if (!category) throw new NotFoundException('Category not found');
+    const profile = await this.profileService.findOne(profileId);
+    if (!profile) throw new NotFoundException('Student profile not found');
+    if (!category.is_serial) {
+      const [channel] = await this.channelService.getByCategoryId(category.id);
+      if (!channel) throw new NotFoundException('There is no any channel');
+      const channelProgress = await this.channelService.getLastUnderdoneChannel(
+        profileId,
+        channel.id,
+      );
+      const channelsDone = await this.channelService.countSuccessChannel(
+        profileId,
+        channel.id,
+      );
+      if (channel.given_one_time && channelsDone >= 1) {
+        throw new NotAcceptableException('Channel already done');
+      }
+      if (channel.progress == 1 || !channelProgress) {
+        await this.assignChannel({
+          channel_id: channel.id,
+          profile_id: profileId,
+          is_done: channel.progress == 1,
+        });
+        return CoreApiResponse.success(null);
+      } else {
+        await this.channelService.updateRelationToProfile({
+          relationId: channelProgress.id,
+          progress: ++channelProgress.progress,
+          is_done: channelProgress.progress == channel.progress,
+        });
+        return CoreApiResponse.success(null);
+      }
+    } else {
+    }
   }
 }

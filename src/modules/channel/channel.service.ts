@@ -5,6 +5,7 @@ import { PaginationDto } from 'src/common/dto/pagination.dto';
 import {
   IAssignChannelArg,
   IFindAllChannel,
+  IUpdateRelationToProfile,
 } from './interface/channel.interface';
 import { CreateChannelDto } from './dto/channel-create.dto';
 import { UpdateChannelDto } from './dto/channel-update.dto';
@@ -70,29 +71,37 @@ export class ChannelService {
     return await this.channelRepo.connectToProfile(arg, knex);
   }
 
-  async getLastFailedChannel(
+  async getLastUnderdoneChannel(
     profileId: string,
     channelId: string,
     knex = this.knex,
   ) {
-    return await this.channelRepo.getLastFailedChannel(
+    return await this.channelRepo.getLastUnderdoneChannel(
       profileId,
       channelId,
       knex,
     );
   }
 
-  async countAfterFail(
+  async countSuccessChannel(
     profileId: string,
     channelId: string,
-    date: Date,
+    date = new Date(),
     knex = this.knex,
   ) {
-    return await this.channelRepo.countAfterFail(
+    return await this.channelRepo.countSuccessChannel(
       profileId,
       channelId,
       date,
       knex,
     );
+  }
+
+  async updateRelationToProfile(dto: IUpdateRelationToProfile) {
+    return await this.channelRepo.updateRelationToProfile(dto);
+  }
+
+  async getByCategoryId(categoryId: string) {
+    return await this.channelRepo.getByCategoryId(categoryId);
   }
 }

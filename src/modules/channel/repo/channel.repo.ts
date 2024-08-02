@@ -1,3 +1,4 @@
+import { IUpdateRelationToProfile } from './../interface/channel.interface';
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
@@ -113,7 +114,7 @@ export class ChannelRepo {
       .andWhere('channel_id', channelId);
   }
 
-  async getLastFailedChannel(
+  async getLastUnderdoneChannel(
     profileId: string,
     channelId: string,
     knex = this.knex,
@@ -127,10 +128,10 @@ export class ChannelRepo {
       .first();
   }
 
-  async countAfterFail(
+  async countSuccessChannel(
     profileId: string,
     channelId: string,
-    date: Date,
+    date = new Date(),
     knex = this.knex,
   ): Promise<number> {
     const data: any = await knex(tableName.channelsM2Mprofiles)
@@ -144,4 +145,36 @@ export class ChannelRepo {
       .first();
     return data.count;
   }
+
+  async getByCategoryId(
+    categoryId: string,
+    knex = this.knex,
+  ): Promise<Omit<ChannelEntity, 'has_streak'>[]> {
+    return knex(this.table)
+      .select('*')
+      .whereRaw('deleted_at is null')
+      .andWhere('channel_category_id', categoryId);
+  }
+
+  async updateRelationToProfile(
+    dto: IUpdateRelationToProfile,
+    knex = this.knex,
+  ) {
+    const { relationId, ...columns } = dto;
+    return knex(this.relationToProfiles)
+      .update({
+        ...columns,
+        updated_at: new Date(),
+      })
+      .where('id', relationId)
+      .andWhereRaw('deleted_at is not null');
+  }
+
+  // async getDoneChannel(
+  //   profileId: string,
+  //   channelId: string,
+  //   knex = this.knex,
+  // ) {
+  //   return
+  // }
 }

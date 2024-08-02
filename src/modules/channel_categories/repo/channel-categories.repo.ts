@@ -5,9 +5,11 @@ import { CreateChannelCategoriesDto } from '../dto/channel-categories-create.dto
 import { ChannelCategoriesEntity } from '../entity/channel-categories.entity';
 import { UpdateChannelCategoriesDto } from '../dto/channel-categories-update.dto';
 import { IFindAllChannelCategories } from '../interface/channel-categories.interface';
+import { tableName } from 'src/common/var/table-name.var';
 
 export class ChannelCategoriesRepo {
-  private readonly table = 'channel_categories';
+  private readonly table = tableName.channelCategories;
+  private readonly channelsTable = tableName.channels;
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
   async create(
@@ -51,8 +53,12 @@ export class ChannelCategoriesRepo {
     knex = this.knex,
   ): Promise<ChannelCategoriesEntity> {
     return await knex
-      .select('*')
-      .from(this.table)
+      .select(
+        '*',
+        knex.raw(
+          `(select count(*) from channels where channel_category_id = ${id} and deleted_at is null) > 1 as is_serial`,
+        ),
+      )
       .where('id', id)
       .andWhere('deleted_at', null)
       .first();

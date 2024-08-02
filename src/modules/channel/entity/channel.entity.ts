@@ -16,7 +16,7 @@ export class ChannelEntity {
   @ApiProperty()
   has_streak: boolean;
   @ApiProperty()
-  type: string;
+  given_one_time: boolean;
   @ApiProperty()
   level: number;
   @ApiProperty()
