@@ -71,10 +71,11 @@ export class TransactionService {
     return await this.transactionRepo.sumAllEarning(profileId);
   }
 
-
-
-  async listTopEarning(limit:number) {
-    return await this.transactionRepo.sumTopEarning(limit);
+  async listTopEarning(limit: number) {
+    return await this.transactionRepo.listTopEarning(limit);
+  }
+  async listTopEarningBySchool(school_id: string, limit: number) {
+    return await this.transactionRepo.listTopEarningBySchool(school_id, limit);
   }
 
   // async update(id: string, dto: any) {
