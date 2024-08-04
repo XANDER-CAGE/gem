@@ -16,6 +16,7 @@ import { FullStreaksService } from '../full-streaks/full-streaks.service';
 import { LevelService } from '../level/level.service';
 import { ChannelCategoriesService } from '../channel_categories/channel-categories.service';
 import { CoreApiResponse } from 'src/common/response-class/core-api.response';
+import { BadgeService } from '../badge/badge.service';
 
 @Injectable()
 export class HomeService {
@@ -28,6 +29,7 @@ export class HomeService {
     private readonly fullStreakService: FullStreaksService,
     private readonly levelService: LevelService,
     private readonly chanCategoryService: ChannelCategoriesService,
+    private readonly badgeService: BadgeService,
   ) {}
 
   async assignChannel(dto: AssignChannelDto) {
@@ -197,6 +199,16 @@ export class HomeService {
         return CoreApiResponse.success(null);
       }
     } else {
+    }
+  }
+
+  async assignBadge(badgeId: string, profileId: string, knex = this.knex) {
+    const badge = await this.badgeService.findOne(badgeId);
+    if (!badge) throw new NotFoundException('Badge not found');
+    const profile = await this.profileService.findOne(profileId);
+    if (!profile) throw new NotFoundException('Student profile not found');
+    if(badge.reward_gem){
+      
     }
   }
 }

@@ -8,6 +8,7 @@ import { FullStreaksModule } from '../full-streaks/full-streaks.module';
 import { HomeService } from './home.service';
 import { LevelModule } from '../level/level.module';
 import { ChannelCategoriesModule } from '../channel_categories/channel-categories.module';
+import { BadgeModule } from '../badge/badge.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ChannelCategoriesModule } from '../channel_categories/channel-categorie
     FullStreaksModule,
     LevelModule,
     ChannelCategoriesModule,
+    BadgeModule,
   ],
   controllers: [AssignController],
   providers: [HomeService],
