@@ -1,5 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsObject,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateBadgeDto {
   @ApiProperty({
@@ -21,8 +27,18 @@ export class CreateBadgeDto {
   @IsOptional()
   description?: string;
 
-  // @ApiPropertyOptional()
-  // @IsString()
-  // @IsOptional()
-  // course_id?: string;
+  @ApiProperty({ example: 10.23 })
+  @IsNumber()
+  @IsNotEmpty()
+  reward_gem: number;
+
+  @ApiProperty({ example: '66af89a7bc128cb8a8b93bd3' })
+  @IsString()
+  @IsNotEmpty()
+  achievement_id: string;
+
+  @ApiPropertyOptional({ example: 3 })
+  @IsNumber()
+  @IsNotEmpty()
+  progress: number;
 }
