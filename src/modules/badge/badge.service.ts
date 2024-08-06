@@ -43,4 +43,12 @@ export class BadgeService {
     if (connection) return connection;
     return await this.badgeRepo.connectToProfile(profileId, badgeId, knex);
   }
+
+  async getUnderdoneBadge(profileId: string, achievementId: string) {
+    return await this.badgeRepo.getUnderdoneBadge(profileId, achievementId);
+  }
+
+  async getBadgeByLevel(level: number, acheievementId: string) {
+    return await this.badgeRepo.getByLevel(level, acheievementId);
+  }
 }

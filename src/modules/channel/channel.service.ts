@@ -1,6 +1,5 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ChannelRepo } from './repo/channel.repo';
-import { BadgeService } from '../badge/badge.service';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import {
   IAssignChannelArg,
@@ -9,7 +8,6 @@ import {
 } from './interface/channel.interface';
 import { CreateChannelDto } from './dto/channel-create.dto';
 import { UpdateChannelDto } from './dto/channel-update.dto';
-import { ChannelCategoriesService } from '../channel_categories/channel-categories.service';
 import { InjectConnection } from 'nest-knexjs';
 import { Knex } from 'knex';
 import { ChannelEntity } from './entity/channel.entity';
@@ -18,24 +16,10 @@ import { ChannelEntity } from './entity/channel.entity';
 export class ChannelService {
   constructor(
     private readonly channelRepo: ChannelRepo,
-    private readonly channelCategoriesService: ChannelCategoriesService,
-    private readonly badgeService: BadgeService,
     @InjectConnection() private readonly knex: Knex,
   ) {}
-  async create(createChannelDto: CreateChannelDto) {
-    const { badge_id: badgeId, channel_category_id: channelCategoriesId } =
-      createChannelDto;
-    if (badgeId) {
-      const badge = await this.badgeService.findOne(badgeId);
-      if (!badge) throw new NotFoundException('Badge not found');
-    }
-    if (channelCategoriesId) {
-      const channel_categories =
-        await this.channelCategoriesService.findOne(channelCategoriesId);
-      if (!channel_categories)
-        throw new NotFoundException('Channel categories not found');
-    }
 
+  async create(createChannelDto: CreateChannelDto) {
     return this.channelRepo.create(createChannelDto);
   }
 
@@ -48,18 +32,6 @@ export class ChannelService {
   }
 
   async update(id: string, updateChannelDto: UpdateChannelDto) {
-    const { badge_id: badgeId, channel_category_id: channelCategoriesId } =
-      updateChannelDto;
-    if (badgeId) {
-      const badge = await this.badgeService.findOne(badgeId);
-      if (!badge) throw new NotFoundException('Badge not found');
-    }
-    if (channelCategoriesId) {
-      const channel_categories =
-        await this.channelCategoriesService.findOne(channelCategoriesId);
-      if (!channel_categories)
-        throw new NotFoundException('Channel categories not found');
-    }
     return this.channelRepo.update(id, updateChannelDto);
   }
 

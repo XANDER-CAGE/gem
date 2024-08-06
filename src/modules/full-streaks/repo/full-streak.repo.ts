@@ -120,7 +120,7 @@ export class FullStreakRepo {
     knex = this.knex,
   ): Promise<FullStreakEntity> {
     return await knex
-      .select('*')
+      .select('*', knex.raw('reward_gem::double precision as reward_gem'))
       .from(this.table)
       .where('channel_id', channelId)
       .andWhere('level', level)

@@ -13,8 +13,8 @@ import { BadgeModule } from './modules/badge/badge.module';
 import { TransactionModule } from './modules/transaction/transaction.module';
 import { LevelModule } from './modules/level/level.module';
 import { FullStreaksModule } from './modules/full-streaks/full-streaks.module';
-import { ChannelCategoriesModule } from './modules/channel_categories/channel-categories.module';
 import { HomeModule } from './modules/home/home.module';
+import { AchievementsModule } from './modules/achievements/achievements.module';
 
 //leadership module
 @Module({
@@ -34,8 +34,8 @@ import { HomeModule } from './modules/home/home.module';
     TransactionModule,
     LevelModule,
     FullStreaksModule,
-    ChannelCategoriesModule,
     HomeModule,
+    AchievementsModule,
   ],
 })
 export class AppModule {}

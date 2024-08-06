@@ -6,6 +6,7 @@ import { IFindAllBadge } from '../interface/find_all.interface';
 import { CreateBadgeDto } from '../dto/create-badge.dto';
 import { UpdateBadgeDto } from '../dto/update-badge.dto';
 import { tableName } from 'src/common/var/table-name.var';
+import { ProfileBadgeEntity } from '../entity/profile-badge.entity';
 
 export class BadgeRepo {
   private readonly table = tableName.badges;
@@ -97,6 +98,35 @@ export class BadgeRepo {
       .from(this.relationToProfile)
       .where('profile_id', profileId)
       .andWhere('badge_id', badgeId)
+      .first();
+  }
+
+  async getUnderdoneBadge(
+    profileId: string,
+    achievemntId: string,
+    knex = this.knex,
+  ): Promise<ProfileBadgeEntity> {
+    return knex
+      .select('*', 'b.progress as badge_progress')
+      .leftJoin(`${this.relationToProfile} as pb`, 'b.id', 'pb.badge_id')
+      .from(`${this.table} as b`)
+      .where('pb.profile_id', profileId)
+      .andWhere('b.achievement_id', achievemntId)
+      .andWhereRaw('pb.progress != b.progress')
+      .orderBy('level', 'asc')
+      .first();
+  }
+
+  async getByLevel(
+    level: number,
+    acheievementId: string,
+    knex = this.knex,
+  ): Promise<BadgeEntity> {
+    return knex
+      .select('*')
+      .from(this.table)
+      .where('level', level)
+      .andWhere('acheievement_id', acheievementId)
       .first();
   }
 }

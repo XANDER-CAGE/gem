@@ -7,8 +7,8 @@ import { TransactionModule } from '../transaction/transaction.module';
 import { FullStreaksModule } from '../full-streaks/full-streaks.module';
 import { HomeService } from './home.service';
 import { LevelModule } from '../level/level.module';
-import { ChannelCategoriesModule } from '../channel_categories/channel-categories.module';
 import { BadgeModule } from '../badge/badge.module';
+import { AchievementsModule } from '../achievements/achievements.module';
 
 @Module({
   imports: [
@@ -18,8 +18,8 @@ import { BadgeModule } from '../badge/badge.module';
     TransactionModule,
     FullStreaksModule,
     LevelModule,
-    ChannelCategoriesModule,
     BadgeModule,
+    AchievementsModule,
   ],
   controllers: [AssignController],
   providers: [HomeService],

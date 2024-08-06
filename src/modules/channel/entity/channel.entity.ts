@@ -10,17 +10,7 @@ export class ChannelEntity {
   @ApiProperty()
   reward_gem: number;
   @ApiProperty()
-  badge_id?: string;
-  @ApiProperty()
-  channel_categories_id?: string;
-  @ApiProperty()
   has_streak: boolean;
-  @ApiProperty()
-  given_one_time: boolean;
-  @ApiProperty()
-  level: number;
-  @ApiProperty()
-  progress: number;
   @ApiProperty()
   deleted_at: Date;
   @ApiProperty()

@@ -61,7 +61,6 @@ export class ChannelRepo {
           'c.*',
           'c.reward_gem::double precision as reward_gem',
           `case when s.id is not null then true else false end as has_streak`,
-          '(select count(id) from channels where channel_category_id = c.channel_category_id) > 1 as is_serial',
         ]),
       )
       .leftJoin(`${tableName.streaks} as s`, function () {

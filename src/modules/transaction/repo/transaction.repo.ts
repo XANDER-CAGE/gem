@@ -12,11 +12,14 @@ export class TransactionRepo {
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
   async createEarning(
-    dto: CreateEarningDto[],
+    dto: CreateEarningDto,
     knex = this.knex,
-  ): Promise<TransactionEntity[]> {
-    const data = await knex.batchInsert(this.table, dto).returning('*');
-    return data as TransactionEntity[];
+  ): Promise<TransactionEntity> {
+    const [transaction] = await knex
+      .insert(dto)
+      .into(this.table)
+      .returning('*');
+    return transaction;
   }
 
   async createSpending(

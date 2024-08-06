@@ -108,13 +108,6 @@ export class FullStreaksService {
       nextFullStreak.id,
       knex,
     );
-    if (nextFullStreak.badge_id) {
-      await this.badgeService.connectToProfile(
-        profileId,
-        nextFullStreak.badge_id,
-        knex,
-      );
-    }
     if (nextFullStreak.product_id) {
       await this.productService.connectToProfile(
         profileId,

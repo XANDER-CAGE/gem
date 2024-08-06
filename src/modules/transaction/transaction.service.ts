@@ -20,9 +20,9 @@ export class TransactionService {
   ) {}
 
   async createEarning(
-    dto: CreateEarningDto[],
+    dto: CreateEarningDto,
     knex = this.knex,
-  ): Promise<TransactionEntity[]> {
+  ): Promise<TransactionEntity> {
     return await this.transactionRepo.createEarning(dto, knex);
   }
 

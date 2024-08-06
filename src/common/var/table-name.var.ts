@@ -18,5 +18,5 @@ export const tableName = {
   levelsM2MProfiles: 'levels_on_profiles',
   levelsM2MProducts: 'levels_on_products',
   stories: 'stories',
-  channelCategories: 'channel_categories'
+  achievements: 'achievements',
 };
