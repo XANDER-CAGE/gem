@@ -4,7 +4,10 @@ import { StudentProfilesService } from '../student-profiles/student-profiles.ser
 import { StreaksService } from '../streaks/streaks.service';
 import { TransactionEntity } from './entity/transaction.entity';
 import { ProductsService } from '../market-products/market-products.service';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
+import {
+  PaginationDto,
+  PaginationForTransactionHistory,
+} from 'src/common/dto/pagination.dto';
 import { IFindAllTransaction } from './interface/find-all-transaction.interface';
 import { CreateEarningDto } from './dto/create-earning-transaction.dto';
 import { CreateSpendingDto } from './dto/create-spending-transaction.dto';
@@ -74,10 +77,14 @@ export class TransactionService {
   async listTopEarning(limit: number) {
     return await this.transactionRepo.listTopEarning(limit);
   }
+
   async listTopEarningBySchool(school_id: string, limit: number) {
     return await this.transactionRepo.listTopEarningBySchool(school_id, limit);
   }
 
+  async transactionHistory(dto: PaginationForTransactionHistory) {
+    return await this.transactionRepo.transactionHistory(dto);
+  }
   // async update(id: string, dto: any) {
   //   return await this.transactionRepo.update(id, dto);
   // }

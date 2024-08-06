@@ -3,7 +3,10 @@ import { InjectConnection } from 'nest-knexjs';
 import { TransactionEntity } from '../entity/transaction.entity';
 import { ICreateEarn } from '../interface/create-earn-transaction.interface';
 import { ICreateSpending } from '../interface/create-spending-transaction.interface';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
+import {
+  PaginationDto,
+  PaginationForTransactionHistory,
+} from 'src/common/dto/pagination.dto';
 import { IFindAllTransaction } from '../interface/find-all-transaction.interface';
 
 export class TransactionRepo {
@@ -151,6 +154,47 @@ export class TransactionRepo {
       .limit(limit);
 
     return data;
+  }
+
+  async transactionHistory(
+    dto: PaginationForTransactionHistory,
+    knex = this.knex,
+  ): Promise<IFindAllTransaction> {
+    const { limit = 10, page = 1 } = dto;
+    const innerQuery = knex
+      .select(
+        't.*',
+        knex.raw('to_json(ch.*) as channel_obj'),
+        knex.raw('to_json(st.*) as streak_obj'),
+        knex.raw('to_json(l.*) as level_obj'),
+        knex.raw('to_json(fs.*) as full_streak_obj'),
+        knex.raw('to_json(b.*) as badge_obj'),
+      )
+      .from('transactions AS t')
+      .leftJoin('channels AS ch', 't.channel_id', 'ch.id')
+      .leftJoin('streaks AS st', 't.streak_id', 'st.id')
+      .leftJoin('levels AS l', 't.level_id', 'l.id')
+      .leftJoin('full_streaks AS fs', 't.full_streak_id', 'fs.id')
+      .leftJoin('badges AS b', 't.badge_id', 'b.id')
+      .leftJoin('market_products AS mp', 't.product_id', 'mp.id')
+      .whereNotNull('t.deleted_at')
+      .andWhere('t.profile_id', dto.profile_id)
+      .andWhereBetween('t.created_at', [dto.start_date, dto.end_date])
+      .limit(limit)
+      .offset((page - 1) * limit)
+      .as('c');
+      
+    const [{ total, data }] = await knex
+      .select([
+        knex.raw(
+          '(SELECT COUNT(id) FROM ?? WHERE deleted_at is null) AS total',
+          this.table,
+        ),
+        knex.raw('jsonb_agg(c.*) AS data'),
+      ])
+      .from(innerQuery);
+
+    return { total: +total, data };
   }
 
   // async update(
