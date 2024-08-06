@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotAcceptableException,
+  NotFoundException,
+} from '@nestjs/common';
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
 import { StudentProfilesService } from '../student-profiles/student-profiles.service';
@@ -11,6 +15,7 @@ import { FullStreaksService } from '../full-streaks/full-streaks.service';
 import { LevelService } from '../level/level.service';
 import { BadgeService } from '../badge/badge.service';
 import { AchievementsService } from '../achievements/achievements.service';
+import { CoreApiResponse } from 'src/common/response-class/core-api.response';
 
 @Injectable()
 export class HomeService {
@@ -113,7 +118,7 @@ export class HomeService {
     return null;
   }
 
-  async calculateStreak(
+  private async calculateStreak(
     channel: ChannelEntity,
     profileId: string,
     knex = this.knex,
@@ -157,26 +162,6 @@ export class HomeService {
     return streak;
   }
 
-  // async assignBadge(badgeId: string, profileId: string, knex = this.knex) {
-  //   const badge = await this.badgeService.findOne(badgeId);
-  //   if (!badge) throw new NotFoundException('Badge not found');
-  //   const profile = await this.profileService.findOne(profileId);
-  //   if (!profile) throw new NotFoundException('Student profile not found');
-  //   if (badge.reward_gem) {
-  //     await this.transactionService.createEarning(
-  //       [
-  //         {
-  //           profile_id: profileId,
-  //           total_gem: badge.reward_gem,
-  //           badge_id: badgeId,
-  //         },
-  //       ],
-  //       knex,
-  //     );
-  //   }
-  //   await this.badgeService.connectToProfile(profileId, badgeId, knex);
-  // }
-
   async assignAchievement(
     profileId: string,
     achievementId: string,
@@ -186,11 +171,36 @@ export class HomeService {
     if (!achievement) throw new NotFoundException('Achievement not found');
     const profile = await this.profileService.findOne(profileId);
     if (!profile) throw new NotFoundException('Student profile not found');
-    const underdoneBadge = await this.badgeService.getUnderdoneBadge(
-      profileId,
-      achievementId,
-    );
-    
-    const nextBadge = await this.badgeService.getBadgeByLevel(underdoneBadge)
+    const { badge, user_progress, connection_id } =
+      await this.badgeService.getUnderdoneBadge(profileId, achievementId);
+    if (!badge) throw new NotAcceptableException('No more badges');
+    await knex.transaction(async (trx) => {
+      if (!user_progress) {
+        await this.badgeService.connectToProfile(profileId, badge.id, 1, trx);
+      } else {
+        await this.badgeService.updateConnection(
+          'progress',
+          user_progress + 1,
+          connection_id,
+          trx,
+        );
+      }
+      if (badge.reward_gem && badge.progress == user_progress + 1) {
+        await this.transactionService.createEarning(
+          {
+            badge_id: badge.id,
+            total_gem: badge.reward_gem,
+            profile_id: profileId,
+          },
+          trx,
+        );
+        await this.profileService.update(
+          profile.id,
+          { gem: profile.gem + badge.reward_gem },
+          trx,
+        );
+      }
+    });
+    return CoreApiResponse.success(null);
   }
 }

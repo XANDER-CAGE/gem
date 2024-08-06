@@ -6,7 +6,7 @@ import { IFindAllBadge } from '../interface/find_all.interface';
 import { CreateBadgeDto } from '../dto/create-badge.dto';
 import { UpdateBadgeDto } from '../dto/update-badge.dto';
 import { tableName } from 'src/common/var/table-name.var';
-import { ProfileBadgeEntity } from '../entity/profile-badge.entity';
+import { IFindUnderdoneBadge } from '../interface/getUnderdoneBadge.interface';
 
 export class BadgeRepo {
   private readonly table = tableName.badges;
@@ -78,55 +78,67 @@ export class BadgeRepo {
       .andWhere('deleted_at', null);
   }
 
-  async connectToProfile(profileId: string, badgeId: string, knex = this.knex) {
+  async connectToProfile(
+    profileId: string,
+    badgeId: string,
+    progress: number,
+    knex = this.knex,
+  ) {
     return await knex
       .insert({
         profile_id: profileId,
+        progress: progress,
         badge_id: badgeId,
       })
       .into(this.relationToProfile)
       .returning('*');
   }
 
-  async findConnectionToProfile(
-    profileId: string,
-    badgeId: string,
-    knex = this.knex,
-  ) {
-    return await knex
-      .select('*')
-      .from(this.relationToProfile)
-      .where('profile_id', profileId)
-      .andWhere('badge_id', badgeId)
-      .first();
-  }
-
   async getUnderdoneBadge(
     profileId: string,
-    achievemntId: string,
+    achievementId: string,
     knex = this.knex,
-  ): Promise<ProfileBadgeEntity> {
-    return knex
-      .select('*', 'b.progress as badge_progress')
-      .leftJoin(`${this.relationToProfile} as pb`, 'b.id', 'pb.badge_id')
+  ): Promise<IFindUnderdoneBadge> {
+    return await knex
+      .select(
+        knex.raw([
+          'to_json(b.*) as badge',
+          'case when pb.progress is null then 0 else pb.progress end as user_progress',
+          'pb.id as connection_id',
+        ]),
+      )
       .from(`${this.table} as b`)
-      .where('pb.profile_id', profileId)
-      .andWhere('b.achievement_id', achievemntId)
-      .andWhereRaw('pb.progress != b.progress')
+      .leftJoin(`${this.relationToProfile} as pb`, function () {
+        this.on('pb.badge_id', 'b.id').andOnVal('pb.profile_id', profileId);
+      })
+      .where('b.achievement_id', achievementId)
+      .andWhere(knex.raw('b.progress != coalesce(pb.progress,0)'))
       .orderBy('level', 'asc')
       .first();
   }
 
   async getByLevel(
     level: number,
-    acheievementId: string,
+    achievementId: string,
     knex = this.knex,
   ): Promise<BadgeEntity> {
     return knex
       .select('*')
       .from(this.table)
       .where('level', level)
-      .andWhere('acheievement_id', acheievementId)
+      .andWhere('achievement_id', achievementId)
       .first();
+  }
+
+  async updateConnection(
+    column: string,
+    value: any,
+    connectionId: string,
+    knex = this.knex,
+  ) {
+    return knex(this.relationToProfile)
+      .update(column, value)
+      .where('id', connectionId)
+      .returning('*');
   }
 }

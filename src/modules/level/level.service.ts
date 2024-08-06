@@ -68,13 +68,6 @@ export class LevelService {
       for (const product of level.products) {
         await this.productService.connectToProfile(profileId, product.id, knex);
       }
-      if (level.badge_id) {
-        await this.badgeService.connectToProfile(
-          profileId,
-          level.badge_id,
-          knex,
-        );
-      }
       totalGem += level.free_gem;
     }
     if (totalGem == 0) return levels;

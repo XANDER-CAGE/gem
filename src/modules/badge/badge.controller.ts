@@ -37,7 +37,6 @@ export class BadgeController {
 
   @ApiOperation({ summary: 'Find all' })
   @Get('/list')
-  @ApiBody({ type: CreateBadgeDto })
   @ApiOkResponse({ type: ListBadgeResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
   async findAll(@Query() dto: PaginationDto) {

@@ -20,8 +20,10 @@ export class StudentProfilesService {
 
   async create(createStudentProfile: CreateStudentProfileDto) {
     const { level_id } = createStudentProfile;
-    const level = await this.levelService.findOne(level_id);
-    if (!level) throw new NotFoundException('Level does not exist');
+    if (level_id) {
+      const level = await this.levelService.findOne(level_id);
+      if (!level) throw new NotFoundException('Level does not exist');
+    }
     return this.studentProfileRepo.create(createStudentProfile);
   }
 

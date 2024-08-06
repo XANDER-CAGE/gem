@@ -6,7 +6,7 @@ export class ChannelEntity {
   @ApiProperty()
   name: string;
   @ApiProperty()
-  desctription?: string;
+  description?: string;
   @ApiProperty()
   reward_gem: number;
   @ApiProperty()

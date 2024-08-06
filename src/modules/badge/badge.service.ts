@@ -34,21 +34,34 @@ export class BadgeService {
     await this.badgeRepo.delete(id);
   }
 
-  async connectToProfile(profileId: string, badgeId: string, knex = this.knex) {
-    const connection = await this.badgeRepo.findConnectionToProfile(
+  async connectToProfile(
+    profileId: string,
+    badgeId: string,
+    progress: number,
+    knex = this.knex,
+  ) {
+    return await this.badgeRepo.connectToProfile(
       profileId,
       badgeId,
+      progress,
       knex,
     );
-    if (connection) return connection;
-    return await this.badgeRepo.connectToProfile(profileId, badgeId, knex);
   }
 
   async getUnderdoneBadge(profileId: string, achievementId: string) {
     return await this.badgeRepo.getUnderdoneBadge(profileId, achievementId);
   }
 
-  async getBadgeByLevel(level: number, acheievementId: string) {
-    return await this.badgeRepo.getByLevel(level, acheievementId);
+  async getBadgeByLevel(level: number, achievementId: string) {
+    return await this.badgeRepo.getByLevel(level, achievementId);
+  }
+
+  async updateConnection(
+    column: string,
+    value: any,
+    connectionId: string,
+    knex = this.knex,
+  ) {
+    return this.badgeRepo.updateConnection(column, value, connectionId, knex);
   }
 }

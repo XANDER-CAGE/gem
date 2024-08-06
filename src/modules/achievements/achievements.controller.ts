@@ -12,7 +12,9 @@ import { AchievementsService } from './achievements.service';
 import { CreateAchievementDto } from './dto/create-achievement.dto';
 import { UpdateAchievementDto } from './dto/update-achievement.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Achievements')
 @Controller('achievements')
 export class AchievementsController {
   constructor(private readonly achievementsService: AchievementsService) {}

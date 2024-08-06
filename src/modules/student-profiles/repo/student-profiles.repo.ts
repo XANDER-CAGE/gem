@@ -38,7 +38,7 @@ export class StudentProfilesRepo {
 
   async findOne(id: string, knex = this.knex) {
     return await knex
-      .select('*')
+      .select('*', knex.raw('gem::double precision as gem'))
       .from(this.table)
       .where('id', id)
       .andWhere('deleted_at', null)
