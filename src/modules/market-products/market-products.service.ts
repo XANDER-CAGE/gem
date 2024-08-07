@@ -49,18 +49,10 @@ export class ProductsService {
     productId: string,
     knex = this.knex,
   ) {
-    const connection = await this.productRepo.getConnectionToProfile(
-      profileId,
-      productId,
-      knex,
-    );
-    if (connection) return connection;
     return await this.productRepo.connectToProfile(profileId, productId, knex);
   }
 
   async listByMarket(marketId: string) {
     return await this.productRepo.listByMarket(marketId);
   }
-
-  async buy()
 }
