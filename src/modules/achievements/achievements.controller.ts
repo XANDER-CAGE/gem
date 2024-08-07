@@ -19,12 +19,12 @@ import { ApiTags } from '@nestjs/swagger';
 export class AchievementsController {
   constructor(private readonly achievementsService: AchievementsService) {}
 
-  @Post()
+  @Post('create')
   create(@Body() dto: CreateAchievementDto) {
     return this.achievementsService.create(dto);
   }
 
-  @Get()
+  @Get('list')
   findAll(@Query() dto: PaginationDto) {
     return this.achievementsService.findAll(dto);
   }

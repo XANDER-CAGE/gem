@@ -10,7 +10,6 @@ import { ChannelService } from '../channel/channel.service';
 import { AssignChannelDto } from './dto/assign-channel.dto';
 import { TransactionService } from '../transaction/transaction.service';
 import { StreaksService } from '../streaks/streaks.service';
-import { ChannelEntity } from '../channel/entity/channel.entity';
 import { FullStreaksService } from '../full-streaks/full-streaks.service';
 import { LevelService } from '../level/level.service';
 import { BadgeService } from '../badge/badge.service';
@@ -47,119 +46,80 @@ export class HomeService {
     let totalGem = 0;
     totalGem = +profile.gem;
     await this.knex.transaction(async (trx) => {
-      if (channel.reward_gem) {
-        await this.transactionService.createEarning({
-          profile_id: profile.id,
-          channel_id: channel.id,
-          total_gem: channel.reward_gem,
-        });
-      }
-      totalGem += +channel.reward_gem;
-      if (channel.has_streak) {
-        const streak = await this.calculateStreak(channel, profile.id, trx);
-        console.log('streak', streak);
-        streakId = streak?.id;
-
-        if (streak?.streak_reward) {
+      try {
+        if (channel.reward_gem) {
           await this.transactionService.createEarning({
             profile_id: profile.id,
-            streak_id: streak.id,
-            total_gem: streak.streak_reward,
+            channel_id: channel.id,
+            total_gem: channel.reward_gem,
           });
-          totalGem += streak.streak_reward;
         }
-        if (streak?.is_last) {
-          const fullStreak = await this.fullStreakService.assignFullStreak(
+        totalGem += +channel.reward_gem;
+        if (channel.has_streak) {
+          const streak = await this.streakService.calculateStreak(
+            channel,
             profile.id,
-            channel.id,
             trx,
           );
-          if (fullStreak?.reward_gem) {
+          streakId = streak?.id;
+          if (streak?.streak_reward) {
             await this.transactionService.createEarning({
               profile_id: profile.id,
-              full_streak_id: fullStreak.id,
-              total_gem: fullStreak.reward_gem,
+              streak_id: streak.id,
+              total_gem: streak.streak_reward,
             });
-            totalGem += +fullStreak.reward_gem;
+            totalGem += streak.streak_reward;
+          }
+          if (streak?.is_last) {
+            const fullStreak = await this.fullStreakService.assignFullStreak(
+              profile.id,
+              channel.id,
+              trx,
+            );
+            if (fullStreak?.reward_gem) {
+              await this.transactionService.createEarning({
+                profile_id: profile.id,
+                full_streak_id: fullStreak.id,
+                total_gem: fullStreak.reward_gem,
+              });
+              totalGem += +fullStreak.reward_gem;
+            }
           }
         }
-      }
-      await this.channelService.connectToProfile(
-        {
-          channel_id: channel.id,
-          streak_id: streakId,
-          profile_id: profile.id,
-          is_done: true,
-        },
-        trx,
-      );
-      const totalEarned = await this.transactionService.sumAllEarning(
-        profile.id,
-        trx,
-      );
-      console.log('TOTAL EARNED', totalEarned);
-      const levels = await this.levelService.connectToProfile(
-        profile.id,
-        totalEarned || 0 + totalGem,
-        trx,
-      );
-      for (const level of levels) {
-        if (level.free_gem) {
-          totalGem += +level.free_gem;
-          await this.transactionService.createEarning({
+        await this.channelService.connectToProfile(
+          {
+            channel_id: channel.id,
+            streak_id: streakId,
             profile_id: profile.id,
-            level_id: level.id,
-            total_gem: level.free_gem,
-          });
+            is_done: true,
+          },
+          trx,
+        );
+        const totalEarned = await this.transactionService.sumAllEarning(
+          profile.id,
+          trx,
+        );
+        const levels = await this.levelService.connectToProfile(
+          profile.id,
+          totalEarned || 0 + totalGem,
+          trx,
+        );
+        for (const level of levels) {
+          if (level.free_gem) {
+            totalGem += +level.free_gem;
+            await this.transactionService.createEarning({
+              profile_id: profile.id,
+              level_id: level.id,
+              total_gem: level.free_gem,
+            });
+          }
         }
+        await this.profileService.update(profile.id, { gem: totalGem }, trx);
+      } catch (error) {
+        throw Error('Error assign channel');
       }
-      await this.profileService.update(profile.id, { gem: totalGem }, trx);
     });
-    return null;
-  }
-
-  private async calculateStreak(
-    channel: ChannelEntity,
-    profileId: string,
-    knex = this.knex,
-  ) {
-    const lastFailedChannel = await this.channelService.getLastUnderdoneChannel(
-      profileId,
-      channel.id,
-      knex,
-    );
-    const lastFullStreak = await this.fullStreakService.getLastFullStreak(
-      profileId,
-      channel.id,
-      knex,
-    );
-    if (lastFullStreak.is_last) return null;
-    let startStreakDate: Date;
-    if (lastFailedChannel && lastFullStreak) {
-      startStreakDate =
-        new Date(lastFullStreak.joined_at) >
-        new Date(lastFailedChannel.created_at)
-          ? new Date(lastFullStreak.joined_at)
-          : new Date(lastFailedChannel.created_at);
-    } else {
-      startStreakDate = lastFailedChannel
-        ? lastFailedChannel.created_at
-        : lastFullStreak
-          ? lastFullStreak.joined_at
-          : new Date('1970');
-    }
-    const successChannelCount = await this.channelService.countSuccessChannel(
-      profileId,
-      channel.id,
-      new Date(startStreakDate),
-      knex,
-    );
-    const streak = await this.streakService.findOneByChannelId(
-      channel.id,
-      successChannelCount + 1,
-      knex,
-    );
-    return streak;
+    return CoreApiResponse.success(null);
   }
 
   async assignAchievement(
@@ -175,30 +135,34 @@ export class HomeService {
       await this.badgeService.getUnderdoneBadge(profileId, achievementId);
     if (!badge) throw new NotAcceptableException('No more badges');
     await knex.transaction(async (trx) => {
-      if (!user_progress) {
-        await this.badgeService.connectToProfile(profileId, badge.id, 1, trx);
-      } else {
-        await this.badgeService.updateConnection(
-          'progress',
-          user_progress + 1,
-          connection_id,
-          trx,
-        );
-      }
-      if (badge.reward_gem && badge.progress == user_progress + 1) {
-        await this.transactionService.createEarning(
-          {
-            badge_id: badge.id,
-            total_gem: badge.reward_gem,
-            profile_id: profileId,
-          },
-          trx,
-        );
-        await this.profileService.update(
-          profile.id,
-          { gem: profile.gem + badge.reward_gem },
-          trx,
-        );
+      try {
+        if (!user_progress) {
+          await this.badgeService.connectToProfile(profileId, badge.id, 1, trx);
+        } else {
+          await this.badgeService.updateConnection(
+            'progress',
+            user_progress + 1,
+            connection_id,
+            trx,
+          );
+        }
+        if (badge.reward_gem && badge.progress == user_progress + 1) {
+          await this.transactionService.createEarning(
+            {
+              badge_id: badge.id,
+              total_gem: badge.reward_gem,
+              profile_id: profileId,
+            },
+            trx,
+          );
+          await this.profileService.update(
+            profile.id,
+            { gem: profile.gem + badge.reward_gem },
+            trx,
+          );
+        }
+      } catch (error) {
+        throw new Error('Assign achievement error');
       }
     });
     return CoreApiResponse.success(null);

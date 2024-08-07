@@ -20,7 +20,6 @@ export class VerifiedGuard implements CanActivate {
     if (isPublic || request?.user?.is_verified) {
       return true;
     }
-
     throw new ForbiddenException('This action only verified users');
   }
 }

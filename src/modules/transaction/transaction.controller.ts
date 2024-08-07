@@ -4,7 +4,8 @@ import { IdDto } from 'src/common/dto/id.dto';
 // import { CreateEarningDto } from './dto/create-earning-transaction.dto';
 // import { CreateSpendingDto } from './dto/create-spending-transaction.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-
+import { ApiTags } from '@nestjs/swagger';
+@ApiTags('Transactions')
 @Controller('transaction')
 export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
