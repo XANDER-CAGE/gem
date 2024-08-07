@@ -10,8 +10,6 @@ export class LevelEntity {
   @ApiProperty()
   reward_point: number;
   @ApiProperty()
-  badge_id?: string;
-  @ApiProperty()
   free_gem: number;
   @ApiProperty()
   deleted_at?: Date;

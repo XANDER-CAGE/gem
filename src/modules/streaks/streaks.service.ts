@@ -54,8 +54,8 @@ export class StreaksService {
     return this.streakRepo.update(id, updateStreak);
   }
 
-  async remove(id: string) {
-    return await this.streakRepo.deleteOne(id);
+  async remove() {
+    return await this.streakRepo.deleteOne();
   }
 
   async calculateStreak(

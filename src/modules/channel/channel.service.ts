@@ -35,8 +35,8 @@ export class ChannelService {
     return this.channelRepo.update(id, updateChannelDto);
   }
 
-  async remove(id: string) {
-    await this.channelRepo.delete(id);
+  async remove(category_id: string) {
+    await this.channelRepo.delete(category_id);
   }
 
   async connectToProfile(arg: IAssignChannelArg, knex = this.knex) {

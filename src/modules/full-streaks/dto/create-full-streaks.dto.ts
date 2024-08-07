@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsNotEmpty,
-  IsOptional,
   IsString,
-  IsInt,
   MinLength,
   MaxLength,
+  IsOptional,
+  IsInt,
 } from 'class-validator';
 
 export class CreateFullStreakDto {
@@ -21,6 +21,7 @@ export class CreateFullStreakDto {
   @IsString()
   @MinLength(1)
   @MaxLength(24)
+  @IsOptional()
   product_id: string;
 
   @ApiProperty({ example: 1 })
@@ -33,17 +34,6 @@ export class CreateFullStreakDto {
   @IsString()
   @MinLength(1)
   @MaxLength(24)
+  @IsOptional()
   badge_id: string;
-
-  @ApiProperty({ example: new Date() })
-  @IsOptional()
-  deleted_at?: Date;
-
-  @ApiProperty({ example: new Date() })
-  @IsOptional()
-  created_at?: Date;
-
-  @ApiProperty({ example: new Date() })
-  @IsOptional()
-  updated_at?: Date;
 }

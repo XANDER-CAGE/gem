@@ -6,8 +6,6 @@ export class StreakEntity {
   @ApiProperty()
   channel_id: string;
   @ApiProperty()
-  streak: number;
-  @ApiProperty()
   streak_reward: number;
   @ApiProperty()
   is_last: boolean;

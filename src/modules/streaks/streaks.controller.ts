@@ -64,11 +64,11 @@ export class StreaksController {
   }
 
   @ApiOperation({ summary: 'Delete one' })
-  @Delete(':id')
+  @Delete()
   @ApiOkResponse({ type: DeleteApiResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
-  async remove(@Param('id') id: string) {
-    await this.streaksService.remove(id);
+  async remove() {
+    await this.streaksService.remove();
     return CoreApiResponse.success(null);
   }
 }

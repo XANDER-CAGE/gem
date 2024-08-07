@@ -15,6 +15,7 @@ import { LevelModule } from './modules/level/level.module';
 import { FullStreaksModule } from './modules/full-streaks/full-streaks.module';
 import { HomeModule } from './modules/home/home.module';
 import { AchievementsModule } from './modules/achievements/achievements.module';
+import { LeadershipModule } from './modules/leadership/leadership.module';
 
 //leadership module
 @Module({
@@ -36,6 +37,7 @@ import { AchievementsModule } from './modules/achievements/achievements.module';
     FullStreaksModule,
     HomeModule,
     AchievementsModule,
+    LeadershipModule,
   ],
 })
 export class AppModule {}

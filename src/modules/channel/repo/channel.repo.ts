@@ -21,13 +21,13 @@ export class ChannelRepo {
     dto: CreateChannelDto,
     knex = this.knex,
   ): Promise<ChannelEntity> {
-    const [data] = await knex
+    return await knex
       .insert({
         ...dto,
       })
       .into(this.table)
-      .returning('*');
-    return data;
+      .returning('*')
+      .first();
   }
 
   async findAll(
@@ -88,13 +88,19 @@ export class ChannelRepo {
     return data;
   }
 
-  async delete(id: string, knex = this.knex): Promise<void> {
+  async delete(category_id: string, knex = this.knex): Promise<void> {
+    const maxResult = await knex(this.table)
+      .max('level as max_level')
+      .where('channel_category_id', category_id);
+    const maxLevel = maxResult[0].max_level;
+
     await knex(this.table)
       .update({
         deleted_at: new Date(),
         updated_at: new Date(),
       })
-      .where('id', id)
+      .where('channel_category_id', category_id)
+      .where('level', maxLevel)
       .andWhere('deleted_at', null);
   }
 

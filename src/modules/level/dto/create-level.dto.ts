@@ -10,22 +10,10 @@ import {
 } from 'class-validator';
 
 export class CreateLevelDto {
-  @ApiProperty({ example: '507f1f77bcf86cd799439011' })
-  @IsOptional()
-  @IsString()
-  @MinLength(1)
-  @MaxLength(24)
-  id?: string;
-
   @ApiProperty({ example: 'Level Name' })
   @IsNotEmpty()
   @IsString()
   name: string;
-
-  @ApiProperty({ example: 1 })
-  @IsNotEmpty()
-  @IsInt()
-  level: number;
 
   @ApiProperty({ example: 100 })
   @IsNotEmpty()

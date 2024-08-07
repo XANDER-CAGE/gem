@@ -2,7 +2,7 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AssignChannelDto } from './dto/assign-channel.dto';
 import { HomeService } from './home.service';
-import { AssignAchievemntDto } from './dto/assign-achievement.dto';
+import { AssignAchievementDto } from './dto/assign-achievement.dto';
 
 @ApiTags('Home')
 @Controller()
@@ -14,7 +14,7 @@ export class AssignController {
   }
 
   @Post('assign/achievement')
-  async assignAchievement(@Body() dto: AssignAchievemntDto) {
+  async assignAchievement(@Body() dto: AssignAchievementDto) {
     return await this.assignService.assignAchievement(
       dto.profile_id,
       dto.achievement_id,

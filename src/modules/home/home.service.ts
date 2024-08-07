@@ -130,13 +130,17 @@ export class HomeService {
     achievementId: string,
     knex = this.knex,
   ) {
+    let totalGem = 0;
     const achievement = await this.achievementsService.findOne(achievementId);
     if (!achievement) throw new NotFoundException('Achievement not found');
     const profile = await this.profileService.findOne(profileId);
     if (!profile) throw new NotFoundException('Student profile not found');
-    const { badge, user_progress, connection_id } =
-      await this.badgeService.getUnderdoneBadge(profileId, achievementId);
-    if (!badge) throw new NotAcceptableException('No more badges');
+    const underdoneBadge = await this.badgeService.getUnderdoneBadge(
+      profileId,
+      achievementId,
+    );
+    if (!underdoneBadge) throw new NotAcceptableException('No more badges');
+    const { badge, user_progress, connection_id } = underdoneBadge;
     await knex.transaction(async (trx) => {
       if (!user_progress) {
         await this.badgeService.connectToProfile(profileId, badge.id, 1, trx);
@@ -149,6 +153,7 @@ export class HomeService {
         );
       }
       if (badge.reward_gem && badge.progress == user_progress + 1) {
+        totalGem += badge.reward_gem;
         await this.transactionService.createEarning(
           {
             badge_id: badge.id,
@@ -157,9 +162,31 @@ export class HomeService {
           },
           trx,
         );
+        const total = await this.transactionService.sumAllEarning(
+          profileId,
+          trx,
+        );
+        const levels = await this.levelService.connectToProfile(
+          profileId,
+          total,
+          trx,
+        );
+        for (const level of levels) {
+          totalGem += level.free_gem;
+          if (level.free_gem) {
+            await this.transactionService.createEarning(
+              {
+                profile_id: profile.id,
+                level_id: level.id,
+                total_gem: level.free_gem,
+              },
+              trx,
+            );
+          }
+        }
         await this.profileService.update(
           profile.id,
-          { gem: profile.gem + badge.reward_gem },
+          { gem: profile.gem + totalGem },
           trx,
         );
       }

@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, Length } from 'class-validator';
 
-export class AssignAchievemntDto {
+export class AssignAchievementDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()

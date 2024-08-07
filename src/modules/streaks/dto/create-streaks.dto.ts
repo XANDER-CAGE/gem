@@ -2,8 +2,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsString,
-  IsInt,
-  IsBoolean,
   MinLength,
   MaxLength,
   IsNumber,
@@ -17,18 +15,8 @@ export class CreateStreakDto {
   @MaxLength(24)
   channel_id: string;
 
-  @ApiProperty({ example: 1 })
-  @IsNotEmpty()
-  @IsInt()
-  streak_day: number;
-
   @ApiProperty({ example: 10.0 })
   @IsNotEmpty()
   @IsNumber({ maxDecimalPlaces: 2 })
   streak_reward: number;
-
-  @ApiProperty({ example: true })
-  @IsNotEmpty()
-  @IsBoolean()
-  is_last: boolean;
 }
