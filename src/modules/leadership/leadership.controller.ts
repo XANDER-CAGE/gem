@@ -3,7 +3,10 @@ import { LeadershipService } from './leadership.service';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { ErrorApiResponse } from 'src/common/response-class/error.response';
-import { LimitWithTopListDto } from './dto/create-leadership.dto';
+import {
+  LimitWithTopListBySchoolDto,
+  LimitWithTopListDto,
+} from './dto/create-leadership.dto';
 
 @ApiTags('Leadership')
 @Controller('leadership')
@@ -22,5 +25,12 @@ export class LeadershipController {
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
   async listOfLeadership(@Query() dto: LimitWithTopListDto) {
     return await this.leadershipService.listOfLeadership(dto);
+  }
+
+  @ApiOperation({ summary: 'Top lists by school' })
+  @Get('list-of-leadership-by-school')
+  @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
+  async listOfLeadershipBySchool(@Query() dto: LimitWithTopListBySchoolDto) {
+    return await this.leadershipService.listOfLeadershipBySchool(dto);
   }
 }

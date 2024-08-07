@@ -3,7 +3,12 @@ import { TransactionService } from './transaction.service';
 import { IdDto } from 'src/common/dto/id.dto';
 // import { CreateEarningDto } from './dto/create-earning-transaction.dto';
 // import { CreateSpendingDto } from './dto/create-spending-transaction.dto';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
+import {
+  PaginationDto,
+  PaginationForTransactionHistory,
+} from 'src/common/dto/pagination.dto';
+import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import { ErrorApiResponse } from 'src/common/response-class/error.response';
 
 @Controller('transaction')
 export class TransactionController {
@@ -27,6 +32,13 @@ export class TransactionController {
   @Get(':id')
   findOne(@Param() { id }: IdDto) {
     return this.transactionService.findOne(id);
+  }
+
+  @ApiOperation({ summary: 'Transaction history' })
+  @Get('transaction-history')
+  @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
+  async transactionHistory(@Query() dto: PaginationForTransactionHistory) {
+    return this.transactionService.transactionHistory(dto);
   }
 
   // @Patch('spending/:id')

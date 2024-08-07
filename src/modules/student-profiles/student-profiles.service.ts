@@ -33,6 +33,11 @@ export class StudentProfilesService {
     return await this.studentProfileRepo.findTopList(limit);
   }
 
+  async findTopListBySchool(school_id: string, limit: number){
+    return await this.studentProfileRepo.findTopListBySchool(school_id, limit)
+  }
+
+
   async findOne(id: string): Promise<StudentProfileEntity> {
     return await this.studentProfileRepo.findOne(id);
   }
