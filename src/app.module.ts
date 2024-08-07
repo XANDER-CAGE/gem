@@ -16,8 +16,6 @@ import { FullStreaksModule } from './modules/full-streaks/full-streaks.module';
 import { ChannelCategoriesModule } from './modules/channel_categories/channel-categories.module';
 import { HomeModule } from './modules/home/home.module';
 import { LeadershipModule } from './modules/leadership/leadership.module';
-import { VacanciesModule } from './modules/vacancies/vacancies.module';
-import { VacanciesAdmissionModule } from './modules/vacancies-admission/vacancies-admission.module';
 
 //leadership module
 @Module({
@@ -40,8 +38,6 @@ import { VacanciesAdmissionModule } from './modules/vacancies-admission/vacancie
     ChannelCategoriesModule,
     HomeModule,
     LeadershipModule,
-    VacanciesModule,
-    VacanciesAdmissionModule,
   ],
 })
 export class AppModule {}
