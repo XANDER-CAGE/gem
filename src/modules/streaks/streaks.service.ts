@@ -73,7 +73,7 @@ export class StreaksService {
       channel.id,
       knex,
     );
-    if (lastFullStreak.is_last) return null;
+    if (lastFullStreak?.is_last) return null;
     let startStreakDate: Date;
     if (lastFailedChannel && lastFullStreak) {
       startStreakDate =
