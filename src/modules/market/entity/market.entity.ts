@@ -12,8 +12,6 @@ export class MarketEntity {
   @ApiProperty()
   category_id?: string;
   @ApiProperty()
-  rating: number;
-  @ApiProperty()
   created_at: Date;
   @ApiProperty()
   updated_at: Date;

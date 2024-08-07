@@ -5,7 +5,6 @@ import {
   IsJSON,
   MinLength,
   MaxLength,
-  IsNumber,
 } from 'class-validator';
 
 export class CreateMarketDto {
@@ -36,9 +35,4 @@ export class CreateMarketDto {
   @MinLength(1)
   @MaxLength(24)
   category_id: string;
-
-  @ApiProperty({ example: 4.5 })
-  @IsNotEmpty()
-  @IsNumber({ maxDecimalPlaces: 2 })
-  rating: number;
 }

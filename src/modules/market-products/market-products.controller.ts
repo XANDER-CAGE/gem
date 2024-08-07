@@ -54,6 +54,15 @@ export class MarketProductsController {
     return CoreApiResponse.success(data);
   }
 
+  @ApiOperation({ summary: 'Get one' })
+  @Get('market/:id')
+  @ApiOkResponse({ type: ListMarketProductResponse, status: 200 })
+  @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
+  async marketList(@Param() { id }: IdDto) {
+    const data = await this.productsService.listByMarket(id);
+    return CoreApiResponse.success(data);
+  }
+
   @ApiOperation({ summary: 'Update one' })
   @Patch(':id')
   @ApiBody({ type: UpdateProductDto })

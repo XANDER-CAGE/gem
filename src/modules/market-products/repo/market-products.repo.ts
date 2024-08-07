@@ -109,4 +109,12 @@ export class ProductRepo {
       .into(this.relationToProfile)
       .returning('*');
   }
+
+  async listByMarket(marketId: string) {
+    return await this.knex
+      .select('*')
+      .from(this.table)
+      .where('market_id', marketId)
+      .andWhere('deleted_at', null);
+  }
 }
