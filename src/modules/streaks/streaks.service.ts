@@ -5,12 +5,17 @@ import { CreateStreakDto } from './dto/create-streaks.dto';
 import { UpdateStreakDto } from './dto/update-streaks.dto';
 import { StreakEntity } from './entity/streaks.entity';
 import { ChannelService } from '../channel/channel.service';
+import { InjectConnection } from 'nest-knexjs';
+import { FullStreaksService } from '../full-streaks/full-streaks.service';
+import { ChannelEntity } from '../channel/entity/channel.entity';
 
 @Injectable()
 export class StreaksService {
   constructor(
     private readonly streakRepo: StreaksRepo,
     private readonly channelService: ChannelService,
+    private readonly fullStreakService: FullStreaksService,
+    @InjectConnection() private readonly knex = this.knex,
   ) {}
 
   async create(createStreak: CreateStreakDto) {
@@ -34,8 +39,9 @@ export class StreaksService {
   async findOneByChannelId(
     channelId: string,
     level: number,
+    knex = this.knex,
   ): Promise<StreakEntity> {
-    return await this.streakRepo.findOneByChannelId(channelId, level);
+    return await this.streakRepo.findOneByChannelId(channelId, level, knex);
   }
 
   async update(id: string, updateStreak: UpdateStreakDto) {
@@ -50,5 +56,49 @@ export class StreaksService {
 
   async remove() {
     return await this.streakRepo.deleteOne();
+  }
+
+  async calculateStreak(
+    channel: ChannelEntity,
+    profileId: string,
+    knex = this.knex,
+  ) {
+    const lastFailedChannel = await this.channelService.getLastUnderdoneChannel(
+      profileId,
+      channel.id,
+      knex,
+    );
+    const lastFullStreak = await this.fullStreakService.getLastFullStreak(
+      profileId,
+      channel.id,
+      knex,
+    );
+    if (lastFullStreak?.is_last) return null;
+    let startStreakDate: Date;
+    if (lastFailedChannel && lastFullStreak) {
+      startStreakDate =
+        new Date(lastFullStreak.joined_at) >
+        new Date(lastFailedChannel.created_at)
+          ? new Date(lastFullStreak.joined_at)
+          : new Date(lastFailedChannel.created_at);
+    } else {
+      startStreakDate = lastFailedChannel
+        ? lastFailedChannel.created_at
+        : lastFullStreak
+          ? lastFullStreak.joined_at
+          : new Date('1970');
+    }
+    const successChannelCount = await this.channelService.countSuccessChannel(
+      profileId,
+      channel.id,
+      new Date(startStreakDate),
+      knex,
+    );
+    const streak = await this.findOneByChannelId(
+      channel.id,
+      successChannelCount + 1,
+      knex,
+    );
+    return streak;
   }
 }

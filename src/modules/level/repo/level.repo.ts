@@ -2,14 +2,21 @@ import { Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { IFindAllLevel } from '../interface/level.interface';
+import {
+  IFindAllLevel,
+  UnreachedLevelsRes,
+} from '../interface/level.interface';
 import { CreateLevelDto } from '../dto/create-level.dto';
 import { UpdateLevelDto } from '../dto/update-level.dto';
 import { LevelEntity } from '../entity/level.entity';
+import { tableName } from 'src/common/var/table-name.var';
 
 @Injectable()
 export class LevelRepo {
-  private table = 'levels';
+  private readonly table = tableName.levels;
+  private readonly relationToProfiles = tableName.levelsM2MProfiles;
+  private readonly relationToProducts = tableName.levelsM2MProducts;
+  private readonly products = tableName.marketProducts;
 
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
@@ -65,7 +72,7 @@ export class LevelRepo {
     return updateMarket;
   }
 
-  async deleteOne( knex = this.knex) {
+  async deleteOne(knex = this.knex) {
     const maxResult = await knex(this.table)
       .max('level as max_level')
       .where('deleted_at', null);
@@ -77,5 +84,37 @@ export class LevelRepo {
       })
       .where('level', maxLevel)
       .andWhere('deleted_at', null);
+  }
+
+  async connectToProfile(profileId: string, levelId: string, knex = this.knex) {
+    await knex(this.relationToProfiles).insert({
+      level_id: levelId,
+      profile_id: profileId,
+    });
+  }
+
+  async getUnreachedLevels(
+    profileId: string,
+    gems: number,
+    knex = this.knex,
+  ): Promise<UnreachedLevelsRes[]> {
+    const subquery = knex('levels as l')
+      .leftJoin('levels_on_profiles as lp', 'lp.level_id', 'l.id')
+      .where('lp.profile_id', profileId)
+      .select('l.id');
+
+    return await knex('levels as l')
+      .leftJoin(`${this.relationToProducts} as lpr`, 'lpr.level_id', 'l.id')
+      .leftJoin(`${this.products} as p`, 'lpr.product_id', 'p.id')
+      .whereNotIn('l.id', subquery)
+      .andWhereRaw(`l.reward_point <= ${gems}`)
+      .select(
+        knex.raw([
+          'l.*',
+          'l.free_gem::double precision as free_gem',
+          `coalesce(jsonb_agg(p.*) filter (where p.id is not null), '[]') as products`,
+        ]),
+      )
+      .groupBy('l.id');
   }
 }

@@ -6,6 +6,9 @@ import { StreaksModule } from '../streaks/streaks.module';
 import { TransactionModule } from '../transaction/transaction.module';
 import { FullStreaksModule } from '../full-streaks/full-streaks.module';
 import { HomeService } from './home.service';
+import { LevelModule } from '../level/level.module';
+import { BadgeModule } from '../badge/badge.module';
+import { AchievementsModule } from '../achievements/achievements.module';
 
 @Module({
   imports: [
@@ -14,6 +17,9 @@ import { HomeService } from './home.service';
     StreaksModule,
     TransactionModule,
     FullStreaksModule,
+    LevelModule,
+    BadgeModule,
+    AchievementsModule,
   ],
   controllers: [AssignController],
   providers: [HomeService],

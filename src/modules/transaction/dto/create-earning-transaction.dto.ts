@@ -1,22 +1,9 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString, Length } from 'class-validator';
-
 export class CreateEarningDto {
-  @ApiProperty({ example: '507f1f77bcf86cd799439011' })
-  @IsNotEmpty()
-  @IsString()
-  @Length(24)
   profile_id: string;
-
-  @ApiPropertyOptional({ example: '507f1f77bcf86cd799439011' })
-  @IsNotEmpty()
-  @IsString()
-  @Length(24)
-  channel_id: string;
-
-  @ApiPropertyOptional({ example: '507f1f77bcf86cd799439011' })
-  @IsOptional()
-  @IsString()
-  @Length(24)
+  total_gem: number;
+  channel_id?: string;
   streak_id?: string;
+  full_streak_id?: string;
+  level_id?: string;
+  badge_id?: string;
 }

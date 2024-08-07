@@ -15,10 +15,10 @@ import { IdDto } from 'src/common/dto/id.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { CreateChannelDto } from './dto/channel-create.dto';
 import { UpdateChannelDto } from './dto/channel-update.dto';
-import { CreateChannelResponse } from './responce/create-channel.responce';
+import { CreateChannelResponse } from './response/create-channel.response';
 import { ErrorApiResponse } from 'src/common/response-class/error.response';
 import { DeleteApiResponse } from 'src/common/response-class/all-null.response';
-import { ListChannelResponse } from './responce/list-channel.responce';
+import { ListChannelResponse } from './response/list-channel.response';
 
 @ApiTags('Channel')
 @Controller('channel')
@@ -68,8 +68,7 @@ export class ChannelController {
   @Delete(':id')
   @ApiOkResponse({ type: DeleteApiResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
-  async remove(@Param() { channel_category_id }: CreateChannelDto) {
-    await this.channelService.remove(channel_category_id);
+  async remove() {
     return CoreApiResponse.success(null);
   }
 }

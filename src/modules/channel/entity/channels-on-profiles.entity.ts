@@ -12,6 +12,8 @@ export class ChannelsOnProfilesEntity {
   @ApiProperty()
   is_done: boolean;
   @ApiProperty()
+  progress: number;
+  @ApiProperty()
   joined_at: Date;
   @ApiProperty()
   deleted_at: Date;

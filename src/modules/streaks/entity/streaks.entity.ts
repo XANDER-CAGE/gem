@@ -8,6 +8,8 @@ export class StreakEntity {
   @ApiProperty()
   streak_reward: number;
   @ApiProperty()
+  is_last: boolean;
+  @ApiProperty()
   created_at?: Date;
   @ApiProperty()
   updated_at?: Date;

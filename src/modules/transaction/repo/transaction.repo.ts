@@ -1,29 +1,28 @@
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
 import { TransactionEntity } from '../entity/transaction.entity';
-import { ICreateEarn } from '../interface/create-earn-transaction.interface';
 import { ICreateSpending } from '../interface/create-spending-transaction.interface';
 import {
   PaginationDto,
   PaginationForTransactionHistory,
 } from 'src/common/dto/pagination.dto';
 import { IFindAllTransaction } from '../interface/find-all-transaction.interface';
+import { tableName } from 'src/common/var/table-name.var';
+import { CreateEarningDto } from '../dto/create-earning-transaction.dto';
 
 export class TransactionRepo {
-  private readonly table = 'transactions';
+  private readonly table = tableName.transactions;
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
   async createEarning(
-    dto: ICreateEarn,
+    dto: CreateEarningDto,
     knex = this.knex,
   ): Promise<TransactionEntity> {
-    const [data] = await knex
-      .insert({
-        ...dto,
-      })
+    const [transaction] = await knex
+      .insert(dto)
       .into(this.table)
       .returning('*');
-    return data;
+    return transaction;
   }
 
   async createSpending(
@@ -72,13 +71,17 @@ export class TransactionRepo {
       .first();
   }
 
-  async sumAllEarning(profileId: string, knex = this.knex) {
-    return knex('transactions')
-      .select(knex.raw('SUM(total_gem) as totalEarned'))
+  async sumAllEarning(profileId: string, knex = this.knex): Promise<number> {
+    const { totalEarned } = await knex
+      .select(knex.raw(['sum(total_gem)::double precision as totalEarned']))
+      .from(this.table)
       .where('profile_id', profileId)
       .andWhere('deleted_at', null)
-      .andWhereNot('channel_id', null);
+      .andWhereNot('channel_id', null)
+      .first();
+    return totalEarned || 0;
   }
+
   async listTopEarning(limit: number, knex = this.knex) {
     const data = knex
       .with('RankedProfiles', (qb) => {
@@ -113,6 +116,7 @@ export class TransactionRepo {
 
     return data;
   }
+
   async listTopEarningBySchool(
     school_id: string,
     limit: number,
@@ -183,7 +187,7 @@ export class TransactionRepo {
       .limit(limit)
       .offset((page - 1) * limit)
       .as('c');
-      
+
     const [{ total, data }] = await knex
       .select([
         knex.raw(

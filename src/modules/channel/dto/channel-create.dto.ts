@@ -3,7 +3,6 @@ import {
   IsNotEmpty,
   IsNumber,
   IsOptional,
-  IsString,
   MaxLength,
   Min,
   MinLength,
@@ -29,26 +28,4 @@ export class CreateChannelDto {
   @IsNumber()
   @Min(0)
   reward_gem: number;
-
-  @ApiPropertyOptional({ example: '507f1f77bcf86cd799439011' })
-  @IsOptional()
-  @MinLength(1)
-  @MaxLength(255)
-  badge_id?: string;
-
-  @ApiPropertyOptional({ example: '507f1f77bcf86cd799439011' })
-  @IsOptional()
-  @MinLength(1)
-  @MaxLength(255)
-  channel_category_id?: string;
-
-  @ApiPropertyOptional({ example: '507f1f77bcf86cd799439011' })
-  @IsOptional()
-  @MinLength(1)
-  @MaxLength(255)
-  product_id?: string;
-
-  @IsOptional()
-  @IsString()
-  type: string;
 }

@@ -1,6 +1,8 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 export class ProductEntity {
+  @ApiProperty()
+  id: string;
   @ApiProperty()
   market_id: string;
   @ApiProperty()

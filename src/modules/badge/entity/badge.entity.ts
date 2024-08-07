@@ -8,7 +8,11 @@ export class BadgeEntity {
   @ApiProperty()
   description: string;
   @ApiProperty()
-  course_id: string;
+  reward_gem: number;
+  @ApiProperty()
+  achievement_id: string;
+  @ApiProperty()
+  progress: number;
   @ApiProperty()
   created_at: Date;
   @ApiProperty()

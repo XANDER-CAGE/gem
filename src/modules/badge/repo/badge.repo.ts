@@ -5,9 +5,12 @@ import { BadgeEntity } from '../entity/badge.entity';
 import { IFindAllBadge } from '../interface/find_all.interface';
 import { CreateBadgeDto } from '../dto/create-badge.dto';
 import { UpdateBadgeDto } from '../dto/update-badge.dto';
+import { tableName } from 'src/common/var/table-name.var';
+import { IFindUnderdoneBadge } from '../interface/getUnderdoneBadge.interface';
 
 export class BadgeRepo {
-  private readonly table = 'badges';
+  private readonly table = tableName.badges;
+  private readonly relationToProfile = tableName.profilesM2Mbadges;
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
   async create(dto: CreateBadgeDto, knex = this.knex): Promise<BadgeEntity> {
@@ -73,5 +76,69 @@ export class BadgeRepo {
       })
       .where('id', id)
       .andWhere('deleted_at', null);
+  }
+
+  async connectToProfile(
+    profileId: string,
+    badgeId: string,
+    progress: number,
+    knex = this.knex,
+  ) {
+    return await knex
+      .insert({
+        profile_id: profileId,
+        progress: progress,
+        badge_id: badgeId,
+      })
+      .into(this.relationToProfile)
+      .returning('*');
+  }
+
+  async getUnderdoneBadge(
+    profileId: string,
+    achievementId: string,
+    knex = this.knex,
+  ): Promise<IFindUnderdoneBadge> {
+    return await knex
+      .select(
+        knex.raw([
+          'to_json(b.*) as badge',
+          'case when pb.progress is null then 0 else pb.progress end as user_progress',
+          'pb.id as connection_id',
+        ]),
+      )
+      .from(`${this.table} as b`)
+      .leftJoin(`${this.relationToProfile} as pb`, function () {
+        this.on('pb.badge_id', 'b.id').andOnVal('pb.profile_id', profileId);
+      })
+      .where('b.achievement_id', achievementId)
+      .andWhere(knex.raw('b.progress != coalesce(pb.progress,0)'))
+      .orderBy('level', 'asc')
+      .first();
+  }
+
+  async getByLevel(
+    level: number,
+    achievementId: string,
+    knex = this.knex,
+  ): Promise<BadgeEntity> {
+    return knex
+      .select('*')
+      .from(this.table)
+      .where('level', level)
+      .andWhere('achievement_id', achievementId)
+      .first();
+  }
+
+  async updateConnection(
+    column: string,
+    value: any,
+    connectionId: string,
+    knex = this.knex,
+  ) {
+    return knex(this.relationToProfile)
+      .update(column, value)
+      .where('id', connectionId)
+      .returning('*');
   }
 }

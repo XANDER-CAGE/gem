@@ -1,7 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { StudentProfilesRepo } from './repo/student-profiles.repo';
-import { LevelService } from '../level/level.service';
 import { CreateStudentProfileDto } from './dto/create-student-profile.dto';
 import { IFindAllStudentProfile } from './interface/student-profile.interface';
 import { UpdateStudentProfileDto } from './dto/update-student-profile.dto';
@@ -14,13 +13,9 @@ export class StudentProfilesService {
   constructor(
     @InjectConnection() private readonly knex: Knex,
     private readonly studentProfileRepo: StudentProfilesRepo,
-    private readonly levelService: LevelService,
   ) {}
 
   async create(createStudentProfile: CreateStudentProfileDto) {
-    const { level_id } = createStudentProfile;
-    const level = await this.levelService.findOne(level_id);
-    if (!level) throw new NotFoundException('Level does not exist');
     return this.studentProfileRepo.create(createStudentProfile);
   }
 
@@ -44,15 +39,10 @@ export class StudentProfilesService {
 
   async update(
     id: string,
-    updateMarketDto: UpdateStudentProfileDto,
+    updateStudentProfileDto: UpdateStudentProfileDto,
     knex = this.knex,
   ): Promise<StudentProfileEntity> {
-    const { level_id } = updateMarketDto;
-    if (level_id) {
-      const level = await this.levelService.findOne(level_id);
-      if (!level) throw new NotFoundException('Level does not exist');
-    }
-    return this.studentProfileRepo.update(id, updateMarketDto, knex);
+    return this.studentProfileRepo.update(id, updateStudentProfileDto, knex);
   }
 
   async remove(id: string) {

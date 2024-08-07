@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { LevelService } from './level.service';
 import { LevelController } from './level.controller';
-import { BadgeModule } from '../badge/badge.module';
 import { LevelRepo } from './repo/level.repo';
+import { BadgeModule } from '../badge/badge.module';
+import { MarketProductsModule } from '../market-products/market-products.module';
 
 @Module({
-  imports: [BadgeModule],
+  imports: [BadgeModule, MarketProductsModule],
   controllers: [LevelController],
   providers: [LevelService, LevelRepo],
   exports: [LevelService],
