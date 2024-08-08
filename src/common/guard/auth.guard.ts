@@ -21,25 +21,18 @@ export class AuthGuard implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ]);
-    if (isPublic) {
-      return true;
-    }
-
+    if (isPublic) return true;
     const request = context.switchToHttp().getRequest();
     const token = request.headers.authorization;
-    if (!token) {
-      return false;
-    }
+    if (!token) throw new UnauthorizedException();
     const user = await this.userService.getUser(token);
-    if (!user) {
-      throw new UnauthorizedException();
-    }
+    if (!user) throw new UnauthorizedException();
     if (user?.is_blocked) {
       throw new ForbiddenException(
         'Access denied. Please pay tuition in full.',
       );
     }
-    request.user = user;
+
     return true;
   }
 }

@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { IFindAllStreaks } from '../interface/streaks.interface';
 import { CreateStreakDto } from '../dto/create-streaks.dto';
 import { StreakEntity } from '../entity/streaks.entity';
 import { UpdateStreakDto } from '../dto/update-streaks.dto';
 import { tableName } from 'src/common/var/table-name.var';
+import { FindAllStreaksDto } from '../dto/find-all.streaks.dto';
 
 @Injectable()
 export class StreaksRepo {
@@ -15,13 +15,18 @@ export class StreaksRepo {
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
   async findAll(
-    dto: PaginationDto,
+    dto: FindAllStreaksDto,
     knex = this.knex,
   ): Promise<IFindAllStreaks> {
     const { limit = 10, page = 1 } = dto;
     const innerQuery = knex(this.table)
       .select('*')
       .where('deleted_at', null)
+      .andWhere(function () {
+        if (dto.channel_id) {
+          this.where('channel_id', dto.channel_id);
+        }
+      })
       .limit(limit)
       .offset((page - 1) * limit)
       .as('c');

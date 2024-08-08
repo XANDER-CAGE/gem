@@ -7,9 +7,16 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { LevelService } from './level.service';
-import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CoreApiResponse } from 'src/common/response-class/core-api.response';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { CreateLevelDto } from './dto/create-level.dto';
@@ -18,8 +25,15 @@ import { CreateLevelResponse } from './response/create-level.response';
 import { ErrorApiResponse } from 'src/common/response-class/error.response';
 import { DeleteApiResponse } from 'src/common/response-class/all-null.response';
 import { ListLevelResponse } from './response/list-level.response';
+import { RolesGuard } from 'src/common/guard/roles.guard';
+import { Roles } from 'src/common/decorator/roles.decorator';
+import { Role } from 'src/common/enum/role.enum';
+import { Public } from 'src/common/decorator/public.decorator';
 
 @ApiTags('Level')
+@ApiBearerAuth()
+@UseGuards(RolesGuard)
+@Roles(Role.app_admin)
 @Controller('level')
 export class LevelController {
   constructor(private readonly levelService: LevelService) {}
@@ -34,6 +48,7 @@ export class LevelController {
     return CoreApiResponse.success(data);
   }
 
+  @Public()
   @ApiOperation({ summary: 'Find all' })
   @Get('/list')
   @ApiOkResponse({ type: ListLevelResponse, status: 200 })
@@ -44,6 +59,7 @@ export class LevelController {
     return CoreApiResponse.success(data, pagination);
   }
 
+  @Public()
   @ApiOperation({ summary: 'Get one' })
   @Get(':id')
   @ApiOkResponse({ type: CreateLevelResponse, status: 200 })

@@ -7,9 +7,16 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ChannelService } from './channel.service';
-import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CoreApiResponse } from 'src/common/response-class/core-api.response';
 import { IdDto } from 'src/common/dto/id.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
@@ -19,8 +26,15 @@ import { CreateChannelResponse } from './response/create-channel.response';
 import { ErrorApiResponse } from 'src/common/response-class/error.response';
 import { DeleteApiResponse } from 'src/common/response-class/all-null.response';
 import { ListChannelResponse } from './response/list-channel.response';
+import { RolesGuard } from 'src/common/guard/roles.guard';
+import { Roles } from 'src/common/decorator/roles.decorator';
+import { Role } from 'src/common/enum/role.enum';
+import { Public } from 'src/common/decorator/public.decorator';
 
 @ApiTags('Channel')
+@ApiBearerAuth()
+@UseGuards(RolesGuard)
+@Roles(Role.app_admin)
 @Controller('channel')
 export class ChannelController {
   constructor(private readonly channelService: ChannelService) {}
@@ -35,6 +49,7 @@ export class ChannelController {
     return CoreApiResponse.success(data);
   }
 
+  @Public()
   @ApiOperation({ summary: 'Find all' })
   @Get('/list')
   @ApiOkResponse({ type: ListChannelResponse, status: 200 })
@@ -45,6 +60,7 @@ export class ChannelController {
     return CoreApiResponse.success(data, pagination);
   }
 
+  @Public()
   @ApiOperation({ summary: 'Get one' })
   @Get(':id')
   @ApiOkResponse({ type: CreateChannelResponse, status: 200 })

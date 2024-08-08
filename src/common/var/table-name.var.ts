@@ -1,5 +1,5 @@
 export const tableName = {
-  students: 'students',
+  users: 'users',
   channels: 'channels',
   channelsM2Mprofiles: 'channels_on_profiles',
   streaks: 'streaks',

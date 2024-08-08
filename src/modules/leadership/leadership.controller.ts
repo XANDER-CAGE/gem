@@ -1,14 +1,25 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { LeadershipService } from './leadership.service';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import { ErrorApiResponse } from 'src/common/response-class/error.response';
 import {
   LimitWithTopListBySchoolDto,
   LimitWithTopListDto,
 } from './dto/create-leadership.dto';
+import { RolesGuard } from 'src/common/guard/roles.guard';
+import { Roles } from 'src/common/decorator/roles.decorator';
+import { Role } from 'src/common/enum/role.enum';
 
 @ApiTags('Leadership')
+@ApiBearerAuth()
+@UseGuards(RolesGuard)
+@Roles(Role.app_admin)
 @Controller('leadership')
 export class LeadershipController {
   constructor(private readonly leadershipService: LeadershipService) {}
