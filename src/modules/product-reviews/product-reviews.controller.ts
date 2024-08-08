@@ -6,24 +6,38 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { ProductReviewsService } from './product-reviews.service';
-import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CoreApiResponse } from 'src/common/response-class/core-api.response';
 import { CreateProductReviewDto } from './dto/create-product-review.dto';
 import { CreateProductReviewResponse } from './response/create-product-review.response';
 import { ErrorApiResponse } from 'src/common/response-class/error.response';
 import { DeleteApiResponse } from 'src/common/response-class/all-null.response';
 import { ListProductReviewResponse } from './response/list-product-review.response';
-import { StudentProfileEntity } from '../student-profiles/entity/student-profile.entity';
 import { FindAllProductReviewDto } from './dto/find-all.product-review.dto';
 import { Public } from 'src/common/decorator/public.decorator';
+import { RolesGuard } from 'src/common/guard/roles.guard';
+import { Role } from 'src/common/enum/role.enum';
+import { Roles } from 'src/common/decorator/roles.decorator';
+import { IMyReq } from 'src/common/interface/my-req.interface';
 
 @ApiTags('Product-Reviews')
+@ApiBearerAuth()
+@UseGuards(RolesGuard)
 @Controller('product-reviews')
 export class ProductReviewsController {
   constructor(private readonly productReviewService: ProductReviewsService) {}
 
+  @Roles(Role.student)
   @ApiOperation({ summary: 'Create new' })
   @Post('/create')
   @ApiBody({ type: CreateProductReviewDto })
@@ -31,15 +45,16 @@ export class ProductReviewsController {
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
   async create(
     @Body() createProductReview: CreateProductReviewDto,
+    @Req() req: IMyReq,
   ): Promise<any> {
-    const profile = new StudentProfileEntity();
     const data = await this.productReviewService.create(
       createProductReview,
-      profile,
+      req.user.profile,
     );
     return CoreApiResponse.success(data);
   }
 
+  @Roles(Role.app_admin, Role.student)
   @Public()
   @ApiOperation({ summary: 'Find all' })
   @Get('/list')
@@ -51,6 +66,7 @@ export class ProductReviewsController {
     return CoreApiResponse.success(data, pagination);
   }
 
+  @Roles(Role.app_admin, Role.student)
   @Public()
   @ApiOperation({ summary: 'Get one' })
   @Get(':id')

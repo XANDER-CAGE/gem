@@ -198,12 +198,15 @@ export class HomeService {
     return CoreApiResponse.success(null);
   }
 
-  async buy(dto: BuyProductDto, profile: StudentProfileEntity) {
+  async buyProduct(dto: BuyProductDto, profile: StudentProfileEntity) {
     await this.knex.transaction(async (trx) => {
       const product = await this.productService.findOne(dto.product_id);
       if (!product) throw new NotFoundException('Product not found');
       if (product.remaining_count == 0) {
         throw new NotAcceptableException('Product sold out');
+      }
+      if (product.price > profile.gem) {
+        throw new NotAcceptableException('Insufficient funds');
       }
       await this.productService.update(
         product.id,

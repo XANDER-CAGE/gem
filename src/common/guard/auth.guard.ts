@@ -32,7 +32,8 @@ export class AuthGuard implements CanActivate {
         'Access denied. Please pay tuition in full.',
       );
     }
-
+    request.user = user;
+    request.profile = user.profile;
     return true;
   }
 }

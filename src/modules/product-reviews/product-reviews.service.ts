@@ -14,8 +14,11 @@ export class ProductReviewsService {
 
   async create(dto: CreateProductReviewDto, profile: StudentProfileEntity) {
     const { product_id: productId } = dto;
-    const product = await this.productService.findOne(productId);
-    if (!product) throw new NotFoundException('Product does not exist');
+    const product = await this.productService.findConnectionToProfile(
+      profile.id,
+      productId,
+    );
+    if (!product) throw new NotFoundException('You bought no product');
     return this.productReviewRepo.create(dto, profile.id);
   }
 
