@@ -3,7 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   Query,
@@ -13,11 +12,11 @@ import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CoreApiResponse } from 'src/common/response-class/core-api.response';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { CreateProductReviewDto } from './dto/create-product-review.dto';
-import { UpdateProductReviewDto } from './dto/update-prdouct-review.dto';
 import { CreateProductReviewResponse } from './response/create-product-review.response';
 import { ErrorApiResponse } from 'src/common/response-class/error.response';
 import { DeleteApiResponse } from 'src/common/response-class/all-null.response';
 import { ListProductReviewResponse } from './response/list-product-review.response';
+import { StudentProfileEntity } from '../student-profiles/entity/student-profile.entity';
 
 @ApiTags('Product-Reviews')
 @Controller('product-reviews')
@@ -32,7 +31,11 @@ export class ProductReviewsController {
   async create(
     @Body() createProductReview: CreateProductReviewDto,
   ): Promise<any> {
-    const data = await this.productReviewService.create(createProductReview);
+    const profile = new StudentProfileEntity();
+    const data = await this.productReviewService.create(
+      createProductReview,
+      profile,
+    );
     return CoreApiResponse.success(data);
   }
 
@@ -52,22 +55,6 @@ export class ProductReviewsController {
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
   async findOne(@Param('id') id: string) {
     const data = await this.productReviewService.findOne(id);
-    return CoreApiResponse.success(data);
-  }
-
-  @ApiOperation({ summary: 'Update one' })
-  @Patch(':id')
-  @ApiBody({ type: UpdateProductReviewDto })
-  @ApiOkResponse({ type: CreateProductReviewResponse, status: 200 })
-  @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
-  async update(
-    @Param('id') id: string,
-    @Body() updateProductReview: UpdateProductReviewDto,
-  ) {
-    const data = await this.productReviewService.update(
-      id,
-      updateProductReview,
-    );
     return CoreApiResponse.success(data);
   }
 

@@ -17,12 +17,6 @@ export class CreateProductDto {
   @MaxLength(24)
   market_id: string;
 
-  @ApiProperty({ example: '507f1f77bcf86cd799439011' })
-  @IsOptional()
-  @MinLength(1)
-  @MaxLength(24)
-  category_id: string;
-
   @ApiProperty({ example: 'Product Name' })
   @IsNotEmpty()
   @IsString()

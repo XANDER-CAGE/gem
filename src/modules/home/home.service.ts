@@ -15,6 +15,9 @@ import { LevelService } from '../level/level.service';
 import { BadgeService } from '../badge/badge.service';
 import { AchievementsService } from '../achievements/achievements.service';
 import { CoreApiResponse } from 'src/common/response-class/core-api.response';
+import { BuyProductDto } from '../market-products/dto/buy.product.dto';
+import { StudentProfileEntity } from '../student-profiles/entity/student-profile.entity';
+import { ProductsService } from '../market-products/market-products.service';
 
 @Injectable()
 export class HomeService {
@@ -28,6 +31,7 @@ export class HomeService {
     private readonly levelService: LevelService,
     private readonly badgeService: BadgeService,
     private readonly achievementsService: AchievementsService,
+    private readonly productService: ProductsService,
   ) {}
 
   async assignChannel(dto: AssignChannelDto) {
@@ -190,6 +194,39 @@ export class HomeService {
           trx,
         );
       }
+    });
+    return CoreApiResponse.success(null);
+  }
+
+  async buy(dto: BuyProductDto, profile: StudentProfileEntity) {
+    await this.knex.transaction(async (trx) => {
+      const product = await this.productService.findOne(dto.product_id);
+      if (!product) throw new NotFoundException('Product not found');
+      if (product.remaining_count == 0) {
+        throw new NotAcceptableException('Product sold out');
+      }
+      await this.productService.update(
+        product.id,
+        {
+          remaining_count: product.remaining_count - 1,
+        },
+        trx,
+      );
+      await this.productService.connectToProfile(profile.id, product.id, trx);
+      await this.profileService.update(
+        profile.id,
+        {
+          gem: profile.gem - product.price,
+        },
+        trx,
+      );
+      await this.transactionService.createSpending(
+        {
+          product_id: product.id,
+          profile_id: profile.id,
+        },
+        trx,
+      );
     });
     return CoreApiResponse.success(null);
   }

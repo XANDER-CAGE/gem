@@ -9,6 +9,6 @@ import { MarketModule } from '../market/market.module';
   imports: [MarketCategoriesModule, MarketModule],
   controllers: [MarketProductsController],
   providers: [ProductsService, ProductRepo],
-  exports: [ProductsService]
+  exports: [ProductsService],
 })
 export class MarketProductsModule {}
