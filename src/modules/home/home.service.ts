@@ -205,13 +205,29 @@ export class HomeService {
       if (product.remaining_count == 0) {
         throw new NotAcceptableException('Product sold out');
       }
-      await this.productService.update(product.id, {
-        remaining_count: product.remaining_count - 1,
-      });
+      await this.productService.update(
+        product.id,
+        {
+          remaining_count: product.remaining_count - 1,
+        },
+        trx,
+      );
       await this.productService.connectToProfile(profile.id, product.id, trx);
-      await this.profileService.update(profile.id, {
-        gem: profile.gem - product.price,
-      });
+      await this.profileService.update(
+        profile.id,
+        {
+          gem: profile.gem - product.price,
+        },
+        trx,
+      );
+      await this.transactionService.createSpending(
+        {
+          product_id: product.id,
+          profile_id: profile.id,
+        },
+        trx,
+      );
     });
+    return CoreApiResponse.success(null);
   }
 }

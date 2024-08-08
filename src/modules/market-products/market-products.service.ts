@@ -31,13 +31,13 @@ export class ProductsService {
     return await this.productRepo.findOne(id);
   }
 
-  async update(id: string, dto: UpdateProductDto) {
+  async update(id: string, dto: UpdateProductDto, knex = this.knex) {
     const { market_id: marketId } = dto;
     if (marketId) {
       const market = await this.marketService.findOne(marketId);
       if (!market) throw new NotFoundException('Market not found');
     }
-    return this.productRepo.update(id, dto);
+    return this.productRepo.update(id, dto, knex);
   }
 
   async remove(id: string) {

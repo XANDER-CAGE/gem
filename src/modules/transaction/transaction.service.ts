@@ -29,7 +29,10 @@ export class TransactionService {
     return await this.transactionRepo.createEarning(dto, knex);
   }
 
-  async createSpending(dto: CreateSpendingDto): Promise<TransactionEntity> {
+  async createSpending(
+    dto: CreateSpendingDto,
+    knex = this.knex,
+  ): Promise<TransactionEntity> {
     let totalGem = 0;
     const profile = await this.profileService.findOne(dto.profile_id);
     if (!profile) throw new NotFoundException('Profile not found');
@@ -37,10 +40,13 @@ export class TransactionService {
     if (!product) throw new NotFoundException('Channel not found');
     totalGem += product.price * dto.count;
     return totalGem
-      ? await this.transactionRepo.createSpending({
-          ...dto,
-          total_gem: totalGem,
-        })
+      ? await this.transactionRepo.createSpending(
+          {
+            ...dto,
+            total_gem: -totalGem,
+          },
+          knex,
+        )
       : null;
   }
 

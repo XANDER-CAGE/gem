@@ -13,12 +13,6 @@ export class CreateProductReviewDto {
   @IsNotEmpty()
   @MinLength(1)
   @MaxLength(24)
-  profile_id: string;
-
-  @ApiProperty({ example: '507f1f77bcf86cd799439011' })
-  @IsNotEmpty()
-  @MinLength(1)
-  @MaxLength(24)
   product_id: string;
 
   @ApiProperty({ example: 'This is a review message.' })

@@ -4,7 +4,7 @@ import { InjectConnection } from 'nest-knexjs';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { IFindAllProductReview } from '../interface/product-review.interface';
 import { CreateProductReviewDto } from '../dto/create-product-review.dto';
-import { UpdateProductReviewDto } from '../dto/update-prdouct-review.dto';
+import { UpdateProductReviewDto } from '../dto/update-product-review.dto';
 
 @Injectable()
 export class ProductReviewsRepo {
@@ -44,8 +44,14 @@ export class ProductReviewsRepo {
       .andWhere('deleted_at', null)
       .first();
   }
-  async create(data: CreateProductReviewDto, knex = this.knex) {
-    return await knex(this.table).insert(data).returning('*');
+  async create(
+    data: CreateProductReviewDto,
+    profileId: string,
+    knex = this.knex,
+  ) {
+    return await knex(this.table)
+      .insert({ ...data, profile_id: profileId })
+      .returning('*');
   }
 
   async update(id: string, data: UpdateProductReviewDto, knex = this.knex) {

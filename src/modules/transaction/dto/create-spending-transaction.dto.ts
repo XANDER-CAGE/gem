@@ -17,5 +17,5 @@ export class CreateSpendingDto {
   @ApiPropertyOptional()
   @IsNumber()
   @IsNotEmpty()
-  count: number;
+  count?: number;
 }
