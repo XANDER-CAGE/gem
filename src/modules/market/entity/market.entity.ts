@@ -10,6 +10,8 @@ export class MarketEntity {
   @ApiProperty()
   avatar?: object;
   @ApiProperty()
+  rating: number;
+  @ApiProperty()
   category_id?: string;
   @ApiProperty()
   created_at: Date;

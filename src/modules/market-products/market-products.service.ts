@@ -55,4 +55,8 @@ export class ProductsService {
   async listByMarket(marketId: string) {
     return await this.productRepo.listByMarket(marketId);
   }
+
+  async findConnectionToProfile(profileId: string, productId: string) {
+    return await this.productRepo.findConnectionToProfile(profileId, productId);
+  }
 }

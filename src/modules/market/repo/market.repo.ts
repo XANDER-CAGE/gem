@@ -5,10 +5,13 @@ import { IFindAllMarkets } from '../interface/find_all.interface';
 import { CreateMarketDto } from '../dto/create-market.dto';
 import { UpdateMarketDto } from '../dto/update-market.dto';
 import { FindAllMarketDto } from '../dto/find-all.market.dto';
+import { tableName } from 'src/common/var/table-name.var';
 
 @Injectable()
 export class MarketRepo {
-  private table = 'markets';
+  private readonly table = tableName.markets;
+  private readonly products = tableName.marketProducts;
+  private readonly productReviews = tableName.productReviews;
 
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
@@ -17,16 +20,25 @@ export class MarketRepo {
     knex = this.knex,
   ): Promise<IFindAllMarkets> {
     const { limit = 10, page = 1 } = dto;
-    const innerQuery = knex(this.table)
-      .select('*')
-      .where('deleted_at', null)
+    const innerQuery = knex(`${this.table} as m`)
+      .select('m.*', knex.raw('avg(pr.rate)::double precision as rating'))
+      .where('m.deleted_at', null)
+      .leftJoin(`${this.products} as p`, function () {
+        this.on('p.market_id', 'm.id').andOn(knex.raw('p.deleted_at is null'));
+      })
+      .leftJoin(`${this.productReviews} as pr`, function () {
+        this.on('pr.product_id', 'p.id').andOn(
+          knex.raw('pr.deleted_at is null'),
+        );
+      })
       .andWhere(function () {
         if (dto.category_id) {
-          this.where('category_id', dto.category_id);
+          this.where('m.category_id', dto.category_id);
         }
       })
       .limit(limit)
       .offset((page - 1) * limit)
+      .groupBy('m.id')
       .as('c');
     const [{ total, data }] = await knex
       .select([
@@ -43,10 +55,19 @@ export class MarketRepo {
 
   async findOne(id: string, knex = this.knex) {
     return await knex
-      .select('*')
-      .from(this.table)
-      .where('id', id)
-      .andWhere('deleted_at', null)
+      .select('m.*', knex.raw('avg(pr.rate)::double precision as rating'))
+      .from(`${this.table} as m`)
+      .leftJoin(`${this.products} as p`, function () {
+        this.on('p.market_id', 'm.id').andOn(knex.raw('p.deleted_at is null'));
+      })
+      .leftJoin(`${this.productReviews} as pr`, function () {
+        this.on('pr.product_id', 'p.id').andOn(
+          knex.raw('pr.deleted_at is null'),
+        );
+      })
+      .where('m.id', id)
+      .andWhere('m.deleted_at', null)
+      .groupBy('m.id')
       .first();
   }
 

@@ -122,4 +122,14 @@ export class ProductRepo {
       .where('market_id', marketId)
       .andWhere('deleted_at', null);
   }
+
+  async findConnectionToProfile(profileId: string, productId: string) {
+    return await this.knex
+      .select('*')
+      .from(this.relationToProfile)
+      .where('profile_id', profileId)
+      .andWhere('product_id', productId)
+      .andWhere('deleted_at', null)
+      .first();
+  }
 }

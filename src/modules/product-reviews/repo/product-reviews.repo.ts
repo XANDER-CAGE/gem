@@ -54,9 +54,10 @@ export class ProductReviewsRepo {
     profileId: string,
     knex = this.knex,
   ) {
-    return await knex(this.table)
+    const review = await knex(this.table)
       .insert({ ...data, profile_id: profileId })
       .returning('*');
+    return review;
   }
 
   async update(id: string, data: UpdateProductReviewDto, knex = this.knex) {
