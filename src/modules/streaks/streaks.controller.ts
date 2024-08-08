@@ -7,19 +7,33 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { StreaksService } from './streaks.service';
-import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CoreApiResponse } from 'src/common/response-class/core-api.response';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { CreateStreakDto } from './dto/create-streaks.dto';
 import { UpdateStreakDto } from './dto/update-streaks.dto';
 import { CreateStreakResponse } from './response/create-streaks.response';
 import { ErrorApiResponse } from 'src/common/response-class/error.response';
 import { DeleteApiResponse } from 'src/common/response-class/all-null.response';
 import { ListStreaksResponse } from './response/list-streak.response';
+import { RolesGuard } from 'src/common/guard/roles.guard';
+import { Role } from 'src/common/enum/role.enum';
+import { Roles } from 'src/common/decorator/roles.decorator';
+import { Public } from 'src/common/decorator/public.decorator';
+import { FindAllStreaksDto } from './dto/find-all.streaks.dto';
 
 @ApiTags('Streaks')
+@ApiBearerAuth()
+@UseGuards(RolesGuard)
+@Roles(Role.app_admin)
 @Controller('streaks')
 export class StreaksController {
   constructor(private readonly streaksService: StreaksService) {}
@@ -34,16 +48,18 @@ export class StreaksController {
     return CoreApiResponse.success(data);
   }
 
+  @Public()
   @ApiOperation({ summary: 'Find all' })
   @Get('/list')
   @ApiOkResponse({ type: ListStreaksResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
-  async findAll(@Query() dto: PaginationDto) {
+  async findAll(@Query() dto: FindAllStreaksDto) {
     const { total, data } = await this.streaksService.findAll(dto);
     const pagination = { total, limit: dto.limit, page: dto.page };
     return CoreApiResponse.success(data, pagination);
   }
 
+  @Public()
   @ApiOperation({ summary: 'Get one' })
   @Get(':id')
   @ApiOkResponse({ type: CreateStreakResponse, status: 200 })

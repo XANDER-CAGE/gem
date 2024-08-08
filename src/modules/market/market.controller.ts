@@ -7,10 +7,16 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { MarketService } from './market.service';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CoreApiResponse } from 'src/common/response-class/core-api.response';
 import { ErrorApiResponse } from 'src/common/response-class/error.response';
 import { CreateMarketResponse } from './response/create-market.response';
@@ -18,8 +24,16 @@ import { ListMarketResponse } from './response/list-market.response';
 import { DeleteApiResponse } from 'src/common/response-class/all-null.response';
 import { CreateMarketDto } from './dto/create-market.dto';
 import { UpdateMarketDto } from './dto/update-market.dto';
+import { RolesGuard } from 'src/common/guard/roles.guard';
+import { Role } from 'src/common/enum/role.enum';
+import { Roles } from 'src/common/decorator/roles.decorator';
+import { FindAllMarketDto } from './dto/find-all.market.dto';
+import { Public } from 'src/common/decorator/public.decorator';
 
 @ApiTags('Market')
+@ApiBearerAuth()
+@UseGuards(RolesGuard)
+@Roles(Role.app_admin)
 @Controller('market')
 export class MarketController {
   constructor(private readonly marketService: MarketService) {}
@@ -34,15 +48,17 @@ export class MarketController {
     return CoreApiResponse.success(data);
   }
 
+  @Public()
   @ApiOperation({ summary: 'Find all' })
   @Get('/list')
   @ApiResponse({ type: ErrorApiResponse, status: 500 })
   @ApiResponse({ type: ListMarketResponse, status: 200 })
-  async findAll(@Query() dto: PaginationDto) {
+  async findAll(@Query() dto: FindAllMarketDto) {
     const data = await this.marketService.findAll(dto);
     return CoreApiResponse.success(data);
   }
 
+  @Public()
   @ApiOperation({ summary: 'Get one' })
   @Get(':id')
   @ApiResponse({ type: ErrorApiResponse, status: 500 })

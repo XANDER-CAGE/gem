@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { IFindAllProductReview } from '../interface/product-review.interface';
 import { CreateProductReviewDto } from '../dto/create-product-review.dto';
 import { UpdateProductReviewDto } from '../dto/update-product-review.dto';
+import { FindAllProductReviewDto } from '../dto/find-all.product-review.dto';
 
 @Injectable()
 export class ProductReviewsRepo {
@@ -13,13 +13,18 @@ export class ProductReviewsRepo {
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
   async findAll(
-    dto: PaginationDto,
+    dto: FindAllProductReviewDto,
     knex = this.knex,
   ): Promise<IFindAllProductReview> {
     const { limit = 10, page = 1 } = dto;
     const innerQuery = knex(this.table)
       .select('*')
       .where('deleted_at', null)
+      .andWhere(function () {
+        if (dto.product_id) {
+          this.where('product_id', dto.product_id);
+        }
+      })
       .limit(limit)
       .offset((page - 1) * limit)
       .as('c');

@@ -7,9 +7,16 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { MarketCategoriesService } from './market-categories.service';
-import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CoreApiResponse } from 'src/common/response-class/core-api.response';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { CreateMarketCategoryDto } from './dto/create-market-categories.dto';
@@ -18,8 +25,15 @@ import { CreateMarketCategoriesResponse } from './response/create-market-categor
 import { ErrorApiResponse } from 'src/common/response-class/error.response';
 import { ListMarketCategoriesResponse } from './response/list-market.response';
 import { DeleteApiResponse } from 'src/common/response-class/all-null.response';
+import { RolesGuard } from 'src/common/guard/roles.guard';
+import { Roles } from 'src/common/decorator/roles.decorator';
+import { Role } from 'src/common/enum/role.enum';
+import { Public } from 'src/common/decorator/public.decorator';
 
 @ApiTags('Market-Categories')
+@ApiBearerAuth()
+@UseGuards(RolesGuard)
+@Roles(Role.app_admin)
 @Controller('market-categories')
 export class MarketCategoriesController {
   constructor(
@@ -40,6 +54,7 @@ export class MarketCategoriesController {
     return CoreApiResponse.success(data);
   }
 
+  @Public()
   @ApiOperation({ summary: 'Find all' })
   @Get('/list')
   @ApiOkResponse({ type: ListMarketCategoriesResponse, status: 200 })
@@ -50,6 +65,7 @@ export class MarketCategoriesController {
     return CoreApiResponse.success(data, pagination);
   }
 
+  @Public()
   @ApiOperation({ summary: 'Get one' })
   @Get(':id')
   @ApiOkResponse({ type: CreateMarketCategoriesResponse, status: 200 })

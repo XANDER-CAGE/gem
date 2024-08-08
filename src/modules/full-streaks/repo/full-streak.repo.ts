@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { IFindAllFullStreak } from '../interface/full-streak.interface';
 import { CreateFullStreakDto } from '../dto/create-full-streaks.dto';
 import { UpdateFullStreakDto } from '../dto/update-full-streaks.dto';
 import { FullStreakEntity } from '../entity/full-streak.entity';
 import { tableName } from 'src/common/var/table-name.var';
 import { FullStreaksOnProfiles } from '../entity/full-streaks-on-profiles.entity';
+import { FindAllFullStreaksDto } from '../dto/find-all.full-streak';
 
 @Injectable()
 export class FullStreakRepo {
@@ -15,13 +15,18 @@ export class FullStreakRepo {
   private relationTable = tableName.fullStreaksM2Mprofiles;
   constructor(@InjectConnection() private readonly knex: Knex) {}
   async findAll(
-    dto: PaginationDto,
+    dto: FindAllFullStreaksDto,
     knex = this.knex,
   ): Promise<IFindAllFullStreak> {
-    const { limit = 10, page = 1 } = dto;
+    const { limit = 10, page = 1, channel_id: channelId } = dto;
     const innerQuery = knex(this.table)
       .select('*')
       .where('deleted_at', null)
+      .andWhere(function () {
+        if (channelId) {
+          this.where('channel_id', channelId);
+        }
+      })
       .limit(limit)
       .offset((page - 1) * limit)
       .as('c');

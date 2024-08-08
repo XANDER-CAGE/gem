@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { BadgeRepo } from './repo/badge.repo';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { IFindAllBadge } from './interface/find_all.interface';
 import { CreateBadgeDto } from './dto/create-badge.dto';
 import { UpdateBadgeDto } from './dto/update-badge.dto';
 import { InjectConnection } from 'nest-knexjs';
 import { Knex } from 'knex';
+import { FindAllBadgesDto } from './dto/find-all.badge.dto';
 
 @Injectable()
 export class BadgeService {
@@ -14,20 +14,20 @@ export class BadgeService {
     @InjectConnection() private readonly knex: Knex,
   ) {}
 
-  async create(createChannelDto: CreateBadgeDto) {
-    return this.badgeRepo.create(createChannelDto);
+  async create(dto: CreateBadgeDto) {
+    return this.badgeRepo.create(dto);
   }
 
-  async findAll(findAllChannelDto: PaginationDto): Promise<IFindAllBadge> {
-    return this.badgeRepo.findAll(findAllChannelDto);
+  async findAll(dto: FindAllBadgesDto): Promise<IFindAllBadge> {
+    return this.badgeRepo.findAll(dto);
   }
 
   async findOne(id: string) {
     return await this.badgeRepo.findOne(id);
   }
 
-  async update(id: string, updateChannelDto: UpdateBadgeDto) {
-    return this.badgeRepo.update(id, updateChannelDto);
+  async update(id: string, dto: UpdateBadgeDto) {
+    return this.badgeRepo.update(id, dto);
   }
 
   async remove(id: string) {

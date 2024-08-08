@@ -2,12 +2,12 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { FullStreakRepo } from './repo/full-streak.repo';
 import { BadgeService } from '../badge/badge.service';
 import { ChannelService } from '../channel/channel.service';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { ProductsService } from '../market-products/market-products.service';
 import { CreateFullStreakDto } from './dto/create-full-streaks.dto';
 import { UpdateFullStreakDto } from './dto/update-full-streaks.dto';
 import { InjectConnection } from 'nest-knexjs';
 import { Knex } from 'knex';
+import { FindAllFullStreaksDto } from './dto/find-all.full-streak';
 
 @Injectable()
 export class FullStreaksService {
@@ -41,8 +41,8 @@ export class FullStreaksService {
     return this.fullStreakRepo.create(fullStreakRepo);
   }
 
-  async findAll(findAllMarketsDto: PaginationDto) {
-    return await this.fullStreakRepo.findAll(findAllMarketsDto);
+  async findAll(dto: FindAllFullStreaksDto) {
+    return await this.fullStreakRepo.findAll(dto);
   }
 
   async findOne(id: string) {

@@ -16,11 +16,15 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, swaggerConfig, {
       deepScanRoutes: true,
     });
-    SwaggerModule.setup('swagger', app, document);
+    SwaggerModule.setup('swagger', app, document, {
+      swaggerOptions: {
+        persistAuthorization: true,
+      },
+    });
     console.log(`Swagger -  ${api}/swagger`);
   }
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   await app.listen(env.PORT || 3000);
 }
-bootstrap().then(() => console.log('API runnning on port ', env.PORT));
+bootstrap().then(() => console.log('API running on port ', env.PORT));

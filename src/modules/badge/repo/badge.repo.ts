@@ -1,12 +1,12 @@
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { BadgeEntity } from '../entity/badge.entity';
 import { IFindAllBadge } from '../interface/find_all.interface';
 import { CreateBadgeDto } from '../dto/create-badge.dto';
 import { UpdateBadgeDto } from '../dto/update-badge.dto';
 import { tableName } from 'src/common/var/table-name.var';
 import { IFindUnderdoneBadge } from '../interface/getUnderdoneBadge.interface';
+import { FindAllBadgesDto } from '../dto/find-all.badge.dto';
 
 export class BadgeRepo {
   private readonly table = tableName.badges;
@@ -23,11 +23,19 @@ export class BadgeRepo {
     return data;
   }
 
-  async findAll(dto: PaginationDto, knex = this.knex): Promise<IFindAllBadge> {
+  async findAll(
+    dto: FindAllBadgesDto,
+    knex = this.knex,
+  ): Promise<IFindAllBadge> {
     const { limit = 10, page = 1 } = dto;
     const innerQuery = knex(this.table)
       .select('*')
       .where('deleted_at', null)
+      .andWhere(function () {
+        if (dto.achievement_id) {
+          this.where('achievement_id', dto.achievement_id);
+        }
+      })
       .limit(limit)
       .offset((page - 1) * limit)
       .as('c');

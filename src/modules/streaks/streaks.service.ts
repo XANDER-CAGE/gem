@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { StreaksRepo } from './repo/streaks.repo';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { CreateStreakDto } from './dto/create-streaks.dto';
 import { UpdateStreakDto } from './dto/update-streaks.dto';
 import { StreakEntity } from './entity/streaks.entity';
@@ -8,6 +7,7 @@ import { ChannelService } from '../channel/channel.service';
 import { InjectConnection } from 'nest-knexjs';
 import { FullStreaksService } from '../full-streaks/full-streaks.service';
 import { ChannelEntity } from '../channel/entity/channel.entity';
+import { FindAllStreaksDto } from './dto/find-all.streaks.dto';
 
 @Injectable()
 export class StreaksService {
@@ -28,8 +28,8 @@ export class StreaksService {
     return this.streakRepo.create(createStreak);
   }
 
-  async findAll(findAllMarketsDto: PaginationDto) {
-    return await this.streakRepo.findAll(findAllMarketsDto);
+  async findAll(dto: FindAllStreaksDto) {
+    return await this.streakRepo.findAll(dto);
   }
 
   async findOne(id: string): Promise<StreakEntity> {

@@ -1,12 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ProductRepo } from './repo/market-products.repo';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { MarketService } from '../market/market.service';
 import { CreateProductDto } from './dto/create-market-product.dto';
 import { IFindAllProduct } from './interface/market-product.interface';
 import { UpdateProductDto } from './dto/update-market-product.dto';
 import { InjectConnection } from 'nest-knexjs';
 import { Knex } from 'knex';
+import { FindAllProductsDto } from './dto/find-all.product.dto';
 
 @Injectable()
 export class ProductsService {
@@ -23,7 +23,7 @@ export class ProductsService {
     return this.productRepo.create(dto);
   }
 
-  async findAll(dto: PaginationDto): Promise<IFindAllProduct> {
+  async findAll(dto: FindAllProductsDto): Promise<IFindAllProduct> {
     return this.productRepo.findAll(dto);
   }
 

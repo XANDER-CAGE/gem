@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { IFindAllMarkets } from '../interface/find_all.interface';
 import { CreateMarketDto } from '../dto/create-market.dto';
 import { UpdateMarketDto } from '../dto/update-market.dto';
+import { FindAllMarketDto } from '../dto/find-all.market.dto';
 
 @Injectable()
 export class MarketRepo {
@@ -13,13 +13,18 @@ export class MarketRepo {
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
   async findAll(
-    dto: PaginationDto,
+    dto: FindAllMarketDto,
     knex = this.knex,
   ): Promise<IFindAllMarkets> {
     const { limit = 10, page = 1 } = dto;
     const innerQuery = knex(this.table)
       .select('*')
       .where('deleted_at', null)
+      .andWhere(function () {
+        if (dto.category_id) {
+          this.where('category_id', dto.category_id);
+        }
+      })
       .limit(limit)
       .offset((page - 1) * limit)
       .as('c');

@@ -16,6 +16,8 @@ import { FullStreaksModule } from './modules/full-streaks/full-streaks.module';
 import { HomeModule } from './modules/home/home.module';
 import { AchievementsModule } from './modules/achievements/achievements.module';
 import { LeadershipModule } from './modules/leadership/leadership.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './common/guard/auth.guard';
 
 //leadership module
 @Module({
@@ -38,6 +40,12 @@ import { LeadershipModule } from './modules/leadership/leadership.module';
     HomeModule,
     AchievementsModule,
     LeadershipModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
   ],
 })
 export class AppModule {}
