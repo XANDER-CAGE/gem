@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { FullStreaksService } from './full-streaks.service';
 import {
@@ -29,6 +30,7 @@ import { Roles } from 'src/common/decorator/roles.decorator';
 import { Role } from 'src/common/enum/role.enum';
 import { FindAllFullStreaksDto } from './dto/find-all.full-streak';
 import { Public } from 'src/common/decorator/public.decorator';
+import { IMyReq } from 'src/common/interface/my-req.interface';
 
 @ApiTags('Full-Streak')
 @ApiBearerAuth()
@@ -57,6 +59,16 @@ export class FullStreaksController {
     const { total, data } = await this.fullStreakService.findAll(dto);
     const pagination = { total, limit: dto.limit, page: dto.page };
     return CoreApiResponse.success(data, pagination);
+  }
+
+  @Roles(Role.student)
+  @ApiOperation({ summary: 'Check for pop up' })
+  @Get('/pop-up')
+  // TODO: Refactor response
+  @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
+  async popUp(@Req() req: IMyReq) {
+    const data = await this.fullStreakService.checkForPopUp(req.profile.id);
+    return CoreApiResponse.success(data);
   }
 
   @Public()

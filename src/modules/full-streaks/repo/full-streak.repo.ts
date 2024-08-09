@@ -12,7 +12,7 @@ import { FindAllFullStreaksDto } from '../dto/find-all.full-streak';
 @Injectable()
 export class FullStreakRepo {
   private table = tableName.fullStreaks;
-  private relationTable = tableName.fullStreaksM2Mprofiles;
+  private relationToProfile = tableName.fullStreaksM2Mprofiles;
   constructor(@InjectConnection() private readonly knex: Knex) {}
   async findAll(
     dto: FindAllFullStreaksDto,
@@ -110,7 +110,7 @@ export class FullStreakRepo {
           .andOn(knex.raw(`fs.channel_id = '${channelId}'`))
           .andOn(knex.raw('fs.deleted_at is null'));
       })
-      .from(`${this.relationTable} as fsp`)
+      .from(`${this.relationToProfile} as fsp`)
       .where('fsp.profile_id', profileId)
       .andWhere(knex.raw('fs.deleted_at is null'))
       .orderBy('fsp.joined_at', 'desc')
@@ -125,7 +125,7 @@ export class FullStreakRepo {
   ) {
     await knex
       .insert({ profile_id: profileId, full_streak_id: fullStreakId })
-      .into(this.relationTable);
+      .into(this.relationToProfile);
   }
 
   async getOneByLevel(
@@ -140,5 +140,27 @@ export class FullStreakRepo {
       .andWhere('level', level)
       .andWhere('deleted_at', null)
       .first();
+  }
+
+  async checkForPopUp(profileId: string, knex = this.knex) {
+    return knex
+      .select('fs.*', 'fp.id as connection_id')
+      .from(`${this.relationToProfile} as fp`)
+      .join(`${this.table} as fs`, 'fp.full_streak_id', 'fs.id')
+      .where('fp.is_shown', false)
+      .andWhere(knex.raw('fp.deleted_at is null'))
+      .andWhere('fp.profile_id', profileId);
+  }
+
+  async updateConnection(
+    column: string,
+    value: any,
+    connectionId: string,
+    knex = this.knex,
+  ) {
+    return knex(this.relationToProfile)
+      .update(column, value)
+      .where('id', connectionId)
+      .returning('*');
   }
 }

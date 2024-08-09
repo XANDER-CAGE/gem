@@ -33,17 +33,15 @@ export class TransactionService {
     dto: CreateSpendingDto,
     knex = this.knex,
   ): Promise<TransactionEntity> {
-    let totalGem = 0;
     const profile = await this.profileService.findOne(dto.profile_id);
     if (!profile) throw new NotFoundException('Profile not found');
     const product = await this.productService.findOne(dto.product_id);
     if (!product) throw new NotFoundException('Channel not found');
-    totalGem += product.price * dto.count;
-    return totalGem
+    return product.price
       ? await this.transactionRepo.createSpending(
           {
             ...dto,
-            total_gem: -totalGem,
+            total_gem: -product.price,
           },
           knex,
         )

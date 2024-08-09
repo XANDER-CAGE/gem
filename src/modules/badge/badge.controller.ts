@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { BadgeService } from './badge.service';
 import { CoreApiResponse } from 'src/common/response-class/core-api.response';
@@ -30,16 +31,17 @@ import { Role } from 'src/common/enum/role.enum';
 import { Roles } from 'src/common/decorator/roles.decorator';
 import { Public } from 'src/common/decorator/public.decorator';
 import { FindAllBadgesDto } from './dto/find-all.badge.dto';
+import { IMyReq } from 'src/common/interface/my-req.interface';
 
 @ApiTags('Badge')
 @ApiBearerAuth()
 @UseGuards(RolesGuard)
-@Roles(Role.app_admin)
 @Controller('badge')
 export class BadgeController {
   constructor(private readonly badgeService: BadgeService) {}
 
   @ApiOperation({ summary: 'Create new one' })
+  @Roles(Role.app_admin)
   @Post('/create')
   @ApiBody({ type: CreateBadgeDto })
   @ApiOkResponse({ type: CreateBadgeResponse, status: 200 })
@@ -60,6 +62,13 @@ export class BadgeController {
     return CoreApiResponse.success(data, pagination);
   }
 
+  @Roles(Role.student)
+  @Get('pop-up')
+  async popUp(@Req() req: IMyReq) {
+    const badges = await this.badgeService.checkForPopUp(req.profile.id);
+    return CoreApiResponse.success(badges);
+  }
+
   @Public()
   @ApiOperation({ summary: 'Get one' })
   @Get(':id')
@@ -71,6 +80,7 @@ export class BadgeController {
   }
 
   @ApiOperation({ summary: 'Update one' })
+  @Roles(Role.app_admin)
   @Patch(':id')
   @ApiBody({ type: UpdateBadgeDto })
   @ApiOkResponse({ type: CreateBadgeResponse, status: 200 })
@@ -81,6 +91,7 @@ export class BadgeController {
   }
 
   @ApiOperation({ summary: 'Delete one' })
+  @Roles(Role.app_admin)
   @Delete(':id')
   @ApiOkResponse({ type: DeleteApiResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })

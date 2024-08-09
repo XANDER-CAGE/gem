@@ -149,4 +149,14 @@ export class BadgeRepo {
       .where('id', connectionId)
       .returning('*');
   }
+
+  async checkForPopUp(profileId: string, knex = this.knex) {
+    return knex
+      .select('b.*', 'pb.id as connection_id')
+      .from(`${this.relationToProfile} as pb`)
+      .leftJoin(`${this.table} as b`, 'pb.badge_id', 'b.id')
+      .where('pb.profile_id', profileId)
+      .andWhere(knex.raw('b.progress = pb.progress'))
+      .andWhere('pb.is_shown', false);
+  }
 }

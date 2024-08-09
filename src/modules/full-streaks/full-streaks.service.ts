@@ -117,4 +117,17 @@ export class FullStreaksService {
     }
     return nextFullStreak;
   }
+
+  async checkForPopUp(profileId: string) {
+    const fullStreaks = await this.fullStreakRepo.checkForPopUp(profileId);
+    for (const fullStreak of fullStreaks) {
+      await this.fullStreakRepo.updateConnection(
+        'is_shown',
+        true,
+        fullStreak.connection_id,
+      );
+      delete fullStreak.connection_id;
+    }
+    return fullStreaks;
+  }
 }

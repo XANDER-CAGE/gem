@@ -10,7 +10,6 @@ import { UpdateAchievementDto } from '../dto/update-achievement.dto';
 export class AchievementsRepo {
   private readonly table = tableName.achievements;
 
-
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
   async findAll(dto: PaginationDto, knex = this.knex) {
@@ -68,5 +67,47 @@ export class AchievementsRepo {
       })
       .where('id', id)
       .andWhere('deleted_at', null);
+  }
+
+  async getGrades(knex = this.knex) {
+    const now = Date.now();
+    const yesterday = new Date(now - 1000 * 60 * 60 * 24)
+      .toISOString()
+      .split('T')[0];
+    return await knex('grades as g')
+      .join('assigned_courses as ac', function () {
+        this.on('g.assigned_course_id', '=', 'ac.id').andOn(
+          knex.raw('ac.is_deleted = false'),
+        );
+      })
+      .join('functions_reference as fr', function () {
+        this.on('fr.id', '=', 'g.component_id').andOn(
+          knex.raw('fr.is_deleted = false'),
+        );
+      })
+      .join('student_profiles as sp', function () {
+        this.on('g.student_id', 'sp.student_id').andOn(
+          knex.raw('sp.deleted_at is null'),
+        );
+      })
+      .join('achievements as a', function () {
+        this.on('a.component_id', 'fr.id').andOn(
+          knex.raw('a.deleted_at is null'),
+        );
+      })
+      .where('g.is_deleted', false)
+      .whereIn('fr.id', [
+        '64fe738e0274a5187fe76d5b',
+        '64fe738e397b9a187f529943',
+      ])
+      .where('g.score', '>=', 90)
+      .where('g.created_at', '>', yesterday)
+      .groupBy('fr.name', 'fr.id')
+      .select(
+        'fr.name as component_name',
+        'fr.id as comp_id',
+        'a.id as achievement_id',
+        knex.raw(`json_agg(json_build_object('profile_id', sp.id)) as grades`),
+      );
   }
 }

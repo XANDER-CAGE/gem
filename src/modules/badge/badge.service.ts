@@ -6,6 +6,7 @@ import { UpdateBadgeDto } from './dto/update-badge.dto';
 import { InjectConnection } from 'nest-knexjs';
 import { Knex } from 'knex';
 import { FindAllBadgesDto } from './dto/find-all.badge.dto';
+import { BadgeEntity } from './entity/badge.entity';
 
 @Injectable()
 export class BadgeService {
@@ -63,5 +64,14 @@ export class BadgeService {
     knex = this.knex,
   ) {
     return this.badgeRepo.updateConnection(column, value, connectionId, knex);
+  }
+
+  async checkForPopUp(profileId: string): Promise<BadgeEntity[]> {
+    const badges = await this.badgeRepo.checkForPopUp(profileId);
+    for (const badge of badges) {
+      await this.updateConnection('is_shown', true, badge.connection_id);
+      delete badge.connection_id;
+    }
+    return badges;
   }
 }

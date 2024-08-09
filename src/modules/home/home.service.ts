@@ -233,4 +233,13 @@ export class HomeService {
     });
     return CoreApiResponse.success(null);
   }
+
+  async handleGradeCron() {
+    const grades = await this.achievementsService.getGrades();
+    for (const comp of grades) {
+      for (const { profile_id } of comp.grades) {
+        await this.assignAchievement(profile_id, comp.achievement_id);
+      }
+    }
+  }
 }
