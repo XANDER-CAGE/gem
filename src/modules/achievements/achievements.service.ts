@@ -13,6 +13,7 @@ import { Knex } from 'knex';
 import { BadgeService } from '../badge/badge.service';
 import { TransactionService } from '../transaction/transaction.service';
 import { CoreApiResponse } from 'src/common/response-class/core-api.response';
+import { IGetAGrades } from './interfaces/getgrades.interface';
 
 @Injectable()
 export class AchievementsService {
@@ -87,5 +88,9 @@ export class AchievementsService {
       }
     });
     return CoreApiResponse.success(null);
+  }
+
+  async getGrades(): Promise<IGetAGrades[]> {
+    return this.achievementRepo.getGrades();
   }
 }

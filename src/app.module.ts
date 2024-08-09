@@ -18,10 +18,12 @@ import { AchievementsModule } from './modules/achievements/achievements.module';
 import { LeadershipModule } from './modules/leadership/leadership.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './common/guard/auth.guard';
+import { ScheduleModule } from '@nestjs/schedule';
 
 //leadership module
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     KnexModule.forRootAsync({
       useClass: KnexConfigService,
     }),
