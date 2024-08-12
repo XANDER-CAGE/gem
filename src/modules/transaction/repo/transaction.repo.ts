@@ -182,8 +182,17 @@ export class TransactionRepo {
       .leftJoin('badges AS b', 't.badge_id', 'b.id')
       .leftJoin('market_products AS mp', 't.product_id', 'mp.id')
       .whereNotNull('t.deleted_at')
-      .andWhere('t.profile_id', dto.profile_id)
-      .andWhereBetween('t.created_at', [dto.start_date, dto.end_date])
+      .andWhere('t.profile_id', dto.profile_id);
+
+    if (dto.start_date && dto.end_date) {
+      innerQuery.andWhereBetween('t.created_at', [
+        dto.start_date,
+        dto.end_date,
+      ]);
+    } else if (dto.start_date) {
+      innerQuery.andWhere('t.created_at', '>', dto.start_date);
+    }
+    innerQuery
       .limit(limit)
       .offset((page - 1) * limit)
       .as('c');

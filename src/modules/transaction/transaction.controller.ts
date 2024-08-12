@@ -10,6 +10,9 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 import { ErrorApiResponse } from 'src/common/response-class/error.response';
+import { ListTransactionResponse } from './response/list-transaction.response';
+import { CoreApiResponse } from 'src/common/response-class/core-api.response';
+import { CreateTransactionResponse } from './response/create-transaction.response';
 
 @ApiTags('Transactions')
 @Controller('transaction')
@@ -26,14 +29,23 @@ export class TransactionController {
   //   return this.transactionService.createSpending(dto);
   // }
 
-  @Get()
-  findAll(@Query() dto: PaginationDto) {
-    return this.transactionService.findAll(dto);
+  @ApiOperation({ summary: 'Find all' })
+  @Get('/list')
+  @ApiOkResponse({ type: ListTransactionResponse, status: 200 })
+  @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
+  async findAll(@Query() dto: PaginationDto) {
+    const { total, data } = await this.transactionService.findAll(dto);
+    const pagination = { total, limit: dto.limit, page: dto.page };
+    return CoreApiResponse.success(data, pagination);
   }
 
+  @ApiOperation({ summary: 'Get one' })
   @Get(':id')
-  findOne(@Param() { id }: IdDto) {
-    return this.transactionService.findOne(id);
+  @ApiOkResponse({ type: CreateTransactionResponse, status: 200 })
+  @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
+  async findOne(@Param() { id }: IdDto) {
+    const data = await this.transactionService.findOne(id);
+    return CoreApiResponse.success(data);
   }
 
   @ApiOperation({ summary: 'Transaction history' })
