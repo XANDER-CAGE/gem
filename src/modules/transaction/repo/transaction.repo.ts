@@ -6,9 +6,13 @@ import {
   PaginationDto,
   PaginationForTransactionHistory,
 } from 'src/common/dto/pagination.dto';
-import { IFindAllTransaction } from '../interface/find-all-transaction.interface';
+import {
+  IFindAllHistoryTransaction,
+  IFindAllTransaction,
+} from '../interface/find-all-transaction.interface';
 import { tableName } from 'src/common/var/table-name.var';
 import { CreateEarningDto } from '../dto/create-earning-transaction.dto';
+import { TransactionHistoryEnum } from '../enum/transaction.history.enum';
 
 export class TransactionRepo {
   private readonly table = tableName.transactions;
@@ -163,25 +167,53 @@ export class TransactionRepo {
   async transactionHistory(
     dto: PaginationForTransactionHistory,
     knex = this.knex,
-  ): Promise<IFindAllTransaction> {
+  ): Promise<IFindAllHistoryTransaction> {
     const { limit = 10, page = 1 } = dto;
-    const innerQuery = knex
-      .select(
-        't.*',
+
+    const innerQuery = knex.select('t.*');
+    if (dto.listType === TransactionHistoryEnum.ALL) {
+      innerQuery.select(
         knex.raw('to_json(ch.*) as channel_obj'),
         knex.raw('to_json(st.*) as streak_obj'),
         knex.raw('to_json(l.*) as level_obj'),
         knex.raw('to_json(fs.*) as full_streak_obj'),
         knex.raw('to_json(b.*) as badge_obj'),
-      )
-      .from('transactions AS t')
-      .leftJoin('channels AS ch', 't.channel_id', 'ch.id')
-      .leftJoin('streaks AS st', 't.streak_id', 'st.id')
-      .leftJoin('levels AS l', 't.level_id', 'l.id')
-      .leftJoin('full_streaks AS fs', 't.full_streak_id', 'fs.id')
-      .leftJoin('badges AS b', 't.badge_id', 'b.id')
-      .leftJoin('market_products AS mp', 't.product_id', 'mp.id')
-      .whereNotNull('t.deleted_at')
+        knex.raw('to_json(mp.*) as product_obj'),
+      );
+    } else if (dto.listType === TransactionHistoryEnum.EXPENSE) {
+      innerQuery.select(knex.raw('to_json(mp.*) as product_obj'));
+    } else if (dto.listType === TransactionHistoryEnum.INCOME) {
+      innerQuery.select(
+        knex.raw('to_json(ch.*) as channel_obj'),
+        knex.raw('to_json(st.*) as streak_obj'),
+        knex.raw('to_json(l.*) as level_obj'),
+        knex.raw('to_json(fs.*) as full_streak_obj'),
+        knex.raw('to_json(b.*) as badge_obj'),
+      );
+    }
+    innerQuery.from('transactions AS t');
+
+    if (dto.listType === TransactionHistoryEnum.ALL) {
+      innerQuery
+        .leftJoin('channels AS ch', 't.channel_id', 'ch.id')
+        .leftJoin('streaks AS st', 't.streak_id', 'st.id')
+        .leftJoin('levels AS l', 't.level_id', 'l.id')
+        .leftJoin('full_streaks AS fs', 't.full_streak_id', 'fs.id')
+        .leftJoin('badges AS b', 't.badge_id', 'b.id')
+        .leftJoin('market_products AS mp', 't.product_id', 'mp.id');
+    } else if (dto.listType === TransactionHistoryEnum.EXPENSE) {
+      innerQuery.leftJoin('market_products AS mp', 't.product_id', 'mp.id');
+    } else if (dto.listType === TransactionHistoryEnum.INCOME) {
+      innerQuery
+        .leftJoin('channels AS ch', 't.channel_id', 'ch.id')
+        .leftJoin('streaks AS st', 't.streak_id', 'st.id')
+        .leftJoin('levels AS l', 't.level_id', 'l.id')
+        .leftJoin('full_streaks AS fs', 't.full_streak_id', 'fs.id')
+        .leftJoin('badges AS b', 't.badge_id', 'b.id');
+    }
+
+    innerQuery
+      .whereNull('t.deleted_at')
       .andWhere('t.profile_id', dto.profile_id);
 
     if (dto.start_date && dto.end_date) {
@@ -189,8 +221,10 @@ export class TransactionRepo {
         dto.start_date,
         dto.end_date,
       ]);
-    } else if (dto.start_date) {
+    } else if (dto.start_date && !dto.end_date) {
       innerQuery.andWhere('t.created_at', '>', dto.start_date);
+    } else if (!dto.start_date && dto.end_date) {
+      innerQuery.andWhere('t.created_at', '<', dto.end_date);
     }
     innerQuery
       .limit(limit)
@@ -206,7 +240,6 @@ export class TransactionRepo {
         knex.raw('jsonb_agg(c.*) AS data'),
       ])
       .from(innerQuery);
-
     return { total: +total, data };
   }
 

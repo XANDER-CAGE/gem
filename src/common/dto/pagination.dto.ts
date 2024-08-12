@@ -46,6 +46,7 @@ export class PaginationForTransactionHistory extends PaginationDto {
     example: TransactionHistoryEnum.ALL,
     enum: TransactionHistoryEnum,
   })
+  @IsNotEmpty()
   @IsEnum(TransactionHistoryEnum)
   listType: TransactionHistoryEnum;
 }
