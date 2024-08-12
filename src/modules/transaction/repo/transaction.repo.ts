@@ -6,17 +6,25 @@ import {
   PaginationDto,
   PaginationForTransactionHistory,
 } from 'src/common/dto/pagination.dto';
-import {
-  IFindAllHistoryTransaction,
-  IFindAllTransaction,
-} from '../interface/find-all-transaction.interface';
+import { IFindAllTransaction } from '../interface/find-all-transaction.interface';
 import { tableName } from 'src/common/var/table-name.var';
 import { CreateEarningDto } from '../dto/create-earning-transaction.dto';
-import { TransactionHistoryEnum } from '../enum/transaction.history.enum';
+import { CreateManualTransactionDto } from '../dto/create.transaction.dto';
 
 export class TransactionRepo {
   private readonly table = tableName.transactions;
   constructor(@InjectConnection() private readonly knex: Knex) {}
+
+  async createManual(
+    dto: CreateManualTransactionDto,
+    userId: string,
+    knex = this.knex,
+  ) {
+    return knex
+      .insert({ ...dto, user_id: userId })
+      .into(this.table)
+      .returning('*');
+  }
 
   async createEarning(
     dto: CreateEarningDto,
@@ -167,105 +175,50 @@ export class TransactionRepo {
   async transactionHistory(
     dto: PaginationForTransactionHistory,
     knex = this.knex,
-  ): Promise<IFindAllHistoryTransaction> {
-    const { limit = 10, page = 1 } = dto;
+  ) {
+    const {
+      limit = 10,
+      page = 1,
+      profile_id,
+      start_date,
+      end_date,
+      listType,
+    } = dto;
 
-    const innerQuery = knex.select('t.*');
-    if (dto.listType === TransactionHistoryEnum.ALL) {
-      innerQuery.select(
-        knex.raw('to_json(ch.*) as channel_obj'),
-        knex.raw('to_json(st.*) as streak_obj'),
-        knex.raw('to_json(l.*) as level_obj'),
-        knex.raw('to_json(fs.*) as full_streak_obj'),
-        knex.raw('to_json(b.*) as badge_obj'),
-        knex.raw('to_json(mp.*) as product_obj'),
-      );
-    } else if (dto.listType === TransactionHistoryEnum.EXPENSE) {
-      innerQuery.select(knex.raw('to_json(mp.*) as product_obj'));
-    } else if (dto.listType === TransactionHistoryEnum.INCOME) {
-      innerQuery.select(
-        knex.raw('to_json(ch.*) as channel_obj'),
-        knex.raw('to_json(st.*) as streak_obj'),
-        knex.raw('to_json(l.*) as level_obj'),
-        knex.raw('to_json(fs.*) as full_streak_obj'),
-        knex.raw('to_json(b.*) as badge_obj'),
-      );
-    }
-    innerQuery.from('transactions AS t');
-
-    if (dto.listType === TransactionHistoryEnum.ALL) {
-      innerQuery
-        .leftJoin('channels AS ch', 't.channel_id', 'ch.id')
-        .leftJoin('streaks AS st', 't.streak_id', 'st.id')
-        .leftJoin('levels AS l', 't.level_id', 'l.id')
-        .leftJoin('full_streaks AS fs', 't.full_streak_id', 'fs.id')
-        .leftJoin('badges AS b', 't.badge_id', 'b.id')
-        .leftJoin('market_products AS mp', 't.product_id', 'mp.id');
-    } else if (dto.listType === TransactionHistoryEnum.EXPENSE) {
-      innerQuery.leftJoin('market_products AS mp', 't.product_id', 'mp.id');
-    } else if (dto.listType === TransactionHistoryEnum.INCOME) {
-      innerQuery
-        .leftJoin('channels AS ch', 't.channel_id', 'ch.id')
-        .leftJoin('streaks AS st', 't.streak_id', 'st.id')
-        .leftJoin('levels AS l', 't.level_id', 'l.id')
-        .leftJoin('full_streaks AS fs', 't.full_streak_id', 'fs.id')
-        .leftJoin('badges AS b', 't.badge_id', 'b.id');
-    }
-
-    innerQuery
+    const baseQuery = knex('transactions AS t')
+      .leftJoin('channels AS ch', 't.channel_id', 'ch.id')
+      .leftJoin('streaks AS st', 't.streak_id', 'st.id')
+      .leftJoin('levels AS l', 't.level_id', 'l.id')
+      .leftJoin('full_streaks AS fs', 't.full_streak_id', 'fs.id')
+      .leftJoin('badges AS b', 't.badge_id', 'b.id')
+      .leftJoin('market_products AS mp', 't.product_id', 'mp.id')
       .whereNull('t.deleted_at')
-      .andWhere('t.profile_id', dto.profile_id);
+      .andWhere('t.profile_id', profile_id)
+      .andWhere('t.created_at', '>', start_date || '1970-01-01')
+      .andWhere('t.created_at', '<', end_date || '3000-01-01')
+      .andWhere(function () {
+        if (listType) {
+          this.where('t.total_gem', listType === 'expense' ? '<' : '>', 0);
+        }
+      });
 
-    if (dto.start_date && dto.end_date) {
-      innerQuery.andWhereBetween('t.created_at', [
-        dto.start_date,
-        dto.end_date,
-      ]);
-    } else if (dto.start_date && !dto.end_date) {
-      innerQuery.andWhere('t.created_at', '>', dto.start_date);
-    } else if (!dto.start_date && dto.end_date) {
-      innerQuery.andWhere('t.created_at', '<', dto.end_date);
-    }
-    innerQuery
+    const [{ total }] = await baseQuery.clone().count('* as total');
+    const data = await baseQuery
+      .select(
+        knex.raw([
+          `case 
+            when t.user_id is not null
+              then 'Manual'
+              else coalesce(ch.name, st.name, l.name, fs.name, b.name, mp.name)
+            end as title`,
+          't.id',
+          't.total_gem::double precision as total_gem',
+          't.created_at',
+        ]),
+      )
       .limit(limit)
-      .offset((page - 1) * limit)
-      .as('c');
+      .offset((page - 1) * limit);
 
-    const [{ total, data }] = await knex
-      .select([
-        knex.raw(
-          '(SELECT COUNT(id) FROM ?? WHERE deleted_at is null) AS total',
-          this.table,
-        ),
-        knex.raw('jsonb_agg(c.*) AS data'),
-      ])
-      .from(innerQuery);
-    return { total: +total, data };
+    return { total: +total, data: data };
   }
-
-  // async update(
-  //   id: string,
-  //   dto: UpdateEarningDto | UpdateSpendingDto,
-  //   knex = this.knex,
-  // ) {
-  //   const [data] = await knex(this.table)
-  //     .update({
-  //       ...dto,
-  //       updated_at: new Date(),
-  //     })
-  //     .where('id', id)
-  //     .andWhere('deleted_at', null)
-  //     .returning('*');
-  //   return data;
-  // }
-
-  // async delete(id: string, knex = this.knex): Promise<void> {
-  //   await knex(this.table)
-  //     .update({
-  //       deleted_at: new Date(),
-  //       updated_at: new Date(),
-  //     })
-  //     .where('id', id)
-  //     .andWhere('deleted_at', null);
-  // }
 }
