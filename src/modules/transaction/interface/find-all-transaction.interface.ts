@@ -1,7 +1,4 @@
-import {
-  TransactionEntity,
-  TransactionHistoryEntity,
-} from '../entity/transaction.entity';
+import { TransactionEntity } from '../entity/transaction.entity';
 
 export interface IFindAllTransaction {
   total: number;
@@ -10,5 +7,5 @@ export interface IFindAllTransaction {
 
 export interface IFindAllHistoryTransaction {
   total: number;
-  data: TransactionHistoryEntity[];
+  data: TransactionEntity[];
 }

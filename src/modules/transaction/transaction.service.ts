@@ -12,6 +12,7 @@ import { CreateEarningDto } from './dto/create-earning-transaction.dto';
 import { CreateSpendingDto } from './dto/create-spending-transaction.dto';
 import { InjectConnection } from 'nest-knexjs';
 import { Knex } from 'knex';
+import { CreateManualTransactionDto } from './dto/create.transaction.dto';
 
 @Injectable()
 export class TransactionService {
@@ -21,6 +22,12 @@ export class TransactionService {
     private readonly profileService: StudentProfilesService,
     private readonly productService: ProductsService,
   ) {}
+
+  async createManual(dto: CreateManualTransactionDto, userId: string) {
+    const profile = await this.profileService.findOne(dto.profile_id);
+    if (!profile) throw new NotFoundException('Profile not found');
+    return this.transactionRepo.createManual(dto, userId);
+  }
 
   async createEarning(
     dto: CreateEarningDto,
@@ -33,15 +40,17 @@ export class TransactionService {
     dto: CreateSpendingDto,
     knex = this.knex,
   ): Promise<TransactionEntity> {
+    let totalGem = 0;
     const profile = await this.profileService.findOne(dto.profile_id);
     if (!profile) throw new NotFoundException('Profile not found');
     const product = await this.productService.findOne(dto.product_id);
     if (!product) throw new NotFoundException('Channel not found');
-    return product.price
+    totalGem += product.price * dto.count;
+    return totalGem
       ? await this.transactionRepo.createSpending(
           {
             ...dto,
-            total_gem: -product.price,
+            total_gem: -totalGem,
           },
           knex,
         )

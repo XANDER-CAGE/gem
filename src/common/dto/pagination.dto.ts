@@ -43,10 +43,10 @@ export class PaginationForTransactionHistory extends PaginationDto {
   end_date: Date;
 
   @ApiPropertyOptional({
-    example: TransactionHistoryEnum.ALL,
+    example: TransactionHistoryEnum.INCOME,
     enum: TransactionHistoryEnum,
   })
-  @IsNotEmpty()
+  @IsOptional()
   @IsEnum(TransactionHistoryEnum)
   listType: TransactionHistoryEnum;
 }
