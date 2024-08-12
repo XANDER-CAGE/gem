@@ -6,7 +6,7 @@ import {
   PaginationDto,
   PaginationForTransactionHistory,
 } from 'src/common/dto/pagination.dto';
-import { IFindAllTransaction } from '../interface/find-all-transaction.interface';
+import { IFindAllHistoryTransaction, IFindAllTransaction } from '../interface/find-all-transaction.interface';
 import { tableName } from 'src/common/var/table-name.var';
 import { CreateEarningDto } from '../dto/create-earning-transaction.dto';
 
@@ -163,8 +163,9 @@ export class TransactionRepo {
   async transactionHistory(
     dto: PaginationForTransactionHistory,
     knex = this.knex,
-  ): Promise<IFindAllTransaction> {
+  ): Promise<IFindAllHistoryTransaction> {
     const { limit = 10, page = 1 } = dto;
+
     const innerQuery = knex
       .select(
         't.*',
@@ -173,6 +174,7 @@ export class TransactionRepo {
         knex.raw('to_json(l.*) as level_obj'),
         knex.raw('to_json(fs.*) as full_streak_obj'),
         knex.raw('to_json(b.*) as badge_obj'),
+        knex.raw('to_json(mp.*) as product_obj')
       )
       .from('transactions AS t')
       .leftJoin('channels AS ch', 't.channel_id', 'ch.id')
@@ -181,7 +183,7 @@ export class TransactionRepo {
       .leftJoin('full_streaks AS fs', 't.full_streak_id', 'fs.id')
       .leftJoin('badges AS b', 't.badge_id', 'b.id')
       .leftJoin('market_products AS mp', 't.product_id', 'mp.id')
-      .whereNotNull('t.deleted_at')
+      .whereNull('t.deleted_at')
       .andWhere('t.profile_id', dto.profile_id);
 
     if (dto.start_date && dto.end_date) {

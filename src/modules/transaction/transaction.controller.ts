@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Param } from '@nestjs/common';
+import { Controller, Get, Query, Param, UseGuards } from '@nestjs/common';
 import { TransactionService } from './transaction.service';
 import { IdDto } from 'src/common/dto/id.dto';
 // import { CreateEarningDto } from './dto/create-earning-transaction.dto';
@@ -7,14 +7,23 @@ import {
   PaginationDto,
   PaginationForTransactionHistory,
 } from 'src/common/dto/pagination.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 import { ErrorApiResponse } from 'src/common/response-class/error.response';
 import { ListTransactionResponse } from './response/list-transaction.response';
 import { CoreApiResponse } from 'src/common/response-class/core-api.response';
-import { CreateTransactionResponse } from './response/create-transaction.response';
+import {
+  CreateTransactionResponse,
+  TransactionHistoryResponse,
+} from './response/create-transaction.response';
+import { RolesGuard } from 'src/common/guard/roles.guard';
+import { Roles } from 'src/common/decorator/roles.decorator';
+import { Role } from 'src/common/enum/role.enum';
 
 @ApiTags('Transactions')
+@ApiBearerAuth()
+@UseGuards(RolesGuard)
+@Roles(Role.student)
 @Controller('transaction')
 export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
@@ -48,11 +57,16 @@ export class TransactionController {
     return CoreApiResponse.success(data);
   }
 
+  @Roles(Role.student)
   @ApiOperation({ summary: 'Transaction history' })
   @Get('transaction-history')
+  @ApiOkResponse({ type: TransactionHistoryResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
   async transactionHistory(@Query() dto: PaginationForTransactionHistory) {
-    return this.transactionService.transactionHistory(dto);
+    const { total, data } =
+      await this.transactionService.transactionHistory(dto);
+    const pagination = { total, limit: dto.limit, page: dto.page };
+    return CoreApiResponse.success(data, pagination);
   }
 
   // @Patch('spending/:id')
