@@ -19,6 +19,7 @@ import { LeadershipModule } from './modules/leadership/leadership.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './common/guard/auth.guard';
 import { ScheduleModule } from '@nestjs/schedule';
+import { FileModule } from './modules/file/file.module';
 
 //leadership module
 @Module({
@@ -42,6 +43,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     HomeModule,
     AchievementsModule,
     LeadershipModule,
+    FileModule,
   ],
   providers: [
     {
