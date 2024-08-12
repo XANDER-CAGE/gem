@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query, Param, UseGuards, Post } from '@nestjs/common';
 import { TransactionService } from './transaction.service';
 import { IdDto } from 'src/common/dto/id.dto';
 // import { CreateEarningDto } from './dto/create-earning-transaction.dto';
@@ -10,12 +10,12 @@ import {
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 import { ErrorApiResponse } from 'src/common/response-class/error.response';
-import { ListTransactionResponse } from './response/list-transaction.response';
-import { CoreApiResponse } from 'src/common/response-class/core-api.response';
 import {
-  CreateTransactionResponse,
-  TransactionHistoryResponse,
-} from './response/create-transaction.response';
+  ListTransactionHistoryResponse,
+  ListTransactionResponse,
+} from './response/list-transaction.response';
+import { CoreApiResponse } from 'src/common/response-class/core-api.response';
+import { CreateTransactionResponse } from './response/create-transaction.response';
 import { RolesGuard } from 'src/common/guard/roles.guard';
 import { Roles } from 'src/common/decorator/roles.decorator';
 import { Role } from 'src/common/enum/role.enum';
@@ -59,8 +59,8 @@ export class TransactionController {
 
   @Roles(Role.student)
   @ApiOperation({ summary: 'Transaction history' })
-  @Get('transaction-history')
-  @ApiOkResponse({ type: TransactionHistoryResponse, status: 200 })
+  @Post('transaction-history')
+  @ApiOkResponse({ type: ListTransactionHistoryResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
   async transactionHistory(@Query() dto: PaginationForTransactionHistory) {
     const { total, data } =
