@@ -12,7 +12,9 @@ export const env = cleanEnv(process.env, {
   PG_DB: str(),
   PG_USER: str(),
   PG_PASS: str(),
-  REDIS_HOST: str(),
-  REDIS_PORT: num({ default: 6379 }),
-  REDIS_PASS: str(),
+  MINIO_ACCESS_KEY: str(),
+  MINIO_ENDPOINT: str(),
+  MINIO_PORT: num(),
+  MINIO_SECRET_KEY: str(),
+  MINIO_BUCKET: str(),
 });
