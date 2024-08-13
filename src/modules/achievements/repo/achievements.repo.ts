@@ -5,6 +5,7 @@ import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { tableName } from 'src/common/var/table-name.var';
 import { CreateAchievementDto } from '../dto/create-achievement.dto';
 import { UpdateAchievementDto } from '../dto/update-achievement.dto';
+import { AchievementEntity } from '../entities/achievement.entity';
 
 @Injectable()
 export class AchievementsRepo {
@@ -38,6 +39,18 @@ export class AchievementsRepo {
       .select('*')
       .from(this.table)
       .where('id', id)
+      .andWhere('deleted_at', null)
+      .first();
+  }
+
+  async findOnByType(
+    type: string,
+    knex = this.knex,
+  ): Promise<AchievementEntity> {
+    return await knex
+      .select('*')
+      .from(this.table)
+      .where('type', type)
       .andWhere('deleted_at', null)
       .first();
   }

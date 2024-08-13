@@ -1,7 +1,16 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Req,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiBody,
+  ApiConsumes,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -17,6 +26,9 @@ import { Roles } from 'src/common/decorator/roles.decorator';
 import { Cron } from '@nestjs/schedule';
 import { DeleteApiResponse } from 'src/common/response-class/all-null.response';
 import { ErrorApiResponse } from 'src/common/response-class/error.response';
+import { CoreApiResponse } from 'src/common/response-class/core-api.response';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { BufferedFile } from 'src/common/interface/buffered-file.interface';
 
 @ApiTags('Home')
 @ApiBearerAuth()
@@ -32,7 +44,8 @@ export class AssignController {
   @ApiOkResponse({ type: DeleteApiResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
   async assignChannel(@Body() dto: AssignChannelDto) {
-    return await this.homeService.assignChannel(dto);
+    await this.homeService.assignChannel(dto);
+    return CoreApiResponse.success(null);
   }
 
   @ApiOperation({ summary: 'Assign achievement' })
@@ -42,10 +55,11 @@ export class AssignController {
   @ApiOkResponse({ type: DeleteApiResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
   async assignAchievement(@Body() dto: AssignAchievementDto) {
-    return await this.homeService.assignAchievement(
+    await this.homeService.assignAchievement(
       dto.profile_id,
       dto.achievement_id,
     );
+    return CoreApiResponse.success(null);
   }
 
   @ApiOperation({ summary: 'Buy product' })
@@ -55,11 +69,32 @@ export class AssignController {
   @ApiOkResponse({ type: DeleteApiResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
   async productBuy(@Body() dto: BuyProductDto, @Req() req: IMyReq) {
-    return await this.homeService.buyProduct(dto, req.user.profile);
+    await this.homeService.buyProduct(dto, req.user.profile);
+    CoreApiResponse.success(null);
+  }
+
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @Post('upload/homework')
+  @Roles(Role.student)
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadHomework(@UploadedFile() file: BufferedFile, @Req() req: IMyReq) {
+    await this.homeService.uploadHomework(file, req.user.id, req.profile.id);
+    return CoreApiResponse.success(null);
   }
 
   @Cron('0 0 14 * * *')
-  async handleCron() {
+  async handleGradeCron() {
     return await this.homeService.handleGradeCron();
   }
 }

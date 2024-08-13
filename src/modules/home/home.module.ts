@@ -10,6 +10,7 @@ import { LevelModule } from '../level/level.module';
 import { BadgeModule } from '../badge/badge.module';
 import { AchievementsModule } from '../achievements/achievements.module';
 import { MarketProductsModule } from '../market-products/market-products.module';
+import { FileModule } from '../file/file.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { MarketProductsModule } from '../market-products/market-products.module'
     BadgeModule,
     AchievementsModule,
     MarketProductsModule,
+    FileModule,
   ],
   controllers: [AssignController],
   providers: [HomeService],

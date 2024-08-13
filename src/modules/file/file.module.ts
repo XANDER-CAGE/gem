@@ -17,5 +17,6 @@ import { FileRepo } from './repo/file.repo';
   ],
   controllers: [FileController],
   providers: [FileService, FileRepo],
+  exports: [FileService],
 })
 export class FileModule {}
