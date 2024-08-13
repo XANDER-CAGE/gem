@@ -47,22 +47,3 @@ export class LimitWithTopListDto {
   listType: TopListTypeEnum;
 }
 
-export class LimitWithTopListBySchoolDto {
-  @ApiProperty({ example: 0 })
-  @Transform(({ value }) => parseInt(value, 10))
-  @IsNumber()
-  limit: number;
-
-  @ApiProperty({ example: '507f1f77bcf86cd799439012' })
-  @IsString()
-  @MinLength(1)
-  @MaxLength(24)
-  school_id: string;
-
-  @ApiProperty({
-    example: TopListTypeEnum.STUDENT_TOP_BY_GEM,
-    enum: TopListTypeEnum,
-  })
-  @IsEnum(TopListTypeEnum)
-  listType: TopListTypeEnum;
-}

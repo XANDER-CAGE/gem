@@ -8,10 +8,7 @@ import {
 } from '@nestjs/swagger';
 
 import { ErrorApiResponse } from 'src/common/response-class/error.response';
-import {
-  LimitWithTopListBySchoolDto,
-  LimitWithTopListDto,
-} from './dto/create-leadership.dto';
+import { LimitWithTopListDto } from './dto/create-leadership.dto';
 import { RolesGuard } from 'src/common/guard/roles.guard';
 import { Roles } from 'src/common/decorator/roles.decorator';
 import { Role } from 'src/common/enum/role.enum';
@@ -34,22 +31,28 @@ export class LeadershipController {
     return await this.leadershipService.saveLeadership();
   }
 
-  @Roles(Role.student)
-  @ApiOperation({ summary: 'Top lists' })
-  @Get('list-of-leadership')
-  @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
-  async listOfLeadership(
-    @Query() dto: LimitWithTopListDto,
-    @Req() req: IMyReq,
-  ) {
-    return await this.leadershipService.listOfLeadership(dto, req.profile.id);
-  }
+  // @Roles(Role.student)
+  // @ApiOperation({ summary: 'Top lists' })
+  // @Get('list-of-leadership')
+  // @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
+  // async listOfLeadership(
+  //   @Query() dto: LimitWithTopListDto,
+  //   @Req() req: IMyReq,
+  // ) {
+  //   return await this.leadershipService.listOfLeadership(dto, req.profile.id);
+  // }
 
   @Roles(Role.student)
   @ApiOperation({ summary: 'Top lists by school' })
   @Get('list-of-leadership-by-school')
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
-  async listOfLeadershipBySchool(@Query() dto: LimitWithTopListBySchoolDto, @Req() req: IMyReq) {
-    return await this.leadershipService.listOfLeadershipBySchool(dto, req.profile.id);
+  async listOfLeadershipBySchool(
+    @Query() dto: LimitWithTopListDto,
+    @Req() req: IMyReq,
+  ) {
+    return await this.leadershipService.listOfLeadershipBySchool(
+      dto,
+      req.profile.id,
+    );
   }
 }

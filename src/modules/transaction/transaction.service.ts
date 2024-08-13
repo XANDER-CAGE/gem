@@ -69,17 +69,15 @@ export class TransactionService {
     return await this.transactionRepo.sumAllEarning(profileId, knex);
   }
 
-  async listTopEarning(limit: number, profile_id: string) {
-    return await this.transactionRepo.listTopEarning(limit, profile_id);
-  }
+  // async listTopEarning(limit: number, profile_id: string) {
+  //   return await this.transactionRepo.listTopEarning(limit, profile_id);
+  // }
 
   async listTopEarningBySchool(
-    school_id: string,
     limit: number,
     profile_id: string,
   ) {
     return await this.transactionRepo.listTopEarningBySchool(
-      school_id,
       limit,
       profile_id,
     );
