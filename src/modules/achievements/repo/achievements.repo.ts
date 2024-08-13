@@ -12,6 +12,7 @@ export class AchievementsRepo {
   private readonly table = tableName.achievements;
   private readonly badgeTable = tableName.badges;
   private readonly profilesBadges = tableName.profilesM2Mbadges;
+  private readonly profileTable = tableName.studentProfiles;
 
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
@@ -129,7 +130,7 @@ export class AchievementsRepo {
           knex.raw('fr.is_deleted = false'),
         );
       })
-      .join('student_profiles as sp', function () {
+      .join(`${this.profileTable} as sp`, function () {
         this.on('g.student_id', 'sp.student_id').andOn(
           knex.raw('sp.deleted_at is null'),
         );

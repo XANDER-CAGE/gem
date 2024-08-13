@@ -6,18 +6,21 @@ import { tableName } from 'src/common/var/table-name.var';
 @Injectable()
 export class UserRepo {
   private readonly users = tableName.users;
+  private readonly profileTable = tableName.studentProfiles;
+  private readonly tokensTable = tableName.tokens;
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
   async findUserByToken(token: string, knex = this.knex) {
     const user = await knex
       .select('u.*', knex.raw('to_json(sp.*) as profile'))
-      .from(`${this.users} as u`)
-      .join('student_profiles as sp', 'sp.student_id', 'u.id')
-      .where('token', token)
-      .andWhere('is_deleted', false)
-      .andWhere('is_blocked', false)
-      .andWhere('is_archived', false)
-      .andWhere('is_verified', true)
+      .join(`${this.users} as u`, 'u.id', 't.user_id')
+      .join(`${this.profileTable} as sp`, 'sp.student_id', 'u.id')
+      .from(`${this.tokensTable} as t`)
+      .where('t.access_token', token)
+      .andWhere('u.is_deleted', false)
+      .andWhere('u.is_blocked', false)
+      .andWhere('u.is_archived', false)
+      .andWhere('u.is_verified', true)
       .first();
     return user;
   }
