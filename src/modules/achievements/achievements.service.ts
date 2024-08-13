@@ -93,4 +93,8 @@ export class AchievementsService {
   async getGrades(): Promise<IGetAGrades[]> {
     return this.achievementRepo.getGrades();
   }
+
+  async findOneByType(type: string, knex = this.knex) {
+    return await this.achievementRepo.findOnByType(type, knex);
+  }
 }

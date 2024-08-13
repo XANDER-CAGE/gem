@@ -18,6 +18,8 @@ import { CoreApiResponse } from 'src/common/response-class/core-api.response';
 import { BuyProductDto } from '../market-products/dto/buy.product.dto';
 import { StudentProfileEntity } from '../student-profiles/entity/student-profile.entity';
 import { ProductsService } from '../market-products/market-products.service';
+import { BufferedFile } from 'src/common/interface/buffered-file.interface';
+import { FileService } from '../file/file.service';
 
 @Injectable()
 export class HomeService {
@@ -32,6 +34,7 @@ export class HomeService {
     private readonly badgeService: BadgeService,
     private readonly achievementsService: AchievementsService,
     private readonly productService: ProductsService,
+    private readonly fileService: FileService,
   ) {}
 
   async assignChannel(dto: AssignChannelDto) {
@@ -241,5 +244,14 @@ export class HomeService {
         await this.assignAchievement(profile_id, comp.achievement_id);
       }
     }
+  }
+
+  async uploadHomework(file: BufferedFile, userId: string, profileId: string) {
+    await this.fileService.upload(file, userId);
+    const achievement =
+      await this.achievementsService.findOneByType('assignment');
+    await this.assignAchievement(profileId, achievement.id).catch((error) =>
+      console.log(error),
+    );
   }
 }

@@ -36,7 +36,7 @@ export class FileController {
   })
   @Post()
   @UseInterceptors(FileInterceptor('file'))
-  async bucketExists(@UploadedFile() file: BufferedFile, @Req() req: IMyReq) {
+  async upload(@UploadedFile() file: BufferedFile, @Req() req: IMyReq) {
     return this.fileService.upload(file, req.user.id);
   }
 
