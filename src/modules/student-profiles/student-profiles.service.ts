@@ -24,12 +24,12 @@ export class StudentProfilesService {
   ): Promise<IFindAllStudentProfile> {
     return await this.studentProfileRepo.findAll(findAllStudentProfiles);
   }
-  async findTopList(limit: number, profile_id:string) {
-    return await this.studentProfileRepo.findTopList(limit, profile_id);
-  }
+  // async findTopList(limit: number, profile_id:string) {
+  //   return await this.studentProfileRepo.findTopList(limit, profile_id);
+  // }
 
-  async findTopListBySchool(school_id: string, limit: number, profile_id:string){
-    return await this.studentProfileRepo.findTopListBySchool(school_id, limit, profile_id)
+  async findTopListBySchool(limit: number, profile_id:string){
+    return await this.studentProfileRepo.findTopListBySchool(limit, profile_id)
   }
 
 
