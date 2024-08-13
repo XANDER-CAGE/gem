@@ -36,7 +36,7 @@ export class StudentProfilesRepo {
     return { total: +total, data };
   }
 
-  async findTopList(limit: number, knex = this.knex) {
+  async findTopList(limit: number, profile_id: string, knex = this.knex) {
     const data = knex
       .with('RankedProfiles', (qb) => {
         qb.select(
@@ -52,6 +52,9 @@ export class StudentProfilesRepo {
         'rp.*',
         knex.raw(
           '(COALESCE(l.last_position_by_gem, rp.position_by_gem) - rp.position_by_gem) AS status',
+        ),
+        knex.raw(
+          `case when rp.id = '${profile_id}' then to_json(rp.*) end as my`,
         ),
       )
       .from('RankedProfiles AS rp')
@@ -83,6 +86,7 @@ export class StudentProfilesRepo {
   async findTopListBySchool(
     school_id: string,
     limit: number,
+    profile_id: string,
     knex = this.knex,
   ) {
     const data = knex
@@ -102,13 +106,16 @@ export class StudentProfilesRepo {
         knex.raw(
           '(COALESCE(l.last_position_by_gem, rp.position_by_gem) - rp.position_by_gem) AS status',
         ),
+        knex.raw(
+          `case when rp.id = '${profile_id}' then to_json(rp.*) end as my`,
+        ),
       )
       .from('RankedProfiles AS rp')
       .leftJoin('leadership AS l', function () {
         this.on('l.profile_id', '=', 'rp.id').andOnNull('l.deleted_at');
       })
       .leftJoin('students AS s', 's.id', '=', 'rp.student_id')
-      .leftJoin('school AS sch', 'sch.id', '=', 's.school_id')
+      .leftJoin('schools AS sch', 'sch.id', '=', 's.school_id')
       .where(function () {
         this.where(
           'l.last_position_by_gem',

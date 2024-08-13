@@ -18,24 +18,26 @@ export class LeadershipService {
     return await this.leadershipRepo.saveLeadership();
   }
 
-  async listOfLeadership(dto: LimitWithTopListDto) {
+  async listOfLeadership(dto: LimitWithTopListDto, profile_id:string) {
     if (dto.listType === TopListTypeEnum.STUDENT_TOP_BY_GEM) {
-      return await this.profileService.findTopList(dto.limit);
+      return await this.profileService.findTopList(dto.limit, profile_id);
     } else {
-      return await this.transactionService.listTopEarning(dto.limit);
+      return await this.transactionService.listTopEarning(dto.limit, profile_id);
     }
   }
 
-  async listOfLeadershipBySchool(dto: LimitWithTopListBySchoolDto) {
+  async listOfLeadershipBySchool(dto: LimitWithTopListBySchoolDto, profile_id:string) {
     if (dto.listType === TopListTypeEnum.STUDENT_TOP_BY_GEM) {
       return await this.profileService.findTopListBySchool(
         dto.school_id,
         dto.limit,
+        profile_id,
       );
     } else {
       return await this.transactionService.listTopEarningBySchool(
         dto.school_id,
         dto.limit,
+        profile_id
       );
     }
   }

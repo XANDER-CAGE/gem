@@ -94,14 +94,14 @@ export class TransactionRepo {
     return totalEarned || 0;
   }
 
-  async listTopEarning(limit: number, knex = this.knex) {
+  async listTopEarning(limit: number, profile_id: string, knex = this.knex) {
     const data = knex
       .with('RankedProfiles', (qb) => {
         qb.select(
           'p.*',
-          knex.raw('SUM(t.total_gem) AS total'),
+          knex.raw('CAST(COALESCE(SUM(t.total_gem), 0) AS NUMERIC) AS total'),
           knex.raw(
-            'ROW_NUMBER() OVER (ORDER BY SUM(t.total_gem) DESC, p.gem DESC) AS last_position_by_earning',
+            'ROW_NUMBER() OVER (ORDER BY SUM(t.total_gem), p.gem DESC) AS position_by_earning',
           ),
         )
           .from('student_profiles AS p')
@@ -116,14 +116,17 @@ export class TransactionRepo {
       .select(
         'rp.*',
         knex.raw(
-          '(COALESCE(l.last_position_by_earning, rp.last_position_by_earning) - rp.last_position_by_earning) AS status',
+          '(COALESCE(l.last_position_by_earning, rp.position_by_earning) - rp.position_by_earning) AS status',
+        ),
+        knex.raw(
+          `case when rp.id = '${profile_id}' then to_json(rp.*) end as my`,
         ),
       )
       .from('RankedProfiles AS rp')
       .leftJoin('leadership AS l', function () {
         this.on('l.profile_id', '=', 'rp.id').andOnNull('l.deleted_at');
       })
-      .orderBy('rp.last_position_by_earning')
+      .orderBy('rp.position_by_earning')
       .limit(limit);
 
     return data;
@@ -132,6 +135,7 @@ export class TransactionRepo {
   async listTopEarningBySchool(
     school_id: string,
     limit: number,
+    profile_id: string,
     knex = this.knex,
   ) {
     const data = knex
@@ -157,6 +161,9 @@ export class TransactionRepo {
         'rp.*',
         knex.raw(
           '(COALESCE(l.last_position_by_earning, rp.last_position_by_earning) - rp.last_position_by_earning) AS status',
+        ),
+        knex.raw(
+          `case when rp.id = '${profile_id}' then to_json(rp.*) end as my`,
         ),
       )
       .from('RankedProfiles AS rp')
