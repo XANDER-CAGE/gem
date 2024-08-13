@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { AchievementsService } from './achievements.service';
 import { CreateAchievementDto } from './dto/create-achievement.dto';
@@ -29,6 +30,7 @@ import { CreateAchievementResponse } from './response/create-achievement.respons
 import { ListAchievementResponse } from './response/list-achievement.response';
 import { DeleteApiResponse } from 'src/common/response-class/all-null.response';
 import { CoreApiResponse } from 'src/common/response-class/core-api.response';
+import { IMyReq } from 'src/common/interface/my-req.interface';
 
 @ApiTags('Achievements')
 @ApiBearerAuth()
@@ -49,14 +51,17 @@ export class AchievementsController {
     return CoreApiResponse.success(data);
   }
 
-  @Public()
   @ApiOperation({ summary: 'Find all' })
   @Get('/list')
+  @Roles(Role.student)
   @ApiOkResponse({ type: ListAchievementResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
   @Get('list')
-  async findAll(@Query() dto: PaginationDto) {
-    const { total, data } = await this.achievementsService.findAll(dto);
+  async findAll(@Query() dto: PaginationDto, @Req() req: IMyReq) {
+    const { total, data } = await this.achievementsService.findAll(
+      dto,
+      req.profile.id,
+    );
     const pagination = { total, limit: dto.limit, page: dto.page };
     return CoreApiResponse.success(data, pagination);
   }

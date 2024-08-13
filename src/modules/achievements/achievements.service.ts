@@ -28,8 +28,8 @@ export class AchievementsService {
     return await this.achievementRepo.create(dto);
   }
 
-  async findAll(dto: PaginationDto) {
-    return await this.achievementRepo.findAll(dto);
+  async findAll(dto: PaginationDto, profileId: string) {
+    return await this.achievementRepo.findAll(dto, profileId);
   }
 
   async findOne(id: string) {

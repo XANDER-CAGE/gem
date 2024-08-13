@@ -146,6 +146,7 @@ export class BadgeRepo {
   ) {
     return knex(this.relationToProfile)
       .update(column, value)
+      .update('joined_at', new Date())
       .where('id', connectionId)
       .returning('*');
   }
