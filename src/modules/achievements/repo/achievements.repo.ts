@@ -10,26 +10,57 @@ import { AchievementEntity } from '../entities/achievement.entity';
 @Injectable()
 export class AchievementsRepo {
   private readonly table = tableName.achievements;
+  private readonly badgeTable = tableName.badges;
+  private readonly profilesBadges = tableName.profilesM2Mbadges;
 
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
-  async findAll(dto: PaginationDto, knex = this.knex) {
+  async findAll(dto: PaginationDto, profileId: string, knex = this.knex) {
     const { limit = 10, page = 1 } = dto;
-    const innerQuery = knex(this.table)
-      .select('*')
-      .where('deleted_at', null)
-      .limit(limit)
-      .offset((page - 1) * limit)
-      .as('c');
-    const [{ total, data }] = await knex
-      .select([
+    const offset = (page - 1) * limit;
+
+    const baseQuery = knex(this.table)
+      .select(
+        'a.*',
         knex.raw(
-          '(SELECT COUNT(id) FROM ?? WHERE deleted_at is null) AS total',
-          this.table,
+          `coalesce(
+            jsonb_agg(
+              jsonb_build_object(
+                'id', b.id,
+                'view', b.view,
+                'name', b.name,
+                'badge_progress', b.progress,
+                'user_progress', coalesce(pb.progress, 0),
+                'description', b.description,
+                'reward_gem', b.reward_gem,
+                'achieved_at', b.joined_at
+              )
+            ) filter (where b.id is not null), 
+            '[]'::jsonb
+          ) AS badges`,
         ),
-        knex.raw('jsonb_agg(c.*) AS data'),
-      ])
-      .from(innerQuery);
+      )
+      .from(`${this.table} as a`)
+      .whereNull('a.deleted_at')
+      .leftJoin(`${this.badgeTable} as b`, function () {
+        this.on('a.id', 'b.achievement_id').andOnNull('b.deleted_at');
+      })
+      .leftJoin(`${this.profilesBadges} as pb`, function () {
+        this.on('pb.badge_id', 'b.id').andOn(
+          knex.raw(`pb.profile_id = '${profileId}'`),
+        );
+      })
+      .limit(limit)
+      .offset(offset)
+      .groupBy('a.id');
+
+    const [{ total }] = await baseQuery
+      .clone()
+      .clearSelect()
+      .clearOrder()
+      .count({ total: 'a.id' });
+
+    const data = await baseQuery;
 
     return { total: +total, data };
   }
