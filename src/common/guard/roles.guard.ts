@@ -1,4 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from '../decorator/roles.decorator';
 import { Role } from '../enum/role.enum';
@@ -19,6 +24,9 @@ export class RolesGuard implements CanActivate {
     ]);
     if (isPublic) return true;
     const req = context.switchToHttp().getRequest();
+    if (req?.user?.role != Role.app_admin && !req.profile) {
+      throw new NotFoundException('Profile not found');
+    }
     return requiredRoles.includes(req?.user?.role);
   }
 }
