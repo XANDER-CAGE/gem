@@ -20,4 +20,7 @@ export const tableName = {
   stories: 'gamification.stories',
   achievements: 'gamification.achievements',
   tokens: 'public.tokens',
+  assignedCourses: 'public.assigned_courses',
+  grades: 'public.grades',
+  functionReference: 'public.functions_reference',
 };
