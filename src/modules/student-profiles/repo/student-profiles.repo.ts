@@ -5,10 +5,11 @@ import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { IFindAllStudentProfile } from '../interface/student-profile.interface';
 import { CreateStudentProfileDto } from '../dto/create-student-profile.dto';
 import { UpdateStudentProfileDto } from '../dto/update-student-profile.dto';
+import { tableName } from 'src/common/var/table-name.var';
 
 @Injectable()
 export class StudentProfilesRepo {
-  private table = 'student_profiles';
+  private table = tableName.studentProfiles;
 
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
