@@ -12,6 +12,11 @@ export class AchievementsRepo {
   private readonly table = tableName.achievements;
   private readonly badgeTable = tableName.badges;
   private readonly profilesBadges = tableName.profilesM2Mbadges;
+  private readonly profileTable = tableName.studentProfiles;
+  private readonly assignedCoursesTable = tableName.assignedCourses;
+  private readonly gradesTable = tableName.grades;
+  private readonly functionReferenceTable = tableName.functionReference;
+  private readonly achievementTable = tableName.achievements;
 
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
@@ -118,23 +123,23 @@ export class AchievementsRepo {
     const yesterday = new Date(now - 1000 * 60 * 60 * 24)
       .toISOString()
       .split('T')[0];
-    return await knex('grades as g')
-      .join('assigned_courses as ac', function () {
+    return await knex(`${this.gradesTable} as g`)
+      .join(`${this.assignedCoursesTable} as ac`, function () {
         this.on('g.assigned_course_id', '=', 'ac.id').andOn(
           knex.raw('ac.is_deleted = false'),
         );
       })
-      .join('functions_reference as fr', function () {
+      .join(`${this.functionReferenceTable} as fr`, function () {
         this.on('fr.id', '=', 'g.component_id').andOn(
           knex.raw('fr.is_deleted = false'),
         );
       })
-      .join('student_profiles as sp', function () {
+      .join(`${this.profileTable} as sp`, function () {
         this.on('g.student_id', 'sp.student_id').andOn(
           knex.raw('sp.deleted_at is null'),
         );
       })
-      .join('achievements as a', function () {
+      .join(`${this.achievementTable} as a`, function () {
         this.on('a.component_id', 'fr.id').andOn(
           knex.raw('a.deleted_at is null'),
         );
@@ -146,7 +151,7 @@ export class AchievementsRepo {
       ])
       .where('g.score', '>=', 90)
       .where('g.created_at', '>', yesterday)
-      .groupBy('fr.name', 'fr.id')
+      .groupBy('fr.name', 'fr.id', 'a.id')
       .select(
         'fr.name as component_name',
         'fr.id as comp_id',
