@@ -19,4 +19,5 @@ export const tableName = {
   levelsM2MProducts: 'levels_on_products',
   stories: 'stories',
   achievements: 'achievements',
+  leadership: 'leadership',
 };
