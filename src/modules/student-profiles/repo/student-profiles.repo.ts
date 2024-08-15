@@ -67,51 +67,6 @@ export class StudentProfilesRepo {
   //   return data;
   // }
 
-  async findTopListBySchool(
-    limit: number,
-    profile_id: string,
-    knex = this.knex,
-  ) {
-    const schoolId = await knex('student_profiles AS p')
-      .leftJoin('students AS s', 's.id', 'p.student_id')
-      .leftJoin('schools AS sch', 'sch.id', 's.school_id')
-      .where('p.id', profile_id)
-      .select('sch.id');
-
-    const data = knex
-      .with('RankedProfiles', (qb) => {
-        qb.select(
-          '*',
-          knex.raw(
-            'ROW_NUMBER() OVER (ORDER BY p.gem DESC) AS position_by_gem',
-          ),
-        )
-          .from('student_profiles AS p')
-          .whereNull('p.deleted_at');
-      })
-      .select(
-        'rp.*',
-        'sch.name as school',
-        knex.raw(
-          '(COALESCE(l.last_position_by_gem, rp.position_by_gem) - rp.position_by_gem) AS status',
-        ),
-        knex.raw(
-          `case when rp.id = '${profile_id}' then to_json(rp.*) end as my`,
-        ),
-      )
-      .from('RankedProfiles AS rp')
-      .leftJoin('leadership AS l', function () {
-        this.on('l.profile_id', '=', 'rp.id').andOnNull('l.deleted_at');
-      })
-      .leftJoin('students AS s', 's.id', '=', 'rp.student_id')
-      .leftJoin('schools AS sch', 'sch.id', '=', 's.school_id')
-      .andWhere('sch.id', schoolId)
-      .orderBy('rp.gem', 'desc')
-      .limit(limit);
-
-    return data;
-  }
-
   async findOne(id: string, knex = this.knex) {
     return await knex
       .select('*', knex.raw('gem::double precision as gem'))

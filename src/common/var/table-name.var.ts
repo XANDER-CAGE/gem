@@ -23,4 +23,5 @@ export const tableName = {
   assignedCourses: 'public.assigned_courses',
   grades: 'public.grades',
   functionReference: 'public.functions_reference',
+  leadership: 'gamification.leadership',
 };

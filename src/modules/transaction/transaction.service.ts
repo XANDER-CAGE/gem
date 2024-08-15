@@ -73,15 +73,6 @@ export class TransactionService {
   //   return await this.transactionRepo.listTopEarning(limit, profile_id);
   // }
 
-  async listTopEarningBySchool(
-    limit: number,
-    profile_id: string,
-  ) {
-    return await this.transactionRepo.listTopEarningBySchool(
-      limit,
-      profile_id,
-    );
-  }
 
   async transactionHistory(dto: PaginationForTransactionHistory) {
     return await this.transactionRepo.transactionHistory(dto);

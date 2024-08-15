@@ -31,17 +31,6 @@ export class LeadershipController {
     return await this.leadershipService.saveLeadership();
   }
 
-  // @Roles(Role.student)
-  // @ApiOperation({ summary: 'Top lists' })
-  // @Get('list-of-leadership')
-  // @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
-  // async listOfLeadership(
-  //   @Query() dto: LimitWithTopListDto,
-  //   @Req() req: IMyReq,
-  // ) {
-  //   return await this.leadershipService.listOfLeadership(dto, req.profile.id);
-  // }
-
   @Roles(Role.student)
   @ApiOperation({ summary: 'Top lists by school' })
   @Get('list-of-leadership-by-school')
