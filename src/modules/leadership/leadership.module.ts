@@ -9,5 +9,6 @@ import { TransactionModule } from '../transaction/transaction.module';
   imports: [StudentProfilesModule, TransactionModule],
   controllers: [LeadershipController],
   providers: [LeadershipService, LeadershipRepo],
+  exports: [LeadershipService],
 })
 export class LeadershipModule {}

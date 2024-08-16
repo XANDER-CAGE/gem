@@ -20,6 +20,7 @@ import { StudentProfileEntity } from '../student-profiles/entity/student-profile
 import { ProductsService } from '../market-products/market-products.service';
 import { BufferedFile } from 'src/common/interface/buffered-file.interface';
 import { FileService } from '../file/file.service';
+import { AssignmentRepo } from './repo/assignment.repo';
 
 @Injectable()
 export class HomeService {
@@ -35,6 +36,7 @@ export class HomeService {
     private readonly achievementsService: AchievementsService,
     private readonly productService: ProductsService,
     private readonly fileService: FileService,
+    private readonly assignmentRepo: AssignmentRepo,
   ) {}
 
   async assignChannel(dto: AssignChannelDto) {
@@ -246,12 +248,23 @@ export class HomeService {
     }
   }
 
-  async uploadHomework(file: BufferedFile, userId: string, profileId: string) {
-    await this.fileService.upload(file, userId);
-    const achievement =
-      await this.achievementsService.findOneByType('assignment');
-    await this.assignAchievement(profileId, achievement.id).catch((error) =>
-      console.log(error),
-    );
+  async uploadHomework(
+    file: BufferedFile,
+    userId: string,
+    profileId: string,
+    knex = this.knex,
+  ) {
+    return await knex.transaction(async (trx) => {
+      const uploadedFile = await this.fileService.upload(file, userId, trx);
+      const achievement = await this.achievementsService.findOneByType(
+        'assignment',
+        trx,
+      );
+      await this.assignAchievement(profileId, achievement.id, trx).catch(
+        (error) => console.log(error),
+      );
+      await this.assignmentRepo.create(uploadedFile.id, profileId, trx);
+      return uploadedFile;
+    });
   }
 }

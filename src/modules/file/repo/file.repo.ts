@@ -5,7 +5,7 @@ import { IFiles } from '../interfaces/file.interface';
 
 @Injectable()
 export class FileRepo {
-  private table = `files`;
+  private readonly table = `files`;
 
   constructor(@InjectConnection() public knex: Knex) {}
 
