@@ -13,7 +13,6 @@ import { RolesGuard } from 'src/common/guard/roles.guard';
 import { Roles } from 'src/common/decorator/roles.decorator';
 import { Role } from 'src/common/enum/role.enum';
 import { IMyReq } from 'src/common/interface/my-req.interface';
-import { Public } from 'src/common/decorator/public.decorator';
 
 @ApiTags('Leadership')
 @ApiBearerAuth()
@@ -23,17 +22,9 @@ import { Public } from 'src/common/decorator/public.decorator';
 export class LeadershipController {
   constructor(private readonly leadershipService: LeadershipService) {}
 
-  @Public()
-  @ApiOperation({ summary: 'Save to the leadership' })
-  @Get('save-leadership')
-  @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
-  async saveLeadership() {
-    return await this.leadershipService.saveLeadership();
-  }
-
   @Roles(Role.student)
   @ApiOperation({ summary: 'Top lists by school' })
-  @Get('list-of-leadership-by-school')
+  @Get()
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
   async listOfLeadershipBySchool(
     @Query() dto: LimitWithTopListDto,

@@ -29,13 +29,17 @@ import { ErrorApiResponse } from 'src/common/response-class/error.response';
 import { CoreApiResponse } from 'src/common/response-class/core-api.response';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { BufferedFile } from 'src/common/interface/buffered-file.interface';
+import { LeadershipService } from '../leadership/leadership.service';
 
 @ApiTags('Home')
 @ApiBearerAuth()
 @UseGuards(RolesGuard)
 @Controller()
-export class AssignController {
-  constructor(private readonly homeService: HomeService) {}
+export class HomeController {
+  constructor(
+    private readonly homeService: HomeService,
+    private readonly leadershipService: LeadershipService,
+  ) {}
 
   @ApiOperation({ summary: 'Assign channel' })
   @Roles(Role.app_admin)
@@ -95,6 +99,7 @@ export class AssignController {
 
   @Cron('0 0 14 * * *')
   async handleGradeCron() {
-    return await this.homeService.handleGradeCron();
+    await this.homeService.handleGradeCron();
+    await this.leadershipService.saveLeadership();
   }
 }
