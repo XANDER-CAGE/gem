@@ -13,6 +13,7 @@ import { RolesGuard } from 'src/common/guard/roles.guard';
 import { Roles } from 'src/common/decorator/roles.decorator';
 import { Role } from 'src/common/enum/role.enum';
 import { IMyReq } from 'src/common/interface/my-req.interface';
+import { CoreApiResponse } from 'src/common/response-class/core-api.response';
 
 @ApiTags('Leadership')
 @ApiBearerAuth()
@@ -30,9 +31,10 @@ export class LeadershipController {
     @Query() dto: LimitWithTopListDto,
     @Req() req: IMyReq,
   ) {
-    return await this.leadershipService.listOfLeadershipBySchool(
+    const data = await this.leadershipService.listOfLeadershipBySchool(
       dto,
       req.profile.id,
     );
+    return CoreApiResponse.success(data);
   }
 }

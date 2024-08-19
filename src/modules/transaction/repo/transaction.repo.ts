@@ -4,7 +4,7 @@ import { TransactionEntity } from '../entity/transaction.entity';
 import { ICreateSpending } from '../interface/create-spending-transaction.interface';
 import {
   PaginationDto,
-  PaginationForTransactionHistory,
+  TransactionListDto,
 } from 'src/common/dto/pagination.dto';
 import { IFindAllTransaction } from '../interface/find-all-transaction.interface';
 import { tableName } from 'src/common/var/table-name.var';
@@ -12,7 +12,13 @@ import { CreateEarningDto } from '../dto/create-earning-transaction.dto';
 import { CreateManualTransactionDto } from '../dto/create.transaction.dto';
 
 export class TransactionRepo {
-  private readonly table = tableName.transactions;
+  private readonly transactionTable = tableName.transactions;
+  private readonly channelsTable = tableName.channels;
+  private readonly streaksTable = tableName.streaks;
+  private readonly fullStreaksTable = tableName.fullStreaks;
+  private readonly levelsTable = tableName.levels;
+  private readonly badgesTable = tableName.badges;
+  private readonly productTable = tableName.marketProducts;
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
   async createManual(
@@ -21,9 +27,13 @@ export class TransactionRepo {
     knex = this.knex,
   ) {
     return knex
-      .insert({ ...dto, user_id: userId })
-      .into(this.table)
-      .returning('*');
+      .insert({
+        total_gem: dto.amount,
+        user_id: userId,
+        profile_id: dto.profile_id,
+      })
+      .into(this.transactionTable)
+      .returning(knex.raw(['*', 'total_gem::double precision']));
   }
 
   async createEarning(
@@ -32,7 +42,7 @@ export class TransactionRepo {
   ): Promise<TransactionEntity> {
     const [transaction] = await knex
       .insert(dto)
-      .into(this.table)
+      .into(this.transactionTable)
       .returning('*');
     return transaction;
   }
@@ -45,7 +55,7 @@ export class TransactionRepo {
       .insert({
         ...dto,
       })
-      .into(this.table)
+      .into(this.transactionTable)
       .returning('*');
     return data;
   }
@@ -55,7 +65,7 @@ export class TransactionRepo {
     knex = this.knex,
   ): Promise<IFindAllTransaction> {
     const { limit = 10, page = 1 } = dto;
-    const innerQuery = knex(this.table)
+    const innerQuery = knex(this.transactionTable)
       .select('*')
       .where('deleted_at', null)
       .limit(limit)
@@ -65,7 +75,7 @@ export class TransactionRepo {
       .select([
         knex.raw(
           '(SELECT COUNT(id) FROM ?? WHERE deleted_at is null) AS total',
-          this.table,
+          this.transactionTable,
         ),
         knex.raw('jsonb_agg(c.*) AS data'),
       ])
@@ -77,7 +87,7 @@ export class TransactionRepo {
   async findOne(id: string, knex = this.knex): Promise<TransactionEntity> {
     return await knex
       .select('*')
-      .from(this.table)
+      .from(this.transactionTable)
       .where('id', id)
       .andWhere('deleted_at', null)
       .first();
@@ -86,7 +96,7 @@ export class TransactionRepo {
   async sumAllEarning(profileId: string, knex = this.knex): Promise<number> {
     const { totalEarned } = await knex
       .select(knex.raw(['sum(total_gem)::double precision as totalEarned']))
-      .from(this.table)
+      .from(this.transactionTable)
       .where('profile_id', profileId)
       .andWhere('deleted_at', null)
       .andWhereNot('channel_id', null)
@@ -94,29 +104,22 @@ export class TransactionRepo {
     return totalEarned || 0;
   }
 
-
   async transactionHistory(
-    dto: PaginationForTransactionHistory,
+    dto: TransactionListDto,
+    profileId: string,
     knex = this.knex,
   ) {
-    const {
-      limit = 10,
-      page = 1,
-      profile_id,
-      start_date,
-      end_date,
-      listType,
-    } = dto;
+    const { limit = 10, page = 1, start_date, end_date, listType } = dto;
 
-    const baseQuery = knex('transactions AS t')
-      .leftJoin('channels AS ch', 't.channel_id', 'ch.id')
-      .leftJoin('streaks AS st', 't.streak_id', 'st.id')
-      .leftJoin('levels AS l', 't.level_id', 'l.id')
-      .leftJoin('full_streaks AS fs', 't.full_streak_id', 'fs.id')
-      .leftJoin('badges AS b', 't.badge_id', 'b.id')
-      .leftJoin('market_products AS mp', 't.product_id', 'mp.id')
+    const baseQuery = knex(`${this.transactionTable} as t`)
+      .leftJoin(`${this.channelsTable} as ch`, 't.channel_id', 'ch.id')
+      .leftJoin(`${this.streaksTable} as st`, 't.streak_id', 'st.id')
+      .leftJoin(`${this.levelsTable} as l`, 't.level_id', 'l.id')
+      .leftJoin(`${this.fullStreaksTable} as fs`, 't.full_streak_id', 'fs.id')
+      .leftJoin(`${this.badgesTable} as b`, 't.badge_id', 'b.id')
+      .leftJoin(`${this.productTable} as mp`, 't.product_id', 'mp.id')
       .whereNull('t.deleted_at')
-      .andWhere('t.profile_id', profile_id)
+      .andWhere('t.profile_id', profileId)
       .andWhere('t.created_at', '>', start_date || '1970-01-01')
       .andWhere('t.created_at', '<', end_date || '3000-01-01')
       .andWhere(function () {

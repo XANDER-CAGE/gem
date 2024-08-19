@@ -5,7 +5,7 @@ import { TransactionEntity } from './entity/transaction.entity';
 import { ProductsService } from '../market-products/market-products.service';
 import {
   PaginationDto,
-  PaginationForTransactionHistory,
+  TransactionListDto,
 } from 'src/common/dto/pagination.dto';
 import { IFindAllTransaction } from './interface/find-all-transaction.interface';
 import { CreateEarningDto } from './dto/create-earning-transaction.dto';
@@ -23,10 +23,23 @@ export class TransactionService {
     private readonly productService: ProductsService,
   ) {}
 
-  async createManual(dto: CreateManualTransactionDto, userId: string) {
+  async createManual(
+    dto: CreateManualTransactionDto,
+    userId: string,
+    knex = this.knex,
+  ) {
     const profile = await this.profileService.findOne(dto.profile_id);
     if (!profile) throw new NotFoundException('Profile not found');
-    return this.transactionRepo.createManual(dto, userId);
+    await knex.transaction(async (trx) => {
+      await this.transactionRepo.createManual(dto, userId, trx);
+      await this.profileService.update(
+        profile.id,
+        {
+          gem: profile.gem + dto.amount,
+        },
+        trx,
+      );
+    });
   }
 
   async createEarning(
@@ -73,9 +86,8 @@ export class TransactionService {
   //   return await this.transactionRepo.listTopEarning(limit, profile_id);
   // }
 
-
-  async transactionHistory(dto: PaginationForTransactionHistory) {
-    return await this.transactionRepo.transactionHistory(dto);
+  async transactionHistory(dto: TransactionListDto, profileId: string) {
+    return await this.transactionRepo.transactionHistory(dto, profileId);
   }
   // async update(id: string, dto: any) {
   //   return await this.transactionRepo.update(id, dto);

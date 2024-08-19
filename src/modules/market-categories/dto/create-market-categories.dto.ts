@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsObject, IsOptional, IsString } from 'class-validator';
 
 export class CreateMarketCategoryDto {
   @ApiProperty({ example: 'Category Name' })
@@ -12,13 +12,13 @@ export class CreateMarketCategoryDto {
   @IsString()
   description?: string;
 
-  @ApiProperty({ example: '{}' })
+  @ApiProperty({ example: {} })
   @IsOptional()
-  @IsString()
-  background?: string;
+  @IsObject()
+  background?: object;
 
-  @ApiProperty({ example: '{}' })
+  @ApiProperty({ example: {} })
   @IsOptional()
-  @IsString()
-  avatar?: string;
+  @IsObject()
+  avatar?: object;
 }

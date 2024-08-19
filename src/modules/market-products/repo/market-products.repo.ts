@@ -7,6 +7,7 @@ import { IFindAllProduct } from '../interface/market-product.interface';
 import { UpdateProductDto } from '../dto/update-market-product.dto';
 import { tableName } from 'src/common/var/table-name.var';
 import { FindAllProductsDto } from '../dto/find-all.product.dto';
+import { FindMyProductsDto } from '../dto/find-my.products.dto';
 
 @Injectable()
 export class ProductRepo {
@@ -41,6 +42,30 @@ export class ProductRepo {
           this.where('market_id', dto.market_id);
         }
       })
+      .limit(limit)
+      .offset((page - 1) * limit)
+      .as('c');
+    const [{ total, data }] = await knex
+      .select([
+        knex.raw(
+          '(SELECT COUNT(id) FROM ?? WHERE deleted_at is null) AS total',
+          this.table,
+        ),
+        knex.raw('jsonb_agg(c.*) AS data'),
+      ])
+      .from(innerQuery);
+    return { total: +total, data };
+  }
+
+  async findMy(
+    dto: FindMyProductsDto,
+    knex = this.knex,
+  ): Promise<IFindAllProduct> {
+    const { limit = 10, page = 1 } = dto;
+    const innerQuery = knex(`${this.table} as p`)
+      .select('p.*')
+      .join(`${this.relationToProfile} as rp`, 'rp.product_id', 'p.id')
+      .where('rp.profile_id', dto.profile_id)
       .limit(limit)
       .offset((page - 1) * limit)
       .as('c');

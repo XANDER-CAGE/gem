@@ -14,5 +14,5 @@ export enum Role {
   department_head = 'department_head',
   course_leader = 'course_leader',
   teacher = 'teacher',
-  app_admin = 'add_admin',
+  app_admin = 'app_admin',
 }

@@ -2,9 +2,9 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsOptional,
-  IsJSON,
   MinLength,
   MaxLength,
+  IsObject,
 } from 'class-validator';
 
 export class CreateMarketDto {
@@ -20,15 +20,15 @@ export class CreateMarketDto {
   @MaxLength(255)
   description: string;
 
-  @ApiProperty({ example: '{}' })
+  @ApiProperty({ example: {} })
   @IsOptional()
-  @IsJSON()
-  background: string;
+  @IsObject()
+  background: object;
 
-  @ApiProperty({ example: '{}' })
+  @ApiProperty({ example: {} })
   @IsOptional()
-  @IsJSON()
-  avatar: string;
+  @IsObject()
+  avatar: object;
 
   @ApiProperty({ example: '507f1f77bcf86cd799439011' })
   @IsOptional()

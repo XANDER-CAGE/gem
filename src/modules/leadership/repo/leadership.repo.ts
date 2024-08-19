@@ -72,15 +72,20 @@ export class LeadershipRepo {
   ) {
     const withQuery = knex.with('rankedProfiles', (qb) => {
       qb.select(
-        'p.*',
-        's.school_id',
-        knex.raw('SUM(t.total_gem) AS total_earning'),
-        knex.raw(
-          'ROW_NUMBER() OVER (PARTITION BY s.school_id ORDER BY p.gem DESC) AS position_by_gem',
-        ),
-        knex.raw(
-          'ROW_NUMBER() OVER (PARTITION BY s.school_id ORDER BY SUM(t.total_gem) DESC, p.gem DESC) AS position_by_earning',
-        ),
+        knex.raw([
+          'p.*',
+          's.school_id',
+          'p.gem::double precision as gem',
+          knex.raw(
+            'coalesce(SUM(t.total_gem), 0)::double precision AS total_earning',
+          ),
+          knex.raw(
+            'ROW_NUMBER() OVER (PARTITION BY s.school_id ORDER BY p.gem DESC)::integer AS position_by_gem',
+          ),
+          knex.raw(
+            'ROW_NUMBER() OVER (PARTITION BY s.school_id ORDER BY SUM(t.total_gem) DESC, p.gem DESC)::integer AS position_by_earning',
+          ),
+        ]),
       )
         .from(`${this.table} AS p`)
         .leftJoin('students AS s', function () {
