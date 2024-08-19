@@ -89,9 +89,9 @@ export class LeadershipRepo {
       )
         .from(`${this.table} AS p`)
         .leftJoin('students AS s', function () {
-          this.on('s.id', '=', 'p.student_id').andOn(
-            knex.raw('s.is_deleted is false'),
-          );
+          this.on('s.id', '=', 'p.student_id')
+            .andOn(knex.raw('s.is_deleted is false'))
+            .andOnNotNull('s.school_id');
         })
         .leftJoin(`${this.transaction_table} AS t`, function () {
           this.on('t.profile_id', '=', 'p.id')
@@ -122,14 +122,22 @@ export class LeadershipRepo {
       .leftJoin(`${this.leadership_table} AS l`, function () {
         this.on('l.profile_id', '=', 'rp.id').andOnNull('l.deleted_at');
       })
-      .leftJoin('students AS s', 's.id', '=', 'rp.student_id')
+      .leftJoin('students AS s', function () {
+        this.on('s.id', 'rp.student_id')
+          .andOn(knex.raw('s.is_deleted is false'))
+          .andOnNotNull('s.school_id');
+      })
       .where(
         's.school_id',
         '=',
         knex
           .select('s.school_id')
           .from(`${this.table} AS p`)
-          .leftJoin('students AS s', 's.id', '=', 'p.student_id')
+          .leftJoin('students AS s', function () {
+            this.on('s.id', 'p.student_id')
+              .andOn(knex.raw('s.is_deleted is false'))
+              .andOnNotNull('s.school_id');
+          })
           .where('p.id', '=', profileId)
           .limit(1),
       )
