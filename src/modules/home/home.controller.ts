@@ -74,7 +74,7 @@ export class HomeController {
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
   async productBuy(@Body() dto: BuyProductDto, @Req() req: IMyReq) {
     await this.homeService.buyProduct(dto, req.user.profile);
-    CoreApiResponse.success(null);
+    return CoreApiResponse.success(null);
   }
 
   @ApiConsumes('multipart/form-data')

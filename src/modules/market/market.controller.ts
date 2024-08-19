@@ -54,8 +54,9 @@ export class MarketController {
   @ApiResponse({ type: ErrorApiResponse, status: 500 })
   @ApiResponse({ type: ListMarketResponse, status: 200 })
   async findAll(@Query() dto: FindAllMarketDto) {
-    const data = await this.marketService.findAll(dto);
-    return CoreApiResponse.success(data);
+    const { total, data } = await this.marketService.findAll(dto);
+    const pagination = { total, limit: dto.limit, page: dto.page };
+    return CoreApiResponse.success(data, pagination);
   }
 
   @Public()

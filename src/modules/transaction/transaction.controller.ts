@@ -1,6 +1,6 @@
 import { Controller, Query, UseGuards, Post, Body, Req } from '@nestjs/common';
 import { TransactionService } from './transaction.service';
-import { PaginationForTransactionHistory } from 'src/common/dto/pagination.dto';
+import { TransactionListDto } from 'src/common/dto/pagination.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 import { ErrorApiResponse } from 'src/common/response-class/error.response';
@@ -21,18 +21,27 @@ export class TransactionController {
 
   @Roles(Role.app_admin)
   @Post('manual')
-  createEarning(@Body() dto: CreateManualTransactionDto, @Req() req: IMyReq) {
-    return this.transactionService.createManual(dto, req.user.id);
+  async createEarning(
+    @Body() dto: CreateManualTransactionDto,
+    @Req() req: IMyReq,
+  ) {
+    const data = await this.transactionService.createManual(dto, req.user.id);
+    return CoreApiResponse.success(data);
   }
 
-  @Roles(Role.student)
+  @Roles(Role.app_admin, Role.student)
   @ApiOperation({ summary: 'Transaction history' })
   @Post('history')
   @ApiOkResponse({ type: ListTransactionHistoryResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
-  async transactionHistory(@Query() dto: PaginationForTransactionHistory) {
-    const { total, data } =
-      await this.transactionService.transactionHistory(dto);
+  async transactionHistory(
+    @Query() dto: TransactionListDto,
+    @Req() req: IMyReq,
+  ) {
+    const { total, data } = await this.transactionService.transactionHistory(
+      dto,
+      req.profile.id,
+    );
     const pagination = { total, limit: dto.limit, page: dto.page };
     return CoreApiResponse.success(data, pagination);
   }

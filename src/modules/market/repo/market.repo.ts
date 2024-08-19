@@ -21,7 +21,10 @@ export class MarketRepo {
   ): Promise<IFindAllMarkets> {
     const { limit = 10, page = 1 } = dto;
     const innerQuery = knex(`${this.table} as m`)
-      .select('m.*', knex.raw('avg(pr.rate)::double precision as rating'))
+      .select(
+        'm.*',
+        knex.raw('coalesce(avg(pr.rate), 5)::double precision as rating'),
+      )
       .where('m.deleted_at', null)
       .leftJoin(`${this.products} as p`, function () {
         this.on('p.market_id', 'm.id').andOn(knex.raw('p.deleted_at is null'));
@@ -55,7 +58,10 @@ export class MarketRepo {
 
   async findOne(id: string, knex = this.knex) {
     return await knex
-      .select('m.*', knex.raw('avg(pr.rate)::double precision as rating'))
+      .select(
+        'm.*',
+        knex.raw('coalesce(avg(pr.rate), 5)::double precision as rating'),
+      )
       .from(`${this.table} as m`)
       .leftJoin(`${this.products} as p`, function () {
         this.on('p.market_id', 'm.id').andOn(knex.raw('p.deleted_at is null'));

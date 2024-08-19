@@ -1,14 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import {
-  IsEnum,
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsString,
-  Length,
-  Min,
-} from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, Min } from 'class-validator';
 import { TransactionHistoryEnum } from 'src/modules/transaction/enum/transaction.history.enum';
 
 export class PaginationDto {
@@ -26,14 +18,7 @@ export class PaginationDto {
   @Min(1)
   page: number;
 }
-
-export class PaginationForTransactionHistory extends PaginationDto {
-  @ApiPropertyOptional({ example: '507f1f77bcf86cd799439011' })
-  @IsNotEmpty()
-  @IsString()
-  @Length(24)
-  profile_id: string;
-
+export class TransactionListDto extends PaginationDto {
   @ApiPropertyOptional({ example: '2023-01-01T00:00:00Z' })
   @IsOptional()
   start_date: Date;

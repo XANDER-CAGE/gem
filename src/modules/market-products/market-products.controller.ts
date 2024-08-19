@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -30,6 +31,8 @@ import { Role } from 'src/common/enum/role.enum';
 import { Roles } from 'src/common/decorator/roles.decorator';
 import { Public } from 'src/common/decorator/public.decorator';
 import { FindAllProductsDto } from './dto/find-all.product.dto';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { IMyReq } from 'src/common/interface/my-req.interface';
 
 @ApiTags('Market-Products')
 @ApiBearerAuth()
@@ -39,6 +42,7 @@ import { FindAllProductsDto } from './dto/find-all.product.dto';
 export class MarketProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
+  @Roles(Role.app_admin)
   @ApiOperation({ summary: 'Create new one' })
   @Post('/create')
   @ApiBody({ type: CreateProductDto })
@@ -49,13 +53,27 @@ export class MarketProductsController {
     return CoreApiResponse.success(data);
   }
 
-  @Public()
+  @Roles(Role.student, Role.app_admin)
   @ApiOperation({ summary: 'Find all' })
   @Get('/list')
   @ApiOkResponse({ type: ListMarketProductResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
   async findAll(@Query() dto: FindAllProductsDto) {
     const { total, data } = await this.productsService.findAll(dto);
+    const pagination = { total, limit: dto.limit, page: dto.page };
+    return CoreApiResponse.success(data, pagination);
+  }
+
+  @Roles(Role.student, Role.app_admin)
+  @ApiOperation({ summary: 'Find all' })
+  @Get('/my')
+  @ApiOkResponse({ type: ListMarketProductResponse, status: 200 })
+  @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
+  async findMy(@Query() dto: PaginationDto, @Req() req: IMyReq) {
+    const { total, data } = await this.productsService.findMy({
+      ...dto,
+      profile_id: req.profile.id,
+    });
     const pagination = { total, limit: dto.limit, page: dto.page };
     return CoreApiResponse.success(data, pagination);
   }
@@ -70,6 +88,7 @@ export class MarketProductsController {
     return CoreApiResponse.success(data);
   }
 
+  @Roles(Role.app_admin)
   @ApiOperation({ summary: 'Update one' })
   @Patch(':id')
   @ApiBody({ type: UpdateProductDto })
@@ -80,6 +99,7 @@ export class MarketProductsController {
     return CoreApiResponse.success(data);
   }
 
+  @Roles(Role.app_admin)
   @ApiOperation({ summary: 'Delete one' })
   @Delete(':id')
   @ApiOkResponse({ type: DeleteApiResponse, status: 200 })

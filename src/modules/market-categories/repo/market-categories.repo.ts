@@ -5,10 +5,11 @@ import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { IFindAllCategoriesMarkets } from '../interface/market-categories.interface';
 import { CreateMarketCategoryDto } from '../dto/create-market-categories.dto';
 import { UpdateMarketCategoryDto } from '../dto/update-market-categories.dto';
+import { tableName } from 'src/common/var/table-name.var';
 
 @Injectable()
 export class MarketCategoriesRepo {
-  private table = 'market_categories';
+  private table = tableName.marketCategories;
 
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
