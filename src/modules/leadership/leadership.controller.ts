@@ -23,6 +23,7 @@ import { CoreApiResponse } from 'src/common/response-class/core-api.response';
 export class LeadershipController {
   constructor(private readonly leadershipService: LeadershipService) {}
 
+  
   @Roles(Role.student)
   @ApiOperation({ summary: 'Top lists by school' })
   @Get()

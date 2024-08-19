@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
 import { tableName } from 'src/common/var/table-name.var';
+import { LimitWithTopListDto } from '../dto/create-leadership.dto';
+import { LeadershipEnum } from '../enum/leadership.enum';
 
 @Injectable()
 export class LeadershipRepo {
@@ -66,7 +68,7 @@ export class LeadershipRepo {
   }
 
   async findTopListBySchool(
-    limit: number,
+    dto: LimitWithTopListDto,
     profileId: string,
     knex = this.knex,
   ) {
@@ -141,9 +143,14 @@ export class LeadershipRepo {
           .where('p.id', '=', profileId)
           .limit(1),
       )
-      .orderBy('rp.position_by_earning')
-      // .orderBy('rp.position_by_gem')
-      .limit(limit);
+      .andWhere(function () {
+        if (dto.top_type === LeadershipEnum.BY_GEM) {
+          this.orderBy('rp.position_by_gem');
+        } else if (dto.top_type === LeadershipEnum.BY_EARNING) {
+          this.orderBy('rp.position_by_earning');
+        }
+      })
+      .limit(dto.limit);
     return { data, me };
   }
 }

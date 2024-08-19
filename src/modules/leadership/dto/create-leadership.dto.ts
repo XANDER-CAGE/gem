@@ -1,12 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import {
+  IsEnum,
   IsNumber,
   IsOptional,
   IsString,
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { LeadershipEnum } from '../enum/leadership.enum';
 
 export class CreateLeadershipDto {
   @ApiProperty({ example: '507f1f77bcf86cd799439011' })
@@ -36,5 +38,8 @@ export class LimitWithTopListDto {
   @Transform(({ value }) => parseInt(value, 10))
   @IsNumber()
   limit: number;
-}
 
+  @ApiProperty({ example: LeadershipEnum.BY_GEM })
+  @IsEnum(LeadershipEnum)
+  top_type: LeadershipEnum;
+}
