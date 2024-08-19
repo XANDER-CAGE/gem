@@ -93,17 +93,3 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USER }}/${{ github.event.repository.name }}:dev
-          
-      - name: Tg Alert
-        uses: appleboy/telegram-action@master
-        with:
-          to: ${{ secrets.TELEGRAM_TO }}
-          token: ${{ secrets.TELEGRAM_TOKEN }}
-          message: |
-            Full Name: ${{ github.event.head_commit.author.name }}
-            Username: ${{ github.actor }}
-            Commit message: ${{ github.event.commits[0].message }}
-            Repository: ${{ github.repository }}
-            Branch: ${{ github.ref_name }}
-            Status: ${{ job.status }}
-            See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
