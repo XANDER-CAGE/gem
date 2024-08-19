@@ -1,4 +1,4 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateMarketDto } from './create-market.dto';
+import { PartialType } from "@nestjs/swagger";
+import { CreateMarketDto } from "./create-market.dto";
 
 export class UpdateMarketDto extends PartialType(CreateMarketDto) {}

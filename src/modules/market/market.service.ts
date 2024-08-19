@@ -1,26 +1,46 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { MarketRepo } from './repo/market.repo';
+import { MarketCategoriesService } from '../market-categories/market-categories.service';
 import { CreateMarketDto } from './dto/create-market.dto';
 import { UpdateMarketDto } from './dto/update-market.dto';
+import { FindAllMarketDto } from './dto/find-all.market.dto';
 
 @Injectable()
 export class MarketService {
-  create(createMarketDto: CreateMarketDto) {
-    return 'This action adds a new market';
+  @Inject() private readonly marketRepo: MarketRepo;
+  @Inject() private readonly categoryService: MarketCategoriesService;
+
+  async create(createMarketDto: CreateMarketDto) {
+    const { category_id } = createMarketDto;
+    if (category_id) {
+      const exist = await this.categoryService.findOne(category_id);
+      if (!exist) {
+        throw new NotFoundException('This category_id does not exist');
+      }
+    }
+    return await this.marketRepo.create(createMarketDto);
   }
 
-  findAll() {
-    return `This action returns all market`;
+  async findAll(findAllMarketsDto: FindAllMarketDto) {
+    return await this.marketRepo.findAll(findAllMarketsDto);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} market`;
+  async findOne(id: string) {
+    return await this.marketRepo.findOne(id);
   }
 
-  update(id: number, updateMarketDto: UpdateMarketDto) {
-    return `This action updates a #${id} market`;
+  async update(id: string, updateMarketDto: UpdateMarketDto) {
+    const { category_id } = updateMarketDto;
+    if (category_id) {
+      const exist = await this.categoryService.findOne(category_id);
+      if (!exist) {
+        throw new NotFoundException('This category_id does not exist');
+      }
+    }
+    return await this.marketRepo.update(id, updateMarketDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} market`;
+  async remove(id: string) {
+    return await this.marketRepo.deleteOne(id);
   }
 }

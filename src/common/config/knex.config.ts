@@ -15,6 +15,7 @@ export class KnexConfigService implements KnexOptionsFactory {
           port: env.PG_PORT,
           password: env.PG_PASS,
           database: env.PG_DB,
+          timezone: 'utc',
         },
         pool: {
           min: 75,
