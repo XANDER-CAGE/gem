@@ -39,7 +39,7 @@ export class LimitWithTopListDto {
   @IsNumber()
   limit: number;
 
-  @ApiProperty({ example: LeadershipEnum.BY_GEM })
+  @ApiProperty({ example: LeadershipEnum.BY_GEM, enum: LeadershipEnum })
   @IsEnum(LeadershipEnum)
   top_type: LeadershipEnum;
 }
