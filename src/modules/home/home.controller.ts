@@ -98,6 +98,7 @@ export class HomeController {
   }
 
   @Cron('0 0 14 * * *')
+  @Roles(Role.student)
   async handleGradeCron() {
     await this.homeService.handleGradeCron();
     await this.leadershipService.saveLeadership();

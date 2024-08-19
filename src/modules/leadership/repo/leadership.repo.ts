@@ -44,7 +44,7 @@ export class LeadershipRepo {
       )
       .select(
         knex.raw(
-          'ROW_NUMBER() OVER (PARTITION BY sub.school_id ORDER BY sum(t.total_gem) DESC, sub.gem DESC)::integer AS last_position_by_earning',
+          'ROW_NUMBER() OVER (PARTITION BY sub.school_id ORDER BY SUM(coalesce(t.total_gem, 0)) DESC, sub.gem desc)::integer AS last_position_by_earning',
         ),
       )
       .groupBy('sub.id', 'sub.gem', 'sub.school_id', 'sub.last_position_by_gem')
@@ -77,13 +77,13 @@ export class LeadershipRepo {
           's.school_id',
           'p.gem::double precision as gem',
           knex.raw(
-            'coalesce(SUM(t.total_gem), 0)::double precision AS total_earning',
+            'SUM(coalesce(t.total_gem, 0))::double precision AS total_earning',
           ),
           knex.raw(
             'ROW_NUMBER() OVER (PARTITION BY s.school_id ORDER BY p.gem DESC)::integer AS position_by_gem',
           ),
           knex.raw(
-            'ROW_NUMBER() OVER (PARTITION BY s.school_id ORDER BY SUM(t.total_gem) DESC, p.gem DESC)::integer AS position_by_earning',
+            'ROW_NUMBER() OVER (PARTITION BY s.school_id ORDER BY SUM(coalesce(t.total_gem, 0)) DESC, p.gem desc)::integer AS position_by_earning',
           ),
         ]),
       )
@@ -142,7 +142,7 @@ export class LeadershipRepo {
           .limit(1),
       )
       .orderBy('rp.position_by_earning')
-      .orderBy('rp.position_by_gem')
+      // .orderBy('rp.position_by_gem')
       .limit(limit);
     return { data, me };
   }
