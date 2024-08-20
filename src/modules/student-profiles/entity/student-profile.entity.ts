@@ -8,8 +8,6 @@ export class StudentProfileEntity {
   @ApiProperty()
   student_id: string;
   @ApiProperty()
-  level_id: string;
-  @ApiProperty()
   gem: number;
   @ApiProperty()
   deleted_at?: Date;
