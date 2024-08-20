@@ -53,7 +53,7 @@ export class AchievementsController {
 
   @ApiOperation({ summary: 'Find all' })
   @Get('/list')
-  @Roles(Role.student)
+  @Roles(Role.student, Role.app_admin)
   @ApiOkResponse({ type: ListAchievementResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
   @Get('list')
