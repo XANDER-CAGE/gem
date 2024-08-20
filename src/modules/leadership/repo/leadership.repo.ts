@@ -10,6 +10,8 @@ export class LeadershipRepo {
   private leadership_table = tableName.leadership;
   private table = tableName.studentProfiles;
   private transaction_table = tableName.transactions;
+  private level_table = tableName.levels;
+  private level_on_profiles_table = tableName.levelsM2MProfiles
 
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
@@ -77,6 +79,7 @@ export class LeadershipRepo {
         knex.raw([
           'p.*',
           'p.gem::double precision as gem',
+          'lv.level as stage',
           's.first_name',
           's.last_name',
           knex.raw(
@@ -101,8 +104,14 @@ export class LeadershipRepo {
             .andOnNull('t.deleted_at')
             .andOn(knex.raw('t.total_gem > 0'));
         })
+        .leftJoin(`${this.level_on_profiles_table} as lp`, function () {
+          this.on('lp.profile_id', '=', 'p.id')
+        })
+        .leftJoin(`${this.level_table} as lv`, function (){
+          this.on('lv.id', '=', 'lp.level_id').andOnNull('lv.deleted_at')
+        })
         .whereNull('p.deleted_at')
-        .groupBy('p.id', 's.school_id', 'p.gem', 's.first_name', 's.last_name');
+        .groupBy('p.id', 's.school_id', 'p.gem', 'lv.level', 's.first_name', 's.last_name');
     });
 
     const data = withQuery
