@@ -78,9 +78,10 @@ export class LeadershipRepo {
       qb.select(
         knex.raw([
           'p.*',
-          's.school_id',
           'p.gem::double precision as gem',
           'lv.level as stage',
+          's.first_name',
+          's.last_name',
           knex.raw(
             'SUM(coalesce(t.total_gem, 0))::double precision AS total_earning',
           ),
@@ -110,16 +111,11 @@ export class LeadershipRepo {
           this.on('lv.id', '=', 'lp.level_id').andOnNull('lv.deleted_at')
         })
         .whereNull('p.deleted_at')
-        .groupBy('p.id', 's.school_id', 'p.gem', 'lv.level');
+        .groupBy('p.id', 's.school_id', 'p.gem', 'lv.level', 's.first_name', 's.last_name');
     });
-    const me = await withQuery
-      .clone()
-      .select('*')
-      .from('rankedProfiles as rp')
-      .where('rp.id', profileId)
-      .first();
 
-    const data = await withQuery
+    const data = withQuery
+      .clone()
       .select(
         'rp.*',
         knex.raw(
@@ -152,14 +148,16 @@ export class LeadershipRepo {
           .where('p.id', '=', profileId)
           .limit(1),
       )
-      .andWhere(function () {
-        if (dto.top_type === LeadershipEnum.BY_GEM) {
-          this.orderBy('rp.position_by_gem');
-        } else if (dto.top_type === LeadershipEnum.BY_EARNING) {
-          this.orderBy('rp.position_by_earning');
-        }
-      })
       .limit(dto.limit);
-    return { data, me };
+    const me = await data
+      .clone()
+      .select('*')
+      .from('rankedProfiles as rp')
+      .where('rp.id', profileId)
+      .first();
+    dto.top_type == LeadershipEnum.BY_GEM
+      ? data.orderBy('rp.position_by_gem')
+      : data.orderBy('rp.position_by_earning');
+    return { top: await data, me };
   }
 }

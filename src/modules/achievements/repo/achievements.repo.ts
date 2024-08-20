@@ -123,7 +123,7 @@ export class AchievementsRepo {
     const yesterday = new Date(now - 1000 * 60 * 60 * 24)
       .toISOString()
       .split('T')[0];
-    return await knex(`${this.gradesTable} as g`)
+    const data = knex(`${this.gradesTable} as g`)
       .join(`${this.assignedCoursesTable} as ac`, function () {
         this.on('g.assigned_course_id', '=', 'ac.id').andOn(
           knex.raw('ac.is_deleted = false'),
@@ -144,13 +144,14 @@ export class AchievementsRepo {
           knex.raw('a.deleted_at is null'),
         );
       })
-      .where('g.is_deleted', false)
       .whereIn('fr.id', [
         '64fe738e0274a5187fe76d5b',
         '64fe738e397b9a187f529943',
       ])
-      .where('g.score', '>=', 90)
-      .where('g.created_at', '>', yesterday)
+      .andWhere('g.is_deleted', false)
+      .andWhere('g.is_published', true)
+      .andWhere('g.score', '>=', 90)
+      .andWhere('g.created_at', '>', yesterday)
       .groupBy('fr.name', 'fr.id', 'a.id')
       .select(
         'fr.name as component_name',
@@ -158,5 +159,6 @@ export class AchievementsRepo {
         'a.id as achievement_id',
         knex.raw(`json_agg(json_build_object('profile_id', sp.id)) as grades`),
       );
+    return data;
   }
 }

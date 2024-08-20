@@ -4,6 +4,8 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
+RUN npm install husky --save-dev --force
+
 RUN npm install --force
 
 COPY . .
@@ -15,6 +17,8 @@ FROM node:20-alpine AS production
 WORKDIR /usr/src/app
 
 COPY package*.json ./
+
+RUN npm install husky --save-dev  --force
 
 RUN npm install --force
 
