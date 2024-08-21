@@ -61,7 +61,7 @@ export class FileService {
     if (!file) throw new NotFoundException('File not found');
     const stream = await this.minio.client.getObject(
       file.bucket_name,
-      file.name,
+      `${file.id}${extname(file.name)}`,
     );
     response.set({
       'Content-Disposition': `attachment; filename="${file.name}"`,
