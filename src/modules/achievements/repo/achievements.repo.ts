@@ -38,7 +38,7 @@ export class AchievementsRepo {
                 'user_progress', coalesce(pb.progress, 0),
                 'description', b.description,
                 'reward_gem', b.reward_gem,
-                'achieved_at', b.joined_at
+                'achieved_at', pb.joined_at
               )
             ) filter (where b.id is not null), 
             '[]'::jsonb
