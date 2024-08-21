@@ -9,7 +9,13 @@ import {
   Query,
 } from '@nestjs/common';
 import { StudentProfilesService } from './student-profiles.service';
-import { ApiBody, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CoreApiResponse } from 'src/common/response-class/core-api.response';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { CreateStudentProfileDto } from './dto/create-student-profile.dto';
@@ -21,6 +27,7 @@ import { CreateStudentProfileResponse } from './response/create-student-profile.
 
 @ApiTags('Student-Profiles')
 @Controller('student-profiles')
+@ApiBearerAuth()
 export class StudentProfilesController {
   constructor(private readonly studentProfileService: StudentProfilesService) {}
 
