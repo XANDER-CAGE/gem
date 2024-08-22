@@ -26,4 +26,5 @@ export const tableName = {
   leadership: 'gamification.leadership',
   assignment: 'gamification.assignments',
   files: 'public.files',
+  students: 'public.students'
 };

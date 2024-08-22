@@ -4,8 +4,6 @@ export class StudentProfileEntity {
   @ApiProperty()
   id: string;
   @ApiProperty()
-  avatar?: string;
-  @ApiProperty()
   student_id: string;
   @ApiProperty()
   gem: number;

@@ -10,6 +10,10 @@ import { tableName } from 'src/common/var/table-name.var';
 @Injectable()
 export class StudentProfilesRepo {
   private table = tableName.studentProfiles;
+  private student_table = tableName.students;
+  private student_on_profiles_table = tableName.levelsM2MProfiles;
+  private levels_table = tableName.levels;
+  private transaction_table = tableName.transactions;
 
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
@@ -19,8 +23,18 @@ export class StudentProfilesRepo {
   ): Promise<IFindAllStudentProfile> {
     const { limit = 10, page = 1 } = dto;
     const innerQuery = knex(this.table)
-      .select('*')
-      .where('deleted_at', null)
+      .select(
+        'st.uid',
+        'st.first_name',
+        'st.last_name',
+        'st.level',
+        'st.avatar',
+        'sp.*',
+        knex.raw('sp.gem::double precision as gem'),
+      )
+      .from({ sp: this.table })
+      .where('sp.deleted_at', null)
+      .leftJoin({ st: this.student_table }, 'sp.student_id', 'st.id')
       .limit(limit)
       .offset((page - 1) * limit)
       .as('c');
@@ -69,12 +83,47 @@ export class StudentProfilesRepo {
 
   async findOne(id: string, knex = this.knex) {
     return await knex
-      .select('*', knex.raw('gem::double precision as gem'))
-      .from(this.table)
-      .where('id', id)
-      .andWhere('deleted_at', null)
-      .first();
+      .select(
+        'st.uid',
+        'st.first_name',
+        'st.last_name',
+        'st.level',
+        'st.avatar',
+        'l.name',
+        'l.level',
+        'sp.*',
+        knex.raw(
+          `(select sum(t.total_gem) from ${this.transaction_table} as t where t.profile_id = sp.id and t.created_at >= NOW() - INTERVAL '1 week')::double precision as transaction_week`,
+        ),
+        knex.raw('sp.gem::double precision as gem'),
+        knex.raw(`
+      (
+        select lv_next.reward_point 
+        from ${this.levels_table} as lv_next 
+        where lv_next.level = l.level + 1
+        limit 1
+      ) as next_level_reward_point
+    `),
+      )
+      .from({ sp: this.table })
+      .leftJoin({ st: this.student_table }, 'sp.student_id', 'st.id')
+      .leftJoin(
+        { sop: this.student_on_profiles_table },
+        'sp.id',
+        'sop.profile_id',
+      )
+      .leftJoin({ l: this.levels_table }, 'l.id', 'sop.level_id')
+      .where('sp.id', id)
+      .andWhere('sp.deleted_at', null)
+      .first()
+      .then((row) => {
+        if (row) {
+          row.points_to_next_level = row.next_level_reward_point - row.gem;
+        }
+        return row;
+      });
   }
+
   async create(data: CreateStudentProfileDto, knex = this.knex) {
     return await knex(this.table).insert(data).returning('*');
   }
