@@ -12,6 +12,8 @@ export class AchievementEntity {
   @ApiProperty()
   type: string;
   @ApiProperty()
+  is_active: boolean;
+  @ApiProperty()
   deleted_at: Date;
   @ApiProperty()
   created_at: Date;

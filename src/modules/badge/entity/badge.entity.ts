@@ -14,6 +14,8 @@ export class BadgeEntity {
   @ApiProperty()
   progress: number;
   @ApiProperty()
+  level: number;
+  @ApiProperty()
   created_at: Date;
   @ApiProperty()
   updated_at: Date;

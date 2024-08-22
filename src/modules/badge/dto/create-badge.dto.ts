@@ -6,16 +6,13 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+import { FileEntity } from 'src/common/entity/file.entity';
 
 export class CreateBadgeDto {
-  @ApiProperty({
-    example: {
-      url: 'https://www.girlscoutshop.com/site/Product_Images/61225_main-01.default.jpg?resizeid=22&resizeh=1200&resizew=1200',
-    },
-  })
+  @ApiProperty({ example: FileEntity })
   @IsNotEmpty()
   @IsObject()
-  view: object;
+  view: FileEntity;
 
   @ApiProperty({ example: 'Conqueror' })
   @IsNotEmpty()
@@ -41,4 +38,9 @@ export class CreateBadgeDto {
   @IsNumber()
   @IsNotEmpty()
   progress: number;
+
+  @ApiProperty({ example: 1 })
+  @IsNumber()
+  @IsNotEmpty()
+  level: number;
 }
