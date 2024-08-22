@@ -1,5 +1,12 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsObject, IsString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsObject,
+  IsOptional,
+  IsString,
+} from 'class-validator';
+import { FileEntity } from 'src/common/entity/file.entity';
 
 export class CreateAchievementDto {
   @ApiProperty()
@@ -12,8 +19,13 @@ export class CreateAchievementDto {
   @IsString()
   description: string;
 
-  @ApiProperty()
+  @ApiProperty({example: FileEntity})
   @IsNotEmpty()
   @IsObject()
-  view: object;
+  view: FileEntity;
+
+  @ApiPropertyOptional({example: false})
+  @IsOptional()
+  @IsBoolean()
+  is_active: boolean;
 }

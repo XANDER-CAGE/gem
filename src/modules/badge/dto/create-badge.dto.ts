@@ -41,9 +41,4 @@ export class CreateBadgeDto {
   @IsNumber()
   @IsNotEmpty()
   progress: number;
-
-  @ApiProperty({ example: 1 })
-  @IsNotEmpty()
-  @IsNumber()
-  level: number;
 }
