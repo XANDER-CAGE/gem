@@ -21,13 +21,13 @@ export class ChannelRepo {
     dto: CreateChannelDto,
     knex = this.knex,
   ): Promise<ChannelEntity> {
-    return await knex
+    const data = await knex
       .insert({
         ...dto,
       })
       .into(this.table)
-      .returning('*')
-      .first();
+      .returning('*');
+    return data[0];
   }
 
   async findAll(

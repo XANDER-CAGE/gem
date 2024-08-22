@@ -1,5 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { BadgeService } from '../badge/badge.service';
+import { Injectable } from '@nestjs/common';
 import { LevelRepo } from './repo/level.repo';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { CreateLevelDto } from './dto/create-level.dto';
@@ -12,20 +11,12 @@ import { LevelEntity } from './entity/level.entity';
 @Injectable()
 export class LevelService {
   constructor(
-    private readonly badgeService: BadgeService,
     private readonly levelRepo: LevelRepo,
     private readonly productService: ProductsService,
     @InjectConnection() private readonly knex: Knex,
   ) {}
 
   async create(createLevelDto: CreateLevelDto) {
-    const { badge_id } = createLevelDto;
-    if (badge_id) {
-      const exist = await this.badgeService.findOne(badge_id);
-      if (!exist) {
-        throw new NotFoundException('This badge id does not exist');
-      }
-    }
     return await this.levelRepo.create(createLevelDto);
   }
 
@@ -38,13 +29,6 @@ export class LevelService {
   }
 
   async update(id: string, updateLevelDto: UpdateLevelDto) {
-    const { badge_id } = updateLevelDto;
-    if (badge_id) {
-      const exist = await this.badgeService.findOne(badge_id);
-      if (!exist) {
-        throw new NotFoundException('This badge does not exist');
-      }
-    }
     return await this.levelRepo.update(id, updateLevelDto);
   }
 
