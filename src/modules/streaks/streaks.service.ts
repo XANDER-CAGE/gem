@@ -6,7 +6,6 @@ import { StreakEntity } from './entity/streaks.entity';
 import { ChannelService } from '../channel/channel.service';
 import { InjectConnection } from 'nest-knexjs';
 import { FullStreaksService } from '../full-streaks/full-streaks.service';
-import { ChannelEntity } from '../channel/entity/channel.entity';
 import { FindAllStreaksDto } from './dto/find-all.streaks.dto';
 
 @Injectable()
@@ -59,18 +58,19 @@ export class StreaksService {
   }
 
   async calculateStreak(
-    channel: ChannelEntity,
+    channelId: string,
     profileId: string,
+    step: number,
     knex = this.knex,
   ) {
     const lastFailedChannel = await this.channelService.getLastUnderdoneChannel(
       profileId,
-      channel.id,
+      channelId,
       knex,
     );
     const lastFullStreak = await this.fullStreakService.getLastFullStreak(
       profileId,
-      channel.id,
+      channelId,
       knex,
     );
     if (lastFullStreak?.is_last) return null;
@@ -90,15 +90,20 @@ export class StreaksService {
     }
     const successChannelCount = await this.channelService.countSuccessChannel(
       profileId,
-      channel.id,
+      channelId,
       new Date(startStreakDate),
       knex,
     );
     const streak = await this.findOneByChannelId(
-      channel.id,
-      successChannelCount + 1,
+      channelId,
+      successChannelCount + step,
       knex,
     );
     return streak;
+  }
+
+  async myStreak(profileId: string) {
+    const channel = await this.channelService.getByName('Attendance');
+    return await this.calculateStreak(channel.id, profileId, 0);
   }
 }

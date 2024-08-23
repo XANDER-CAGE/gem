@@ -28,7 +28,6 @@ export class StudentProfilesService {
   //   return await this.studentProfileRepo.findTopList(limit, profile_id);
   // }
 
-
   async findOne(id: string): Promise<StudentProfileEntity> {
     return await this.studentProfileRepo.findOne(id);
   }
