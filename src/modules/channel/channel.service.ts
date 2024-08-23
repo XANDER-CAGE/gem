@@ -73,7 +73,7 @@ export class ChannelService {
     return await this.channelRepo.updateRelationToProfile(dto);
   }
 
-  async getByCategoryId(categoryId: string) {
-    return await this.channelRepo.getByCategoryId(categoryId);
+  async getByName(channelName: string) {
+    return await this.channelRepo.getByName(channelName);
   }
 }

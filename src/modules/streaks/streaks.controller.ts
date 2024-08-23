@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { StreaksService } from './streaks.service';
 import {
@@ -29,16 +30,17 @@ import { Role } from 'src/common/enum/role.enum';
 import { Roles } from 'src/common/decorator/roles.decorator';
 import { Public } from 'src/common/decorator/public.decorator';
 import { FindAllStreaksDto } from './dto/find-all.streaks.dto';
+import { IMyReq } from 'src/common/interface/my-req.interface';
 
 @ApiTags('Streaks')
 @ApiBearerAuth()
 @UseGuards(RolesGuard)
-@Roles(Role.app_admin)
 @Controller('streaks')
 export class StreaksController {
   constructor(private readonly streaksService: StreaksService) {}
 
   @ApiOperation({ summary: 'Create new one' })
+  @Roles(Role.app_admin)
   @Post('/create')
   @ApiBody({ type: CreateStreakDto })
   @ApiOkResponse({ type: CreateStreakResponse, status: 200 })
@@ -59,6 +61,16 @@ export class StreaksController {
     return CoreApiResponse.success(data, pagination);
   }
 
+  @Roles(Role.student)
+  @ApiOperation({ summary: 'Get one' })
+  @Get('my')
+  @ApiOkResponse({ type: CreateStreakResponse, status: 200 })
+  @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
+  async my(@Req() req: IMyReq) {
+    const data = await this.streaksService.myStreak(req.profile.id);
+    return CoreApiResponse.success(data);
+  }
+
   @Public()
   @ApiOperation({ summary: 'Get one' })
   @Get(':id')
@@ -71,6 +83,7 @@ export class StreaksController {
 
   @ApiOperation({ summary: 'Update one' })
   @Patch(':id')
+  @Roles(Role.app_admin)
   @ApiBody({ type: UpdateStreakDto })
   @ApiOkResponse({ type: CreateStreakResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
@@ -81,6 +94,7 @@ export class StreaksController {
 
   @ApiOperation({ summary: 'Delete one' })
   @Delete()
+  @Roles(Role.app_admin)
   @ApiOkResponse({ type: DeleteApiResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
   async remove() {

@@ -98,12 +98,12 @@ export class LevelRepo {
     gems: number,
     knex = this.knex,
   ): Promise<UnreachedLevelsRes[]> {
-    const subquery = knex('levels as l')
-      .leftJoin('levels_on_profiles as lp', 'lp.level_id', 'l.id')
+    const subquery = knex(`${this.table} as l`)
+      .leftJoin(`${this.relationToProfiles} as lp`, 'lp.level_id', 'l.id')
       .where('lp.profile_id', profileId)
       .select('l.id');
 
-    return await knex('levels as l')
+    return await knex(`${this.table} as l`)
       .leftJoin(`${this.relationToProducts} as lpr`, 'lpr.level_id', 'l.id')
       .leftJoin(`${this.products} as p`, 'lpr.product_id', 'p.id')
       .whereNotIn('l.id', subquery)

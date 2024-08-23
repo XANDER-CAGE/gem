@@ -43,7 +43,7 @@ export class HomeController {
 
   @ApiOperation({ summary: 'Assign channel' })
   @Roles(Role.app_admin)
-  @Post('assign/channel')
+  @Post('assign/attendance')
   @ApiBody({ type: AssignChannelDto })
   @ApiOkResponse({ type: DeleteApiResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })

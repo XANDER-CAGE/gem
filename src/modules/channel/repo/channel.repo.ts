@@ -151,14 +151,25 @@ export class ChannelRepo {
     return data.count;
   }
 
-  async getByCategoryId(
-    categoryId: string,
+  async getByName(
+    channelName: string,
     knex = this.knex,
-  ): Promise<Omit<ChannelEntity, 'has_streak'>[]> {
-    return knex(this.table)
-      .select('*')
-      .whereRaw('deleted_at is null')
-      .andWhere('channel_category_id', categoryId);
+  ): Promise<ChannelEntity> {
+    return await knex
+      .select(
+        knex.raw([
+          'c.*',
+          'c.reward_gem::double precision as reward_gem',
+          `case when s.id is not null then true else false end as has_streak`,
+        ]),
+      )
+      .leftJoin(`${tableName.streaks} as s`, function () {
+        this.on('s.channel_id', 'c.id').andOn(knex.raw('s.deleted_at is null'));
+      })
+      .from(`${this.table} as c`)
+      .where('c.name', channelName)
+      .andWhere(knex.raw('c.deleted_at is null'))
+      .first();
   }
 
   async updateRelationToProfile(

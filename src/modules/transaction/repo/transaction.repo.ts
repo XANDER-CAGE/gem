@@ -99,6 +99,7 @@ export class TransactionRepo {
       .from(this.transactionTable)
       .where('profile_id', profileId)
       .andWhere('deleted_at', null)
+      .andWhere('total_gem', '>', 0)
       .andWhereNot('channel_id', null)
       .first();
     return totalEarned || 0;

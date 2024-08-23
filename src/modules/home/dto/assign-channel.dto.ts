@@ -10,12 +10,6 @@ export class AssignChannelDto {
 
   @ApiProperty()
   @IsNotEmpty()
-  @IsString()
-  @Length(24)
-  channel_id: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
   @IsBoolean()
   is_done: boolean;
 }

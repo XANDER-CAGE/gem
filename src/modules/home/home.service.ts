@@ -42,7 +42,7 @@ export class HomeService {
   async assignChannel(dto: AssignChannelDto) {
     const profile = await this.profileService.findOne(dto.profile_id);
     if (!profile) throw new NotFoundException('Student profile not found');
-    const channel = await this.channelService.findOne(dto.channel_id);
+    const channel = await this.channelService.getByName('Attendance');
     if (!channel) throw new NotFoundException('Channel not found');
     if (!dto.is_done) {
       await this.channelService.connectToProfile({
@@ -69,8 +69,9 @@ export class HomeService {
       totalGem += +channel.reward_gem;
       if (channel.has_streak) {
         const streak = await this.streakService.calculateStreak(
-          channel,
+          channel.id,
           profile.id,
+          1,
           trx,
         );
         streakId = streak?.id;

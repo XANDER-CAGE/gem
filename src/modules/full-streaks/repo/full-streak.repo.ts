@@ -105,7 +105,7 @@ export class FullStreakRepo {
           `((select count(*) from ${this.table} where deleted_at is null and channel_id = '${channelId}') = level) as is_last`,
         ]),
       )
-      .leftJoin('full_streaks as fs', function () {
+      .leftJoin(`${this.table} as fs`, function () {
         this.on('fs.id', 'fsp.full_streak_id')
           .andOn(knex.raw(`fs.channel_id = '${channelId}'`))
           .andOn(knex.raw('fs.deleted_at is null'));
