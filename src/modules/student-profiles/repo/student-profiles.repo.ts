@@ -87,15 +87,22 @@ export class StudentProfilesRepo {
         'st.uid',
         'st.first_name',
         'st.last_name',
-        'st.level',
         'st.avatar',
         'l.name',
-        'l.level',
+        'l.level as stage',
         'sp.*',
         knex.raw(
           `(select sum(t.total_gem) from ${this.transaction_table} as t where t.profile_id = sp.id and t.created_at >= NOW() - INTERVAL '1 week')::double precision as transaction_week`,
         ),
         knex.raw('sp.gem::double precision as gem'),
+        knex.raw(`
+          (select sum(t.total_gem) from ${this.transaction_table} as t where t.profile_id = sp.id and t.total_gem > 0)::double precision as total_point
+        `),
+        knex.raw(`(
+          select lv_current.reward_point from ${this.levels_table} as lv_current
+          where lv_current.level = l.level
+          limit 1
+        ) as current_level_reward_point`),
         knex.raw(`
       (
         select lv_next.reward_point 
@@ -115,13 +122,8 @@ export class StudentProfilesRepo {
       .leftJoin({ l: this.levels_table }, 'l.id', 'sop.level_id')
       .where('sp.id', id)
       .andWhere('sp.deleted_at', null)
-      .first()
-      .then((row) => {
-        if (row) {
-          row.points_to_next_level = row.next_level_reward_point - row.gem;
-        }
-        return row;
-      });
+      .orderBy('sop.joined_at', 'desc')
+      .first();
   }
 
   async create(data: CreateStudentProfileDto, knex = this.knex) {
