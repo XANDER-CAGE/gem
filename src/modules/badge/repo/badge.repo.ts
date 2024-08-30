@@ -36,6 +36,7 @@ export class BadgeRepo {
           this.where('achievement_id', dto.achievement_id);
         }
       })
+      .orderBy('reward_gem')
       .limit(limit)
       .offset((page - 1) * limit)
       .as('c');
@@ -146,7 +147,7 @@ export class BadgeRepo {
   ) {
     return knex(this.relationToProfile)
       .update(column, value)
-      .update('joined_at', new Date())
+      .update(`joined_at`, new Date().toISOString())
       .where('id', connectionId)
       .returning('*');
   }
