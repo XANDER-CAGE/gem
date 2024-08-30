@@ -57,7 +57,7 @@ export class AchievementsRepo {
       })
       .limit(limit)
       .offset(offset)
-      .groupBy('a.id');
+      .groupBy('a.id')
 
     const [{ total }] = await baseQuery
       .clone()
