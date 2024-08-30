@@ -29,20 +29,21 @@ export class AchievementsRepo {
         'a.*',
         knex.raw(
           `coalesce(
-            jsonb_agg(
-              jsonb_build_object(
-                'id', b.id,
-                'view', b.view,
-                'name', b.name,
-                'badge_progress', b.progress,
-                'user_progress', coalesce(pb.progress, 0),
-                'description', b.description,
-                'reward_gem', b.reward_gem,
-                'achieved_at', pb.joined_at
-              )
-            ) filter (where b.id is not null), 
-            '[]'::jsonb
-          ) AS badges`,
+        jsonb_agg(
+          jsonb_build_object(
+            'id', b.id,
+            'view', b.view,
+            'name', b.name,
+            'badge_progress', b.progress,
+            'user_progress', coalesce(pb.progress, 0),
+            'description', b.description,
+            'reward_gem', b.reward_gem,
+            'achieved_at', pb.joined_at
+          )
+          ORDER BY b.reward_gem ASC
+        ) filter (where b.id is not null), 
+        '[]'::jsonb
+      ) AS badges`,
         ),
       )
       .from(`${this.table} as a`)
@@ -55,9 +56,9 @@ export class AchievementsRepo {
           knex.raw(`pb.profile_id = '${profileId}'`),
         );
       })
-      .limit(limit)
-      .offset(offset)
       .groupBy('a.id')
+      .limit(limit)
+      .offset(offset);
 
     const [{ total }] = await baseQuery
       .clone()
