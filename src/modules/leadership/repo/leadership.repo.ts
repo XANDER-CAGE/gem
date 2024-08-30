@@ -10,8 +10,8 @@ export class LeadershipRepo {
   private leadership_table = tableName.leadership;
   private table = tableName.studentProfiles;
   private transaction_table = tableName.transactions;
-  private level_table = tableName.levels;
-  private level_on_profiles_table = tableName.levelsM2MProfiles;
+  // private level_table = tableName.levels;
+  // private level_on_profiles_table = tableName.levelsM2MProfiles;
 
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
@@ -75,40 +75,48 @@ export class LeadershipRepo {
     knex = this.knex,
   ) {
     const withQuery = knex.with('rankedProfiles', (qb) => {
-      qb.select(
-        knex.raw([
-          'p.*',
-          'p.gem::double precision as gem',
-          'lv.level as stage',
-          's.first_name',
-          's.last_name',
-          knex.raw(
-            'SUM(coalesce(t.total_gem, 0))::double precision AS total_earning',
-          ),
-          knex.raw(
-            'ROW_NUMBER() OVER (PARTITION BY s.school_id ORDER BY p.gem DESC)::integer AS position_by_gem',
-          ),
-          knex.raw(
-            'ROW_NUMBER() OVER (PARTITION BY s.school_id ORDER BY SUM(coalesce(t.total_gem, 0)) DESC, p.gem desc)::integer AS position_by_earning',
-          ),
-        ]),
-      )
-        .from(`${this.table} AS p`)
-        .leftJoin('students AS s', function () {
+      qb.select([
+        'p.*',
+        knex.raw('p.gem::double precision AS gem'),
+        'lv.level AS stage',
+        's.first_name',
+        's.last_name',
+        knex.raw(
+          'SUM(COALESCE(t.total_gem, 0))::double precision AS total_earning',
+        ),
+        knex.raw(
+          'ROW_NUMBER() OVER (PARTITION BY s.school_id ORDER BY p.gem DESC)::integer AS position_by_gem',
+        ),
+        knex.raw(
+          'ROW_NUMBER() OVER (PARTITION BY s.school_id ORDER BY SUM(COALESCE(t.total_gem, 0)) DESC, p.gem DESC)::integer AS position_by_earning',
+        ),
+      ])
+        .from('gamification.student_profiles as p')
+        .leftJoin('students as s', function () {
           this.on('s.id', '=', 'p.student_id')
             .andOn(knex.raw('s.is_deleted is false'))
             .andOnNotNull('s.school_id');
         })
-        .leftJoin(`${this.transaction_table} AS t`, function () {
+        .leftJoin('gamification.transactions as t', function () {
           this.on('t.profile_id', '=', 'p.id')
             .andOnNull('t.deleted_at')
             .andOn(knex.raw('t.total_gem > 0'));
         })
-        .leftJoin(`${this.level_on_profiles_table} as lp`, function () {
-          this.on('lp.profile_id', '=', 'p.id');
-        })
-        .leftJoin(`${this.level_table} as lv`, function () {
-          this.on('lv.id', '=', 'lp.level_id').andOnNull('lv.deleted_at');
+        .leftJoin(
+          knex('gamification.levels_on_profiles as lp')
+            .select('lp.profile_id', knex.raw('MAX(lv.level) AS max_level'))
+            .leftJoin('gamification.levels as lv', function () {
+              this.on('lv.id', '=', 'lp.level_id').andOnNull('lv.deleted_at');
+            })
+            .groupBy('lp.profile_id')
+            .as('max_levels'),
+          'max_levels.profile_id',
+          'p.id',
+        )
+        .leftJoin('gamification.levels as lv', function () {
+          this.on('lv.level', '=', 'max_levels.max_level').andOnNull(
+            'lv.deleted_at',
+          );
         })
         .whereNull('p.deleted_at')
         .groupBy(
