@@ -135,9 +135,14 @@ export class TransactionRepo {
         knex.raw([
           `case 
             when t.user_id is not null
-              then 'Manual'
+              then 'Moderator'
               else coalesce(ch.name, st.name, l.name, fs.name, b.name, mp.name)
             end as title`,
+          `case 
+            when t.user_id is not null
+              then true
+              else false
+            end as is_moderator`,
           't.id',
           't.total_gem::double precision as total_gem',
           't.created_at',
