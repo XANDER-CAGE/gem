@@ -7,6 +7,8 @@ import {
   Param,
   Delete,
   Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { StudentProfilesService } from './student-profiles.service';
 import {
@@ -24,10 +26,16 @@ import { ErrorApiResponse } from 'src/common/response-class/error.response';
 import { DeleteApiResponse } from 'src/common/response-class/all-null.response';
 import { ListStudentProfileResponse } from './response/list-student-profile.response';
 import { CreateStudentProfileResponse } from './response/create-student-profile.response';
+import { IMyReq } from 'src/common/interface/my-req.interface';
+import { RolesGuard } from 'src/common/guard/roles.guard';
+import { Roles } from 'src/common/decorator/roles.decorator';
+import { Role } from 'src/common/enum/role.enum';
+import { Public } from 'src/common/decorator/public.decorator';
 
 @ApiTags('Student-Profiles')
 @Controller('student-profiles')
 @ApiBearerAuth()
+@UseGuards(RolesGuard)
 export class StudentProfilesController {
   constructor(private readonly studentProfileService: StudentProfilesService) {}
 
@@ -36,6 +44,7 @@ export class StudentProfilesController {
   @ApiBody({ type: CreateStudentProfileDto })
   @ApiOkResponse({ type: CreateStudentProfileResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
+  @Roles(Role.app_admin)
   async create(@Body() createStudent: CreateStudentProfileDto) {
     const data = await this.studentProfileService.create(createStudent);
     return CoreApiResponse.success(data);
@@ -43,6 +52,7 @@ export class StudentProfilesController {
 
   @ApiOperation({ summary: 'Find all' })
   @Get('/list')
+  @Public()
   @ApiOkResponse({ type: ListStudentProfileResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
   async findAll(@Query() dto: PaginationDto) {
@@ -52,11 +62,22 @@ export class StudentProfilesController {
   }
 
   @ApiOperation({ summary: 'Get one' })
+  @Get('me')
+  @ApiOkResponse({ type: CreateStudentProfileResponse, status: 200 })
+  @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
+  @Roles(Role.student)
+  async findOneFromtoken(@Req() req: IMyReq) {
+    const data = await this.studentProfileService.findOne(req.profile.id);
+    return CoreApiResponse.success(data);
+  }
+
+  @ApiOperation({ summary: 'Get one' })
   @Get(':id')
   @ApiOkResponse({ type: CreateStudentProfileResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
-  async findOne(@Param('id') id: string) {
-    const data = await this.studentProfileService.findOne(id);
+  @Roles(Role.student)
+  async findOne(@Req() req: IMyReq, @Param('id') id: string) {
+    const data = await this.studentProfileService.findOne(id || req.profile.id);
     return CoreApiResponse.success(data);
   }
 
