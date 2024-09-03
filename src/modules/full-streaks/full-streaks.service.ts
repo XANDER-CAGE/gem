@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { FullStreakRepo } from './repo/full-streak.repo';
-import { BadgeService } from '../badge/badge.service';
 import { ChannelService } from '../channel/channel.service';
 import { ProductsService } from '../market-products/market-products.service';
 import { CreateFullStreakDto } from './dto/create-full-streaks.dto';
@@ -14,19 +13,12 @@ export class FullStreaksService {
   constructor(
     private readonly fullStreakRepo: FullStreakRepo,
     private readonly productService: ProductsService,
-    private readonly badgeService: BadgeService,
     private readonly chanelService: ChannelService,
     @InjectConnection() private readonly knex: Knex,
   ) {}
 
   async create(fullStreakRepo: CreateFullStreakDto) {
-    const { badge_id, channel_id, product_id } = fullStreakRepo;
-    if (badge_id) {
-      const badgeExist = await this.badgeService.findOne(badge_id);
-      if (!badgeExist) {
-        throw new NotFoundException('This badge does not exist');
-      }
-    }
+    const { channel_id, product_id } = fullStreakRepo;
     if (product_id) {
       const productExist = await this.productService.findOne(product_id);
       if (!productExist) {
@@ -50,13 +42,7 @@ export class FullStreaksService {
   }
 
   async update(id: string, updateFullStreak: UpdateFullStreakDto) {
-    const { badge_id, channel_id, product_id } = updateFullStreak;
-    if (badge_id) {
-      const badgeExist = await this.badgeService.findOne(badge_id);
-      if (!badgeExist) {
-        throw new NotFoundException('This badge does not exist');
-      }
-    }
+    const { channel_id, product_id } = updateFullStreak;
     if (product_id) {
       const productExist = await this.productService.findOne(product_id);
       if (!productExist) {
