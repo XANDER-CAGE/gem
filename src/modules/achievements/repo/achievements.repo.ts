@@ -38,7 +38,7 @@ export class AchievementsRepo {
             'user_progress', coalesce(pb.progress, 0),
             'description', b.description,
             'reward_gem', b.reward_gem,
-            'achieved_at', pb.joined_at
+            'achieved_at',  to_char(pb.joined_at, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')
           )
           ORDER BY b.reward_gem ASC
         ) filter (where b.id is not null), 
