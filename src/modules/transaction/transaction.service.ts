@@ -13,6 +13,7 @@ import { CreateSpendingDto } from './dto/create-spending-transaction.dto';
 import { InjectConnection } from 'nest-knexjs';
 import { Knex } from 'knex';
 import { CreateManualTransactionDto } from './dto/create.transaction.dto';
+import { LevelService } from '../level/level.service';
 
 @Injectable()
 export class TransactionService {
@@ -21,6 +22,7 @@ export class TransactionService {
     private readonly transactionRepo: TransactionRepo,
     private readonly profileService: StudentProfilesService,
     private readonly productService: ProductsService,
+    private readonly levelService: LevelService,
   ) {}
 
   async createManual(
@@ -39,6 +41,8 @@ export class TransactionService {
         },
         trx,
       );
+      const sum = await this.transactionRepo.sumAllEarning(dto.profile_id, trx);
+      await this.levelService.connectToProfile(dto.profile_id, sum, trx);
     });
   }
 
