@@ -6,6 +6,7 @@ import { StudentProfilesModule } from '../student-profiles/student-profiles.modu
 import { StreaksModule } from '../streaks/streaks.module';
 import { MarketProductsModule } from '../market-products/market-products.module';
 import { ChannelModule } from '../channel/channel.module';
+import { LevelModule } from '../level/level.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { ChannelModule } from '../channel/channel.module';
     StreaksModule,
     MarketProductsModule,
     ChannelModule,
+    LevelModule,
   ],
   controllers: [TransactionController],
   providers: [TransactionService, TransactionRepo],

@@ -94,15 +94,14 @@ export class TransactionRepo {
   }
 
   async sumAllEarning(profileId: string, knex = this.knex): Promise<number> {
-    const { totalEarned } = await knex
-      .select(knex.raw(['sum(total_gem)::double precision as totalEarned']))
+    const { count } = await knex
+      .select(knex.raw(['sum(total_gem)::double precision as count']))
       .from(this.transactionTable)
       .where('profile_id', profileId)
       .andWhere('deleted_at', null)
       .andWhere('total_gem', '>', 0)
-      .andWhereNot('channel_id', null)
       .first();
-    return totalEarned || 0;
+    return count || 0;
   }
 
   async transactionHistory(
