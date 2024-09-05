@@ -20,6 +20,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './common/guard/auth.guard';
 import { ScheduleModule } from '@nestjs/schedule';
 import { FileModule } from './modules/file/file.module';
+import { AttendanceModule } from './modules/attendance/attendance.module';
 
 //leadership module
 @Module({
@@ -44,6 +45,7 @@ import { FileModule } from './modules/file/file.module';
     AchievementsModule,
     LeadershipModule,
     FileModule,
+    AttendanceModule,
   ],
   providers: [
     {
