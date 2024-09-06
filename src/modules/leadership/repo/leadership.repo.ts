@@ -77,7 +77,7 @@ export class LeadershipRepo {
     const withQuery = knex.with('rankedProfiles', (qb) => {
       qb.select([
         'p.*',
-        knex.raw('p.gem::double precision AS gem'),
+        knex.raw('COALESCE(p.gem::double precision, 0) AS gem'),
         'lv.level AS stage',
         's.first_name',
         's.last_name',
@@ -85,7 +85,7 @@ export class LeadershipRepo {
           'SUM(COALESCE(t.total_gem, 0))::double precision AS total_earning',
         ),
         knex.raw(
-          'ROW_NUMBER() OVER (PARTITION BY s.school_id ORDER BY p.gem DESC)::integer AS position_by_gem',
+          'ROW_NUMBER() OVER (PARTITION BY s.school_id ORDER BY COALESCE(p.gem::double precision, 0) DESC)::integer AS position_by_gem',
         ),
         knex.raw(
           'ROW_NUMBER() OVER (PARTITION BY s.school_id ORDER BY SUM(COALESCE(t.total_gem, 0)) DESC, p.gem DESC)::integer AS position_by_earning',

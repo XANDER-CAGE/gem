@@ -91,6 +91,7 @@ export class StudentProfilesRepo {
         'l.name',
         'l.level as stage',
         'sp.*',
+        'st.gender',
         knex.raw(
           `(select sum(t.total_gem) from ${this.transaction_table} as t where t.profile_id = sp.id and t.created_at >= NOW() - INTERVAL '1 week')::double precision as transaction_week`,
         ),
