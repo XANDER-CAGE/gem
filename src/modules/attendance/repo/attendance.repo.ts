@@ -14,7 +14,7 @@ export class AttendanceRepo {
       .select('created_at')
       .from('gamification.attendance')
       .whereNull('deleted_at')
-      .andWhere('profile_id', profileId)
+      .andWhere('student_id', profileId)
       .andWhere(function () {
         this.where('is_last_streak', true).orWhere('success', false);
       })

@@ -36,7 +36,7 @@ export class LevelService {
     return await this.levelRepo.deleteOne();
   }
 
-  async connectToProfile(
+  async connectReachedLevels(
     profileId: string,
     totalEarned: number,
     knex = this.knex,
@@ -55,7 +55,7 @@ export class LevelService {
       totalGem += level.free_gem;
     }
     if (totalGem == 0) return levels;
-    const checkForNewLevel = await this.connectToProfile(
+    const checkForNewLevel = await this.connectReachedLevels(
       profileId,
       totalEarned + totalGem,
       knex,

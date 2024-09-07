@@ -61,18 +61,17 @@ export class StreaksRepo {
       .first();
   }
 
-  async findOneByChannelId(channelId: string, level: number, knex = this.knex) {
+  async findOneByLevel(level: number, knex = this.knex) {
     const data = await knex
       .select(
         knex.raw([
           '*',
           'streak_reward::double precision as streak_reward',
-          `((select count(*) from ${this.table} where channel_id = '${channelId}' and deleted_at is null) = level) as is_last`,
+          `((select count(*) from ${this.table} where deleted_at is null) = level) as is_last`,
         ]),
       )
       .from(`${this.table}`)
-      .where('channel_id', channelId)
-      .andWhere('deleted_at', null)
+      .whereNull('deleted_at')
       .andWhere('level', level)
       .first();
     return data || null;

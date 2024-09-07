@@ -7,6 +7,7 @@ import { ChannelService } from '../channel/channel.service';
 import { InjectConnection } from 'nest-knexjs';
 import { FullStreaksService } from '../full-streaks/full-streaks.service';
 import { FindAllStreaksDto } from './dto/find-all.streaks.dto';
+import { Knex } from 'knex';
 
 @Injectable()
 export class StreaksService {
@@ -14,7 +15,7 @@ export class StreaksService {
     private readonly streakRepo: StreaksRepo,
     private readonly channelService: ChannelService,
     private readonly fullStreakService: FullStreaksService,
-    @InjectConnection() private readonly knex = this.knex,
+    @InjectConnection() private readonly knex: Knex,
   ) {}
 
   async create(createStreak: CreateStreakDto) {
@@ -35,12 +36,8 @@ export class StreaksService {
     return await this.streakRepo.findOne(id);
   }
 
-  async findOneByChannelId(
-    channelId: string,
-    level: number,
-    knex = this.knex,
-  ): Promise<StreakEntity> {
-    return await this.streakRepo.findOneByChannelId(channelId, level, knex);
+  async findOneByLevel(level: number, knex = this.knex): Promise<StreakEntity> {
+    return await this.streakRepo.findOneByLevel(level, knex);
   }
 
   async update(id: string, updateStreak: UpdateStreakDto) {
@@ -94,12 +91,7 @@ export class StreaksService {
       new Date(startStreakDate),
       knex,
     );
-    const streak = await this.findOneByChannelId(
-      channelId,
-      successChannelCount + step,
-      knex,
-    );
-    return streak;
+    return await this.findOneByLevel(successChannelCount + step, knex);
   }
 
   async myStreak(profileId: string) {

@@ -32,17 +32,35 @@ export class TransactionService {
   ) {
     const profile = await this.profileService.findOne(dto.profile_id);
     if (!profile) throw new NotFoundException('Profile not found');
+    let totalGem = dto.amount;
     await knex.transaction(async (trx) => {
       await this.transactionRepo.createManual(dto, userId, trx);
+      const sum = await this.transactionRepo.sumAllEarning(dto.profile_id, trx);
+      const levels = await this.levelService.connectReachedLevels(
+        dto.profile_id,
+        sum,
+        trx,
+      );
+      for (const level of levels) {
+        if (level.free_gem) {
+          totalGem += +level.free_gem;
+          await this.createEarning(
+            {
+              profile_id: profile.id,
+              level_id: level.id,
+              total_gem: level.free_gem,
+            },
+            trx,
+          );
+        }
+      }
       await this.profileService.update(
         profile.id,
         {
-          gem: profile.gem + dto.amount,
+          gem: profile.gem + totalGem,
         },
         trx,
       );
-      const sum = await this.transactionRepo.sumAllEarning(dto.profile_id, trx);
-      await this.levelService.connectToProfile(dto.profile_id, sum, trx);
     });
   }
 

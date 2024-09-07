@@ -112,7 +112,7 @@ export class HomeService {
         profile.id,
         trx,
       );
-      const levels = await this.levelService.connectToProfile(
+      const levels = await this.levelService.connectReachedLevels(
         profile.id,
         totalEarned || 0 + totalGem,
         trx,
@@ -176,7 +176,7 @@ export class HomeService {
           profileId,
           trx,
         );
-        const levels = await this.levelService.connectToProfile(
+        const levels = await this.levelService.connectReachedLevels(
           profileId,
           total,
           trx,
