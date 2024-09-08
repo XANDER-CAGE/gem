@@ -16,5 +16,6 @@ import { LevelModule } from '../level/level.module';
   ],
   controllers: [AttendanceController],
   providers: [AttendanceService, AttendanceRepo],
+  exports: [AttendanceService],
 })
 export class AttendanceModule {}
