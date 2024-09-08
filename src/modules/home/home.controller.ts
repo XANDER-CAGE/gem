@@ -15,7 +15,6 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { AssignChannelDto } from './dto/assign-channel.dto';
 import { HomeService } from './home.service';
 import { AssignAchievementDto } from './dto/assign-achievement.dto';
 import { BuyProductDto } from '../market-products/dto/buy.product.dto';
@@ -40,17 +39,6 @@ export class HomeController {
     private readonly homeService: HomeService,
     private readonly leadershipService: LeadershipService,
   ) {}
-
-  @ApiOperation({ summary: 'Assign channel' })
-  @Roles(Role.app_admin)
-  @Post('assign/attendance')
-  @ApiBody({ type: AssignChannelDto })
-  @ApiOkResponse({ type: DeleteApiResponse, status: 200 })
-  @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
-  async assignChannel(@Body() dto: AssignChannelDto) {
-    await this.homeService.assignChannel(dto);
-    return CoreApiResponse.success(null);
-  }
 
   @ApiOperation({ summary: 'Assign achievement' })
   @ApiBody({ type: AssignAchievementDto })

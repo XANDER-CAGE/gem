@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { AssignChannelDto } from './dto/assign-channel.dto';
 import { StudentProfilesService } from '../student-profiles/student-profiles.service';
 import { AttendanceRepo } from './repo/attendance.repo';
 import { CoreApiResponse } from 'src/common/response-class/core-api.response';
@@ -8,6 +7,7 @@ import { InjectConnection } from 'nest-knexjs';
 import { Knex } from 'knex';
 import { TransactionService } from '../transaction/transaction.service';
 import { LevelService } from '../level/level.service';
+import axios from 'axios';
 
 @Injectable()
 export class AttendanceService {
@@ -19,14 +19,19 @@ export class AttendanceService {
     private readonly transactionService: TransactionService,
     private readonly levelService: LevelService,
   ) {}
-  async assignChannel(dto: AssignChannelDto) {
-    const profile = await this.profileService.findOne(dto.profile_id);
-    if (!profile) throw new NotFoundException('Student profile not found');
-    if (!dto.is_done) {
+  async assignAttendance(studentId: string, isDone: boolean) {
+    const profile = await this.profileService.getProfileByColumn(
+      'student_id',
+      studentId,
+    );
+    if (!profile) {
+      throw new NotFoundException('Student not registered in gamification');
+    }
+    if (!isDone) {
       await this.attendanceRepo.create({
         is_last_streak: false,
         streak_id: null,
-        student_id: profile.student_id,
+        profile_id: profile.id,
         success: false,
       });
       return CoreApiResponse.success(null);
@@ -34,21 +39,19 @@ export class AttendanceService {
     let totalGem = +profile.gem || 0;
     await this.knex.transaction(async (trx) => {
       const startDate = await this.attendanceRepo.findStreakStartDate(
-        profile.student_id,
+        profile.id,
         trx,
       );
-      console.log(startDate);
-      
       const successCount = await this.attendanceRepo.countSuccess(
         profile.id,
-        startDate,
+        startDate ? new Date(startDate) : new Date('1970'),
         trx,
       );
       const streak = await this.streakService.findOneByLevel(
-        successCount + 1,
+        +successCount + 1,
         trx,
       );
-      if (streak || streak?.streak_reward) {
+      if (streak && streak?.streak_reward) {
         await this.transactionService.createEarning({
           profile_id: profile.id,
           streak_id: streak.id,
@@ -58,9 +61,9 @@ export class AttendanceService {
       }
       await this.attendanceRepo.create(
         {
-          is_last_streak: true,
+          is_last_streak: streak.is_last,
           streak_id: streak.id,
-          student_id: profile.student_id,
+          profile_id: profile.id,
           success: true,
         },
         trx,
@@ -71,7 +74,7 @@ export class AttendanceService {
       );
       const levels = await this.levelService.connectReachedLevels(
         profile.id,
-        totalEarned || 0 + totalGem,
+        totalEarned + totalGem,
         trx,
       );
       for (const level of levels) {
@@ -90,5 +93,23 @@ export class AttendanceService {
       await this.profileService.update(profile.id, { gem: totalGem }, trx);
     });
     return CoreApiResponse.success(null);
+  }
+
+  private async getAttendances() {
+    const date = new Date();
+    const data = date.toISOString().split('T')[0];
+    const response = await axios.post(
+      // TODO: env
+      'https://lms.eduplus.uz/api/attendance-v2/daily-strike-check-status',
+      { day: data },
+    );
+    return response.data;
+  }
+
+  async attendanceCron() {
+    const datas = await this.getAttendances();
+    for (const data of datas) {
+      this.assignAttendance(data.student_id, data.daily_strike_status);
+    }
   }
 }

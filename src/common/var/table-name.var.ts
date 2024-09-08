@@ -1,10 +1,6 @@
 export const tableName = {
   users: 'public.users',
-  channels: 'gamification.channels',
-  channelsM2Mprofiles: 'gamification.channels_on_profiles',
   streaks: 'gamification.streaks',
-  fullStreaks: 'gamification.full_streaks',
-  fullStreaksM2Mprofiles: 'gamification.full_streaks_on_profiles',
   transactions: 'gamification.transactions',
   markets: 'gamification.markets',
   marketCategories: 'gamification.market_categories',
@@ -27,4 +23,5 @@ export const tableName = {
   assignment: 'gamification.assignments',
   files: 'public.files',
   students: 'public.students',
+  attendance: 'gamification.attendance',
 };

@@ -11,7 +11,7 @@ import { tableName } from 'src/common/var/table-name.var';
 export class StudentProfilesRepo {
   private table = tableName.studentProfiles;
   private student_table = tableName.students;
-  private student_on_profiles_table = tableName.levelsM2MProfiles;
+  private levels_on_profiles_table = tableName.levelsM2MProfiles;
   private levels_table = tableName.levels;
   private transaction_table = tableName.transactions;
 
@@ -115,7 +115,7 @@ export class StudentProfilesRepo {
       .from({ sp: this.table })
       .leftJoin({ st: this.student_table }, 'sp.student_id', 'st.id')
       .leftJoin(
-        { sop: this.student_on_profiles_table },
+        { sop: this.levels_on_profiles_table },
         'sp.id',
         'sop.profile_id',
       )
@@ -127,7 +127,8 @@ export class StudentProfilesRepo {
   }
 
   async create(data: CreateStudentProfileDto, knex = this.knex) {
-    return await knex(this.table).insert(data).returning('*');
+    const [profile] = await knex(this.table).insert(data).returning('*');
+    return profile;
   }
 
   async update(id: string, data: UpdateStudentProfileDto, knex = this.knex) {
@@ -150,5 +151,58 @@ export class StudentProfilesRepo {
       })
       .where('id', id)
       .andWhere('deleted_at', null);
+  }
+
+  async getStudentByColumn(column: string, value: string, knex = this.knex) {
+    return knex(this.student_table)
+      .select('*')
+      .where(column, value)
+      .andWhere('is_deleted', false)
+      .first();
+  }
+
+  async getProfileByColumn(column: string, value: string, knex = this.knex) {
+    return await knex
+      .select(
+        'st.uid',
+        'st.first_name',
+        'st.last_name',
+        'st.avatar',
+        'l.name',
+        'l.level as stage',
+        'sp.*',
+        knex.raw(
+          `(select sum(t.total_gem) from ${this.transaction_table} as t where t.profile_id = sp.id and t.created_at >= NOW() - INTERVAL '1 week')::double precision as transaction_week`,
+        ),
+        knex.raw('sp.gem::double precision as gem'),
+        knex.raw(`
+        (select sum(t.total_gem) from ${this.transaction_table} as t where t.profile_id = sp.id and t.total_gem > 0)::double precision as total_point
+      `),
+        knex.raw(`(
+        select lv_current.reward_point from ${this.levels_table} as lv_current
+        where lv_current.level = l.level
+        limit 1
+      ) as current_level_reward_point`),
+        knex.raw(`
+    (
+      select lv_next.reward_point 
+      from ${this.levels_table} as lv_next 
+      where lv_next.level = l.level + 1
+      limit 1
+    ) as next_level_reward_point
+  `),
+      )
+      .from({ sp: this.table })
+      .leftJoin({ st: this.student_table }, 'sp.student_id', 'st.id')
+      .leftJoin(
+        { sop: this.levels_on_profiles_table },
+        'sp.id',
+        'sop.profile_id',
+      )
+      .leftJoin({ l: this.levels_table }, 'l.id', 'sop.level_id')
+      .where(column, value)
+      .andWhere('sp.deleted_at', null)
+      .orderBy('sop.joined_at', 'desc')
+      .first();
   }
 }

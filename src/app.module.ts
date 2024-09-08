@@ -8,11 +8,9 @@ import { StudentProfilesModule } from './modules/student-profiles/student-profil
 import { MarketProductsModule } from './modules/market-products/market-products.module';
 import { ProductReviewsModule } from './modules/product-reviews/product-reviews.module';
 import { MarketCategoriesModule } from './modules/market-categories/market-categories.module';
-import { ChannelModule } from './modules/channel/channel.module';
 import { BadgeModule } from './modules/badge/badge.module';
 import { TransactionModule } from './modules/transaction/transaction.module';
 import { LevelModule } from './modules/level/level.module';
-import { FullStreaksModule } from './modules/full-streaks/full-streaks.module';
 import { HomeModule } from './modules/home/home.module';
 import { AchievementsModule } from './modules/achievements/achievements.module';
 import { LeadershipModule } from './modules/leadership/leadership.module';
@@ -36,11 +34,9 @@ import { AttendanceModule } from './modules/attendance/attendance.module';
     MarketProductsModule,
     ProductReviewsModule,
     MarketCategoriesModule,
-    ChannelModule,
     BadgeModule,
     TransactionModule,
     LevelModule,
-    FullStreaksModule,
     HomeModule,
     AchievementsModule,
     LeadershipModule,

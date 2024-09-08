@@ -5,7 +5,6 @@ import { TransactionRepo } from './repo/transaction.repo';
 import { StudentProfilesModule } from '../student-profiles/student-profiles.module';
 import { StreaksModule } from '../streaks/streaks.module';
 import { MarketProductsModule } from '../market-products/market-products.module';
-import { ChannelModule } from '../channel/channel.module';
 import { LevelModule } from '../level/level.module';
 
 @Module({
@@ -13,7 +12,6 @@ import { LevelModule } from '../level/level.module';
     StudentProfilesModule,
     StreaksModule,
     MarketProductsModule,
-    ChannelModule,
     LevelModule,
   ],
   controllers: [TransactionController],

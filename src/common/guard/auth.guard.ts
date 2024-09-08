@@ -8,11 +8,14 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { StudentProfilesService } from 'src/modules/student-profiles/student-profiles.service';
 import { UsersService } from 'src/modules/users/users.service';
+import { Role } from '../enum/role.enum';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   @Inject() private readonly userService: UsersService;
+  @Inject() private readonly profileService: StudentProfilesService;
 
   constructor(private reflector: Reflector) {}
 
@@ -31,6 +34,11 @@ export class AuthGuard implements CanActivate {
       throw new ForbiddenException(
         'Access denied. Please pay tuition in full.',
       );
+    }
+    if (user.role == Role.student && !user.profile) {
+      user.profile = await this.profileService.create({
+        student_id: user.id,
+      });
     }
     request.user = user;
     request.profile = user.profile;

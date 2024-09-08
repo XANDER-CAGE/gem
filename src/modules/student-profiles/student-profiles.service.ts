@@ -43,4 +43,16 @@ export class StudentProfilesService {
   async remove(id: string) {
     return await this.studentProfileRepo.deleteOne(id);
   }
+
+  async getStudentByColumn(column: string, value: string, knex = this.knex) {
+    return this.studentProfileRepo.getStudentByColumn(column, value, knex);
+  }
+
+  async getProfileByColumn(column: string, value: string, knex = this.knex) {
+    return await this.studentProfileRepo.getProfileByColumn(
+      column,
+      value,
+      knex,
+    );
+  }
 }

@@ -6,27 +6,23 @@ import { CreateStreakDto } from '../dto/create-streaks.dto';
 import { StreakEntity } from '../entity/streaks.entity';
 import { UpdateStreakDto } from '../dto/update-streaks.dto';
 import { tableName } from 'src/common/var/table-name.var';
-import { FindAllStreaksDto } from '../dto/find-all.streaks.dto';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class StreaksRepo {
   private table = tableName.streaks;
+  private attendance_table = tableName.attendance;
 
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
   async findAll(
-    dto: FindAllStreaksDto,
+    dto: PaginationDto,
     knex = this.knex,
   ): Promise<IFindAllStreaks> {
     const { limit = 10, page = 1 } = dto;
     const innerQuery = knex(this.table)
       .select('*')
       .where('deleted_at', null)
-      .andWhere(function () {
-        if (dto.channel_id) {
-          this.where('channel_id', dto.channel_id);
-        }
-      })
       .limit(limit)
       .offset((page - 1) * limit)
       .as('c');
@@ -47,15 +43,6 @@ export class StreaksRepo {
     return await knex
       .select('*')
       .from(this.table)
-      .where('id', id)
-      .andWhere('deleted_at', null)
-      .first();
-  }
-
-  async channelExists(id: string, knex = this.knex) {
-    return await knex
-      .select('*')
-      .from('channels')
       .where('id', id)
       .andWhere('deleted_at', null)
       .first();
@@ -111,5 +98,35 @@ export class StreaksRepo {
       })
       .where('level', maxLevel)
       .andWhere('deleted_at', null);
+  }
+
+  async findStreakStartDate(profileId: string, knex = this.knex) {
+    const data = await knex
+      .select('created_at')
+      .from(this.attendance_table)
+      .whereNull('deleted_at')
+      .andWhere('profile_id', profileId)
+      .andWhere(function () {
+        this.where('success', false).orWhere('is_last_streak', true);
+      })
+      .orderBy('created_at', 'desc')
+      .first();
+    return data ? data.created_at : new Date('1970');
+  }
+
+  async countSuccess(profileId: string, startDate: Date, knex = this.knex) {
+    const data = await knex
+      .count('id')
+      .from(this.attendance_table)
+      .whereNull('deleted_at')
+      .andWhere('profile_id', profileId)
+      .andWhere(
+        'created_at',
+        '>',
+        startDate.toISOString().replace('T', ' ').replace('Z', ''),
+      )
+      .andWhere('success', true)
+      .first();
+    return data.count || 0;
   }
 }
