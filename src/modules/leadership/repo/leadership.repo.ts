@@ -10,8 +10,9 @@ export class LeadershipRepo {
   private leadership_table = tableName.leadership;
   private table = tableName.studentProfiles;
   private transaction_table = tableName.transactions;
-  // private level_table = tableName.levels;
-  // private level_on_profiles_table = tableName.levelsM2MProfiles;
+  private level_table = tableName.levels;
+  private level_on_profiles_table = tableName.levelsM2MProfiles;
+  private profiles_table = tableName.studentProfiles;
 
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
@@ -91,21 +92,21 @@ export class LeadershipRepo {
           'ROW_NUMBER() OVER (PARTITION BY s.school_id ORDER BY SUM(COALESCE(t.total_gem, 0)) DESC, p.gem DESC)::integer AS position_by_earning',
         ),
       ])
-        .from('gamification.student_profiles as p')
+        .from(`${this.profiles_table} as p`)
         .leftJoin('students as s', function () {
           this.on('s.id', '=', 'p.student_id')
             .andOn(knex.raw('s.is_deleted is false'))
             .andOnNotNull('s.school_id');
         })
-        .leftJoin('gamification.transactions as t', function () {
+        .leftJoin(`${this.transaction_table} as t`, function () {
           this.on('t.profile_id', '=', 'p.id')
             .andOnNull('t.deleted_at')
             .andOn(knex.raw('t.total_gem > 0'));
         })
         .leftJoin(
-          knex('gamification.levels_on_profiles as lp')
+          knex(`${this.level_on_profiles_table} as lp`)
             .select('lp.profile_id', knex.raw('MAX(lv.level) AS max_level'))
-            .leftJoin('gamification.levels as lv', function () {
+            .leftJoin(`${this.level_table} as lv`, function () {
               this.on('lv.id', '=', 'lp.level_id').andOnNull('lv.deleted_at');
             })
             .groupBy('lp.profile_id')
@@ -113,7 +114,7 @@ export class LeadershipRepo {
           'max_levels.profile_id',
           'p.id',
         )
-        .leftJoin('gamification.levels as lv', function () {
+        .leftJoin(`${this.level_table} as lv`, function () {
           this.on('lv.level', '=', 'max_levels.max_level').andOnNull(
             'lv.deleted_at',
           );

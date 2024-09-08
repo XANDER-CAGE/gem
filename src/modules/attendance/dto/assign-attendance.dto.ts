@@ -1,12 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsNotEmpty, IsString, Length } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
 
-export class AssignChannelDto {
+export class AssignAttendance {
   @ApiProperty()
   @IsNotEmpty()
   @IsString()
-  @Length(24)
-  profile_id: string;
+  uid: string;
 
   @ApiProperty()
   @IsNotEmpty()

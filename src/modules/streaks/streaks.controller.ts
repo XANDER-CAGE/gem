@@ -29,8 +29,8 @@ import { RolesGuard } from 'src/common/guard/roles.guard';
 import { Role } from 'src/common/enum/role.enum';
 import { Roles } from 'src/common/decorator/roles.decorator';
 import { Public } from 'src/common/decorator/public.decorator';
-import { FindAllStreaksDto } from './dto/find-all.streaks.dto';
 import { IMyReq } from 'src/common/interface/my-req.interface';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @ApiTags('Streaks')
 @ApiBearerAuth()
@@ -55,7 +55,7 @@ export class StreaksController {
   @Get('/list')
   @ApiOkResponse({ type: ListStreaksResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
-  async findAll(@Query() dto: FindAllStreaksDto) {
+  async findAll(@Query() dto: PaginationDto) {
     const { total, data } = await this.streaksService.findAll(dto);
     const pagination = { total, limit: dto.limit, page: dto.page };
     return CoreApiResponse.success(data, pagination);

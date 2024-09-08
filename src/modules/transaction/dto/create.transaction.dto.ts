@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString, Length } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateManualTransactionDto {
   @ApiProperty()
@@ -9,6 +9,6 @@ export class CreateManualTransactionDto {
 
   @ApiProperty()
   @IsString()
-  @Length(24)
-  profile_id: string;
+  @IsNotEmpty()
+  uid: string;
 }

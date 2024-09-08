@@ -19,12 +19,12 @@ export class CreateAchievementDto {
   @IsString()
   description: string;
 
-  @ApiProperty({example: FileEntity})
+  @ApiProperty({ example: FileEntity })
   @IsNotEmpty()
   @IsObject()
   view: FileEntity;
 
-  @ApiPropertyOptional({example: false})
+  @ApiPropertyOptional({ example: false })
   @IsOptional()
   @IsBoolean()
   is_active: boolean;

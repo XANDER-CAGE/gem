@@ -6,15 +6,14 @@ import {
 import { Response } from 'express';
 import { MinioService } from 'nestjs-minio-client';
 import { extname } from 'path';
-import { env } from 'src/common/config/env.config';
 import { BufferedFile } from 'src/common/interface/buffered-file.interface';
 import { FileRepo } from './repo/file.repo';
 import { InjectConnection } from 'nest-knexjs';
 import { Knex } from 'knex';
+import { getBucketName } from 'src/common/utils/get-gucket-name.util';
 
 @Injectable()
 export class FileService {
-  private readonly bucketname = env.MINIO_BUCKET;
   constructor(
     private readonly minio: MinioService,
     private readonly filesRepo: FileRepo,
@@ -34,7 +33,7 @@ export class FileService {
     return knex.transaction(async (trx) => {
       const saveFile = await this.filesRepo.saveFile(
         {
-          bucket_name: this.bucketname,
+          bucket_name: getBucketName(),
           created_by,
           type: mimeType,
           name: fileName,
@@ -44,7 +43,7 @@ export class FileService {
       );
 
       await this.minio.client.putObject(
-        this.bucketname,
+        getBucketName(),
         `${saveFile.id}${extname(fileName)}`,
         file.buffer,
       );

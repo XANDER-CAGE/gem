@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotAcceptableException,
+  NotFoundException,
+} from '@nestjs/common';
 import { TransactionRepo } from './repo/transaction.repo';
 import { StudentProfilesService } from '../student-profiles/student-profiles.service';
 import { TransactionEntity } from './entity/transaction.entity';
@@ -30,19 +34,54 @@ export class TransactionService {
     userId: string,
     knex = this.knex,
   ) {
-    const profile = await this.profileService.findOne(dto.profile_id);
-    if (!profile) throw new NotFoundException('Profile not found');
+    const student = await this.profileService.getStudentByColumn(
+      'uid',
+      dto.uid,
+    );
+    if (!student) throw new NotFoundException('Student not found');
+    if (student.is_blocked) {
+      throw new NotAcceptableException('Student is blocked');
+    }
+    const profile = await this.profileService.getProfileByColumn(
+      'student_id',
+      student.id,
+    );
+    if (!profile) {
+      throw new NotFoundException('Student not registered in gamification');
+    }
+    let totalGem = dto.amount;
     await knex.transaction(async (trx) => {
-      await this.transactionRepo.createManual(dto, userId, trx);
+      await this.transactionRepo.createManual(
+        { amount: dto.amount, profile_id: profile.id },
+        userId,
+        trx,
+      );
+      const sum = await this.transactionRepo.sumAllEarning(profile.id, trx);
+      const levels = await this.levelService.connectReachedLevels(
+        profile.id,
+        sum,
+        trx,
+      );
+      for (const level of levels) {
+        if (level.free_gem) {
+          totalGem += +level.free_gem;
+          await this.createEarning(
+            {
+              profile_id: profile.id,
+              level_id: level.id,
+              total_gem: level.free_gem,
+            },
+            trx,
+          );
+        }
+      }
       await this.profileService.update(
         profile.id,
         {
-          gem: profile.gem + dto.amount,
+          gem: profile.gem + totalGem,
         },
         trx,
       );
-      const sum = await this.transactionRepo.sumAllEarning(dto.profile_id, trx);
-      await this.levelService.connectToProfile(dto.profile_id, sum, trx);
     });
   }
 
@@ -61,7 +100,7 @@ export class TransactionService {
     const profile = await this.profileService.findOne(dto.profile_id);
     if (!profile) throw new NotFoundException('Profile not found');
     const product = await this.productService.findOne(dto.product_id);
-    if (!product) throw new NotFoundException('Channel not found');
+    if (!product) throw new NotFoundException('Product not found');
     totalGem += product.price * dto.count;
     return totalGem
       ? await this.transactionRepo.createSpending(
