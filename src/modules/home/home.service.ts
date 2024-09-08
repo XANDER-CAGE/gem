@@ -154,13 +154,7 @@ export class HomeService {
   ) {
     return await knex.transaction(async (trx) => {
       const uploadedFile = await this.fileService.upload(file, userId, trx);
-      const achievement = await this.achievementsService.findOneByType(
-        'assignment',
-        trx,
-      );
-      await this.assignAchievement(profileId, achievement.id, trx).catch(
-        (error) => console.log(error),
-      );
+      await this.achievementsService.assignment(profileId, trx);
       await this.assignmentRepo.create(uploadedFile.id, profileId, trx);
       return uploadedFile;
     });

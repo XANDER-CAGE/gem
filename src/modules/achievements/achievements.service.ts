@@ -72,7 +72,7 @@ export class AchievementsService {
           await this.transactionService.createEarning(
             {
               badge_id: badge.id,
-              total_gem: badge.reward_gem,
+              total_gem: +badge.reward_gem,
               profile_id: profileId,
             },
             trx,
@@ -96,5 +96,71 @@ export class AchievementsService {
 
   async findOneByType(type: string, knex = this.knex) {
     return await this.achievementRepo.findOnByType(type, knex);
+  }
+
+  async assignment(profileId: string, knex = this.knex) {
+    await knex.transaction(async (trx) => {
+      const achievement = await this.findOneByType('assignment', trx);
+      if (!achievement) throw new NotFoundException('No assignment found');
+      const profile = await this.profileService.findOne(profileId);
+      const assignmentCount = await this.badgeService.assignmentCount(
+        profileId,
+        trx,
+      );
+      console.log('count ', assignmentCount);
+
+      if (!assignmentCount) {
+        const badges = await this.badgeService.getByAchievement(
+          achievement.id,
+          trx,
+        );
+        for (const badge of badges) {
+          if (badge.progress == 1) {
+            await this.transactionService.createEarning(
+              {
+                profile_id: profileId,
+                total_gem: +badge.reward_gem,
+                badge_id: badge.id,
+              },
+              trx,
+            );
+            await this.profileService.update(
+              profile.id,
+              { gem: profile.gem + +badge.reward_gem },
+              trx,
+            );
+          }
+          await this.badgeService.connectToProfile(profileId, badge.id, 1, trx);
+        }
+        return;
+      }
+      const badges = await this.badgeService.getUnderdoneAssignment(
+        profileId,
+        assignmentCount + 1,
+        trx,
+      );
+      console.log('badge count:', badges.length);
+
+      for (const badge of badges) {
+        if (+badge.user_progress + 1 == +badge.progress) {
+          await this.transactionService.createEarning({
+            profile_id: profileId,
+            total_gem: +badge.reward_gem,
+            badge_id: badge.id,
+          });
+          await this.profileService.update(
+            profile.id,
+            { gem: profile.gem + +badge.reward_gem },
+            trx,
+          );
+        }
+        await this.badgeService.updateConnection(
+          'progress',
+          badge.user_progress + 1,
+          badge.connection_id,
+          trx,
+        );
+      }
+    });
   }
 }
