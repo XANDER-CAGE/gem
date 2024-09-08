@@ -11,6 +11,7 @@ import { FileModule } from '../file/file.module';
 import { AssignmentRepo } from './repo/assignment.repo';
 import { HomeController } from './home.controller';
 import { LeadershipModule } from '../leadership/leadership.module';
+import { AttendanceModule } from '../attendance/attendance.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { LeadershipModule } from '../leadership/leadership.module';
     MarketProductsModule,
     FileModule,
     LeadershipModule,
+    AttendanceModule,
   ],
   controllers: [HomeController],
   providers: [HomeService, AssignmentRepo],

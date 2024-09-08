@@ -41,7 +41,7 @@ export class HomeService {
     const achievement = await this.achievementsService.findOne(achievementId);
     if (!achievement) throw new NotFoundException('Achievement not found');
     const profile = await this.profileService.findOne(profileId);
-    if (!profile) throw new NotFoundException('Student profile not found');
+    if (!profile) throw new NotFoundException('Student not in gamification');
     const underdoneBadge = await this.badgeService.getUnderdoneBadge(
       profileId,
       achievementId,

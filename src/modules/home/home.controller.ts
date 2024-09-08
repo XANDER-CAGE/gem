@@ -29,6 +29,7 @@ import { CoreApiResponse } from 'src/common/response-class/core-api.response';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { BufferedFile } from 'src/common/interface/buffered-file.interface';
 import { LeadershipService } from '../leadership/leadership.service';
+import { AttendanceService } from '../attendance/attendance.service';
 
 @ApiTags('Home')
 @ApiBearerAuth()
@@ -38,6 +39,7 @@ export class HomeController {
   constructor(
     private readonly homeService: HomeService,
     private readonly leadershipService: LeadershipService,
+    private readonly attendanceService: AttendanceService,
   ) {}
 
   @ApiOperation({ summary: 'Assign achievement' })
@@ -86,8 +88,8 @@ export class HomeController {
   }
 
   @Cron('0 0 14 * * *')
-  @Roles(Role.student)
   async handleGradeCron() {
+    await this.attendanceService.attendanceCron();
     await this.homeService.handleGradeCron();
     await this.leadershipService.saveLeadership();
   }

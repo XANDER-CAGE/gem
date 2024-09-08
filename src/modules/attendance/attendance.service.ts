@@ -109,7 +109,7 @@ export class AttendanceService {
   async attendanceCron() {
     const datas = await this.getAttendances();
     for (const data of datas) {
-      this.assignAttendance(data.student_id, data.daily_strike_status);
+      await this.assignAttendance(data.student_id, data.daily_strike_status);
     }
   }
 }
