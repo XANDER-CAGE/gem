@@ -74,4 +74,24 @@ export class BadgeService {
     }
     return badges;
   }
+
+  async getByAchievement(achievementId: string, knex = this.knex) {
+    return await this.badgeRepo.getByAchievement(achievementId, knex);
+  }
+
+  async getUnderdoneAssignment(
+    profileId: string,
+    assignmentCount: number,
+    knex = this.knex,
+  ) {
+    return await this.badgeRepo.getUnderdoneAssignment(
+      profileId,
+      assignmentCount,
+      knex,
+    );
+  }
+
+  async assignmentCount(profileId: string, knex = this.knex) {
+    return await this.badgeRepo.assignmentCount(profileId, knex);
+  }
 }

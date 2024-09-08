@@ -11,6 +11,8 @@ import { FindAllBadgesDto } from '../dto/find-all.badge.dto';
 export class BadgeRepo {
   private readonly table = tableName.badges;
   private readonly relationToProfile = tableName.profilesM2Mbadges;
+  private readonly achievements = tableName.achievements;
+  private readonly assignments = tableName.assignment;
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
   async create(dto: CreateBadgeDto, knex = this.knex): Promise<BadgeEntity> {
@@ -145,7 +147,7 @@ export class BadgeRepo {
     connectionId: string,
     knex = this.knex,
   ) {
-    return knex(this.relationToProfile)
+    return await knex(this.relationToProfile)
       .update(column, value)
       .update(`joined_at`, new Date().toISOString())
       .where('id', connectionId)
@@ -160,5 +162,48 @@ export class BadgeRepo {
       .where('pb.profile_id', profileId)
       .andWhere(knex.raw('b.progress = pb.progress'))
       .andWhere('pb.is_shown', false);
+  }
+
+  async getByAchievement(achievementId: string, knex = this.knex) {
+    return knex
+      .select('*')
+      .from(this.table)
+      .whereNull('deleted_at')
+      .andWhere('achievement_id', achievementId);
+  }
+
+  async getUnderdoneAssignment(
+    profileId: string,
+    assignmentCount: number,
+    knex = this.knex,
+  ) {
+    return await knex
+      .select(
+        'b.*',
+        knex.raw([
+          'coalesce(pb.progress, 0) as user_progress',
+          'pb.id as connection_id',
+        ]),
+      )
+      .leftJoin(`${this.relationToProfile} as pb`, function () {
+        this.on('pb.badge_id', 'b.id').andOnVal('pb.profile_id', profileId);
+      })
+      .join(`${this.achievements} as a`, function () {
+        this.on('a.id', 'b.achievement_id')
+          .andOnNull('a.deleted_at')
+          .andOnVal('a.type', 'assignment');
+      })
+      .from(`${this.table} as b`)
+      .whereNull('b.deleted_at')
+      .andWhereRaw('pb.progress != b.progress')
+      .andWhere('pb.progress', '<', assignmentCount);
+  }
+
+  async assignmentCount(profileId: string, knex = this.knex) {
+    const [data]: any[] = await knex
+      .count('id')
+      .from(this.assignments)
+      .where('profile_id', profileId);
+    return +data.count || 0;
   }
 }
