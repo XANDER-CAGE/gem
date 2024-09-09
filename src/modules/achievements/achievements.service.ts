@@ -14,6 +14,7 @@ import { BadgeService } from '../badge/badge.service';
 import { TransactionService } from '../transaction/transaction.service';
 import { CoreApiResponse } from 'src/common/response-class/core-api.response';
 import { IGetAGrades } from './interfaces/getgrades.interface';
+import { LevelService } from '../level/level.service';
 
 @Injectable()
 export class AchievementsService {
@@ -22,6 +23,7 @@ export class AchievementsService {
     private readonly profileService: StudentProfilesService,
     private readonly badgeService: BadgeService,
     private readonly transactionService: TransactionService,
+    private readonly levelService: LevelService,
     @InjectConnection() private readonly knex: Knex,
   ) {}
   async create(dto: CreateAchievementDto) {
@@ -103,12 +105,11 @@ export class AchievementsService {
       const achievement = await this.findOneByType('assignment', trx);
       if (!achievement) throw new NotFoundException('No assignment found');
       const profile = await this.profileService.findOne(profileId);
+      let earnedGem = +profile.gem;
       const assignmentCount = await this.badgeService.assignmentCount(
         profileId,
         trx,
       );
-      console.log('count ', assignmentCount);
-
       if (!assignmentCount) {
         const badges = await this.badgeService.getByAchievement(
           achievement.id,
@@ -124,9 +125,15 @@ export class AchievementsService {
               },
               trx,
             );
+            earnedGem += +badge.reward_gem;
             await this.profileService.update(
               profile.id,
               { gem: profile.gem + +badge.reward_gem },
+              trx,
+            );
+            await this.levelService.connectReachedLevels(
+              profile.id,
+              earnedGem,
               trx,
             );
           }
@@ -139,8 +146,6 @@ export class AchievementsService {
         assignmentCount + 1,
         trx,
       );
-      console.log('badge count:', badges.length);
-
       for (const badge of badges) {
         if (+badge.user_progress + 1 == +badge.progress) {
           await this.transactionService.createEarning({
@@ -148,6 +153,7 @@ export class AchievementsService {
             total_gem: +badge.reward_gem,
             badge_id: badge.id,
           });
+          earnedGem += +badge.reward_gem;
           await this.profileService.update(
             profile.id,
             { gem: profile.gem + +badge.reward_gem },
@@ -161,6 +167,7 @@ export class AchievementsService {
           trx,
         );
       }
+      await this.levelService.connectReachedLevels(profile.id, earnedGem, trx);
     });
   }
 }
