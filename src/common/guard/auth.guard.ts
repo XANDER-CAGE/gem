@@ -11,11 +11,13 @@ import { Reflector } from '@nestjs/core';
 import { StudentProfilesService } from 'src/modules/student-profiles/student-profiles.service';
 import { UsersService } from 'src/modules/users/users.service';
 import { Role } from '../enum/role.enum';
+import { LevelService } from 'src/modules/level/level.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   @Inject() private readonly userService: UsersService;
   @Inject() private readonly profileService: StudentProfilesService;
+  @Inject() private readonly levelService: LevelService;
 
   constructor(private reflector: Reflector) {}
 
@@ -39,6 +41,7 @@ export class AuthGuard implements CanActivate {
       user.profile = await this.profileService.create({
         student_id: user.id,
       });
+      await this.levelService.connectReachedLevels(user.profile.id, 0);
     }
     request.user = user;
     request.profile = user.profile;
