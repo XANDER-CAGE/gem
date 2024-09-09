@@ -89,7 +89,7 @@ export class StudentProfilesRepo {
         'st.last_name',
         'st.avatar',
         'l.name',
-        'l.level as stage',
+        knex.raw('COALESCE(l.level, 1) as stage'),
         'sp.*',
         'st.gender',
         knex.raw(
