@@ -87,7 +87,7 @@ export class HomeController {
     return CoreApiResponse.success(null);
   }
 
-  @Cron('0 42 9 * * *')
+  @Cron('0 0 10 * * *')
   async handleGradeCron() {
     await this.attendanceService.attendanceCron();
     await this.homeService.handleGradeCron();
