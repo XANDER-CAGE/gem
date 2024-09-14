@@ -1,16 +1,7 @@
-import {
-  Body,
-  Controller,
-  Post,
-  Req,
-  UploadedFile,
-  UseGuards,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiBody,
-  ApiConsumes,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -26,10 +17,9 @@ import { Cron } from '@nestjs/schedule';
 import { DeleteApiResponse } from 'src/common/response-class/all-null.response';
 import { ErrorApiResponse } from 'src/common/response-class/error.response';
 import { CoreApiResponse } from 'src/common/response-class/core-api.response';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { BufferedFile } from 'src/common/interface/buffered-file.interface';
 import { LeadershipService } from '../leadership/leadership.service';
 import { AttendanceService } from '../attendance/attendance.service';
+import { UploadHomeworkDto } from './dto/upload-homework.dto';
 
 @ApiTags('Home')
 @ApiBearerAuth()
@@ -67,23 +57,10 @@ export class HomeController {
     return CoreApiResponse.success(null);
   }
 
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        file: {
-          type: 'string',
-          format: 'binary',
-        },
-      },
-    },
-  })
   @Post('upload/homework')
   @Roles(Role.student)
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadHomework(@UploadedFile() file: BufferedFile, @Req() req: IMyReq) {
-    await this.homeService.uploadHomework(file, req.user.id, req.profile.id);
+  async uploadHomework(@Body() dto: UploadHomeworkDto, @Req() req: IMyReq) {
+    await this.homeService.uploadHomework(dto, req.user.id, req.profile.id);
     return CoreApiResponse.success(null);
   }
 

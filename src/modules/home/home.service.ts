@@ -14,9 +14,8 @@ import { CoreApiResponse } from 'src/common/response-class/core-api.response';
 import { BuyProductDto } from '../market-products/dto/buy.product.dto';
 import { StudentProfileEntity } from '../student-profiles/entity/student-profile.entity';
 import { ProductsService } from '../market-products/market-products.service';
-import { BufferedFile } from 'src/common/interface/buffered-file.interface';
-import { FileService } from '../file/file.service';
 import { AssignmentRepo } from './repo/assignment.repo';
+import { UploadHomeworkDto } from './dto/upload-homework.dto';
 
 @Injectable()
 export class HomeService {
@@ -28,7 +27,6 @@ export class HomeService {
     private readonly badgeService: BadgeService,
     private readonly achievementsService: AchievementsService,
     private readonly productService: ProductsService,
-    private readonly fileService: FileService,
     private readonly assignmentRepo: AssignmentRepo,
   ) {}
 
@@ -147,16 +145,15 @@ export class HomeService {
   }
 
   async uploadHomework(
-    file: BufferedFile,
+    dto: UploadHomeworkDto,
     userId: string,
     profileId: string,
     knex = this.knex,
   ) {
     return await knex.transaction(async (trx) => {
-      const uploadedFile = await this.fileService.upload(file, userId, trx);
+      // const uploadedFile = await this.fileService.upload(file, userId, trx);
       await this.achievementsService.assignment(profileId, trx);
-      await this.assignmentRepo.create(uploadedFile.id, profileId, trx);
-      return uploadedFile;
+      await this.assignmentRepo.create(dto.file_id, profileId, trx);
     });
   }
 }
