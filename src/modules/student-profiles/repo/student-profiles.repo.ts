@@ -106,7 +106,7 @@ export class StudentProfilesRepo {
         ) as current_level_reward_point`),
         knex.raw(`
       (
-        select lv_next.reward_point 
+        select (lv_next.reward_point - gem)::double precision
         from ${this.levels_table} as lv_next 
         where lv_next.level = l.level + 1
         limit 1

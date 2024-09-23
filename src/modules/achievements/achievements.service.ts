@@ -100,7 +100,7 @@ export class AchievementsService {
     return await this.achievementRepo.findOnByType(type, knex);
   }
 
-  async assignment(profileId: string, knex = this.knex) {
+  async  assignment(profileId: string, knex = this.knex) {
     await knex.transaction(async (trx) => {
       const achievement = await this.findOneByType('assignment', trx);
       if (!achievement) throw new NotFoundException('No assignment found');
