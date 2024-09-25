@@ -55,6 +55,7 @@ export class StreaksRepo {
           '*',
           'streak_reward::double precision as streak_reward',
           `((select count(*) from ${this.table} where deleted_at is null) = level) as is_last`,
+          `'deprecated' as channel_id`,
         ]),
       )
       .from(`${this.table}`)
