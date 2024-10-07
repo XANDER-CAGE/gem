@@ -13,4 +13,8 @@ export class LeadershipService {
   async listOfLeadershipBySchool(dto: LimitWithTopListDto, profile_id: string) {
     return await this.leadershipRepo.findTopListBySchool(dto, profile_id);
   }
+
+  async topListByAllSchools(){
+    return await this.leadershipRepo.topListByAllSchools();
+  }
 }

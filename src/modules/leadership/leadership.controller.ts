@@ -14,6 +14,7 @@ import { Roles } from 'src/common/decorator/roles.decorator';
 import { Role } from 'src/common/enum/role.enum';
 import { IMyReq } from 'src/common/interface/my-req.interface';
 import { CoreApiResponse } from 'src/common/response-class/core-api.response';
+import { Public } from 'src/common/decorator/public.decorator';
 
 @ApiTags('Leadership')
 @ApiBearerAuth()
@@ -35,6 +36,15 @@ export class LeadershipController {
       dto,
       req.profile.id,
     );
+    return CoreApiResponse.success(data);
+  }
+
+  @Public()
+  @ApiOperation({ summary: 'Top 20 list by all schools( Overall 100)' })
+  @Get('/topListAllSchools')
+  @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
+  async topListByAllSchools() {
+    const data = await this.leadershipService.topListByAllSchools();
     return CoreApiResponse.success(data);
   }
 }
