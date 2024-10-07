@@ -8,7 +8,10 @@ import {
 } from '@nestjs/swagger';
 
 import { ErrorApiResponse } from 'src/common/response-class/error.response';
-import { LimitWithTopListDto } from './dto/create-leadership.dto';
+import {
+  LimitWithTopListDto,
+  SchoolsTypeDto,
+} from './dto/create-leadership.dto';
 import { RolesGuard } from 'src/common/guard/roles.guard';
 import { Roles } from 'src/common/decorator/roles.decorator';
 import { Role } from 'src/common/enum/role.enum';
@@ -43,8 +46,10 @@ export class LeadershipController {
   @ApiOperation({ summary: 'Top 20 list by all schools( Overall 100)' })
   @Get('/topListAllSchools')
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
-  async topListByAllSchools() {
-    const data = await this.leadershipService.topListByAllSchools();
+  async topListByAllSchools(@Query() dto: SchoolsTypeDto) {
+    const data = await this.leadershipService.topListByAllSchools(
+      dto.school_type,
+    );
     return CoreApiResponse.success(data);
   }
 }

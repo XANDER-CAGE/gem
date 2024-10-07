@@ -8,7 +8,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { LeadershipEnum } from '../enum/leadership.enum';
+import { LeadershipEnum, SchoolsEnum } from '../enum/leadership.enum';
 
 export class CreateLeadershipDto {
   @ApiProperty({ example: '507f1f77bcf86cd799439011' })
@@ -42,4 +42,10 @@ export class LimitWithTopListDto {
   @ApiProperty({ example: LeadershipEnum.BY_GEM, enum: LeadershipEnum })
   @IsEnum(LeadershipEnum)
   top_type: LeadershipEnum;
+}
+
+export class SchoolsTypeDto {
+  @ApiProperty({ example: SchoolsEnum.BUSINESS_SCHOOL, enum: SchoolsEnum })
+  @IsEnum(SchoolsEnum)
+  school_type: SchoolsEnum;
 }

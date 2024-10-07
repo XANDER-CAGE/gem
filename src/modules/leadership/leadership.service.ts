@@ -14,7 +14,7 @@ export class LeadershipService {
     return await this.leadershipRepo.findTopListBySchool(dto, profile_id);
   }
 
-  async topListByAllSchools(){
-    return await this.leadershipRepo.topListByAllSchools();
+  async topListByAllSchools(school: string) {
+    return await this.leadershipRepo.topListByAllSchools(school);
   }
 }
