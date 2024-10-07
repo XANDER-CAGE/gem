@@ -177,7 +177,7 @@ export class LeadershipRepo {
     return { top: await data, me };
   }
 
-  async topListByAllSchools(knex = this.knex) {
+  async topListByAllSchools(school: string, knex = this.knex) {
     return await knex
       .with('ranked_students', (qb) => {
         qb.select(
@@ -194,7 +194,8 @@ export class LeadershipRepo {
           .from('gamification.student_profiles as g')
           .leftJoin('students as s', 'g.student_id', 's.id')
           .leftJoin('grade.schools as sch', 'sch.id', 's.school_id')
-          .whereNotNull('s.school_id');
+          .whereNotNull('s.school_id')
+          .andWhere('sch.title', school);
       })
       .select('first_name', 'last_name', 'uid', 'school_id', 'gem', 'title')
       .from('ranked_students')
