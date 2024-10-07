@@ -176,4 +176,32 @@ export class LeadershipRepo {
       : data.orderBy('rp.position_by_earning');
     return { top: await data, me };
   }
+
+  async topListByAllSchools(knex = this.knex) {
+    return await knex
+      .with('ranked_students', (qb) => {
+        qb.select(
+          's.first_name',
+          's.last_name',
+          's.uid',
+          's.school_id',
+          'g.gem',
+          'sch.title',
+          knex.raw(
+            'ROW_NUMBER() OVER (PARTITION BY s.school_id ORDER BY g.gem DESC) AS rn',
+          ),
+        )
+          .from('gamification.student_profiles as g')
+          .leftJoin('students as s', 'g.student_id', 's.id')
+          .leftJoin('grade.schools as sch', 'sch.id', 's.school_id')
+          .whereNotNull('s.school_id');
+      })
+      .select('first_name', 'last_name', 'uid', 'school_id', 'gem', 'title')
+      .from('ranked_students')
+      .where('rn', '<=', 20)
+      .orderBy([
+        { column: 'school_id', order: 'asc' },
+        { column: 'gem', order: 'desc' },
+      ]);
+  }
 }
