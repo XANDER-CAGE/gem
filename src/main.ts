@@ -11,6 +11,14 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['error', 'fatal', 'warn', 'verbose'],
   });
+  
+  app.enableCors({
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+  });
+
   app.setGlobalPrefix('api');
   if (env.isDevelopment || env.isTest) {
     const document = SwaggerModule.createDocument(app, swaggerConfig, {
