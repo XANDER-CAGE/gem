@@ -108,6 +108,8 @@ export class AttendanceService {
 
   async attendanceCron() {
     const datas = await this.getAttendances();
+    console.log('DATA LENGTH: ', datas.length);
+
     for (const data of datas) {
       await this.assignAttendance(data.student_id, data.daily_strike_status);
     }

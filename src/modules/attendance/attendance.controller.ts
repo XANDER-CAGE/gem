@@ -4,6 +4,7 @@ import {
   Body,
   NotFoundException,
   NotAcceptableException,
+  UseGuards,
 } from '@nestjs/common';
 import { AttendanceService } from './attendance.service';
 import {
@@ -19,6 +20,7 @@ import { ErrorApiResponse } from 'src/common/response-class/error.response';
 import { CoreApiResponse } from 'src/common/response-class/core-api.response';
 import { AssignAttendance } from './dto/assign-attendance.dto';
 import { StudentProfilesService } from '../student-profiles/student-profiles.service';
+import { RolesGuard } from 'src/common/guard/roles.guard';
 
 @ApiTags('Attendance')
 @ApiBearerAuth()
@@ -30,6 +32,7 @@ export class AttendanceController {
   ) {}
 
   @ApiOperation({ summary: 'Assign attendance' })
+  @UseGuards(RolesGuard)
   @Roles(Role.app_admin)
   @Post('assign')
   @ApiOkResponse({ type: DeleteApiResponse, status: 200 })
