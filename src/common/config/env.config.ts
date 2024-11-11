@@ -17,4 +17,7 @@ export const env = cleanEnv(process.env, {
   MINIO_PORT: num(),
   MINIO_SECRET_KEY: str(),
   MINIO_BUCKET: str(),
+  REDIS_HOST: str(),
+  REDIS_PORT: num(),
+  REDIS_PASS: str(),
 });

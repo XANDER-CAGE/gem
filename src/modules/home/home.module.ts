@@ -8,10 +8,10 @@ import { BadgeModule } from '../badge/badge.module';
 import { AchievementsModule } from '../achievements/achievements.module';
 import { MarketProductsModule } from '../market-products/market-products.module';
 import { FileModule } from '../file/file.module';
-import { AssignmentRepo } from './repo/assignment.repo';
 import { HomeController } from './home.controller';
 import { LeadershipModule } from '../leadership/leadership.module';
 import { AttendanceModule } from '../attendance/attendance.module';
+import { AssignmentRepo } from './repo/assignment.repo';
 
 @Module({
   imports: [
@@ -28,5 +28,6 @@ import { AttendanceModule } from '../attendance/attendance.module';
   ],
   controllers: [HomeController],
   providers: [HomeService, AssignmentRepo],
+  exports: [HomeService],
 })
 export class HomeModule {}
