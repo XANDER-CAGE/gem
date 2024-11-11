@@ -101,7 +101,7 @@ export class TransactionService {
     if (!profile) throw new NotFoundException('Profile not found');
     const product = await this.productService.findOne(dto.product_id);
     if (!product) throw new NotFoundException('Product not found');
-    totalGem += product.price * dto.count;
+    totalGem += product.price;
     return totalGem
       ? await this.transactionRepo.createSpending(
           {

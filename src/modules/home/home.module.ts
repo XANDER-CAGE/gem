@@ -28,5 +28,6 @@ import { AttendanceModule } from '../attendance/attendance.module';
   ],
   controllers: [HomeController],
   providers: [HomeService, AssignmentRepo],
+  exports: [HomeService],
 })
 export class HomeModule {}
