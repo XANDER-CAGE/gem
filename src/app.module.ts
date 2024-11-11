@@ -20,6 +20,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { FileModule } from './modules/file/file.module';
 import { AttendanceModule } from './modules/attendance/attendance.module';
 import { CartModule } from './modules/cart/cart.module';
+import { QueueModule } from './modules/queue/queue.module';
 
 //leadership module
 @Module({
@@ -44,6 +45,7 @@ import { CartModule } from './modules/cart/cart.module';
     FileModule,
     AttendanceModule,
     CartModule,
+    QueueModule,
   ],
   providers: [
     {

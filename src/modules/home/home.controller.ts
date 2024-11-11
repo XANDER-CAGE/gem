@@ -13,12 +13,9 @@ import { IMyReq } from 'src/common/interface/my-req.interface';
 import { RolesGuard } from 'src/common/guard/roles.guard';
 import { Role } from 'src/common/enum/role.enum';
 import { Roles } from 'src/common/decorator/roles.decorator';
-import { Cron } from '@nestjs/schedule';
 import { DeleteApiResponse } from 'src/common/response-class/all-null.response';
 import { ErrorApiResponse } from 'src/common/response-class/error.response';
 import { CoreApiResponse } from 'src/common/response-class/core-api.response';
-import { LeadershipService } from '../leadership/leadership.service';
-import { AttendanceService } from '../attendance/attendance.service';
 import { UploadHomeworkDto } from './dto/upload-homework.dto';
 
 @ApiTags('Home')
@@ -26,11 +23,7 @@ import { UploadHomeworkDto } from './dto/upload-homework.dto';
 @UseGuards(RolesGuard)
 @Controller()
 export class HomeController {
-  constructor(
-    private readonly homeService: HomeService,
-    private readonly leadershipService: LeadershipService,
-    private readonly attendanceService: AttendanceService,
-  ) {}
+  constructor(private readonly homeService: HomeService) {}
 
   @ApiOperation({ summary: 'Assign achievement' })
   @ApiBody({ type: AssignAchievementDto })
@@ -62,12 +55,5 @@ export class HomeController {
   async uploadHomework(@Body() dto: UploadHomeworkDto, @Req() req: IMyReq) {
     await this.homeService.uploadHomework(dto, req.user.id, req.profile.id);
     return CoreApiResponse.success(null);
-  }
-
-  @Cron('0 0 12 * * *')
-  async handleGradeCron() {
-    await this.attendanceService.attendanceCron();
-    await this.homeService.handleGradeCron();
-    await this.leadershipService.saveLeadership();
   }
 }
