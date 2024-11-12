@@ -24,13 +24,38 @@ export class CartRepo {
       .returning('*');
   }
 
+  //   "name": "book2",
+  // "description": null,
+  // "avatar": null,
+  // "type": null,
+  // "price": "200.00",
+  // "remaining_count": 5,
+  // "limited": false,
+  // "type_item": "item"
   async add(product_id: string, profile_id: string, knex = this.knex) {
-    return await knex(this.table)
-      .where('profile_id', profile_id)
-      .andWhere('product_id', product_id)
-      .whereNull('deleted_at')
-      .increment('count', 1)
-      .returning('*');
+    await knex(`${this.table} as c`)
+      .where('c.profile_id', profile_id)
+      .andWhere('c.product_id', product_id)
+      .whereNull('c.deleted_at')
+      .increment('count', 1);
+
+    const result = await knex(`${this.table} as c`)
+      .select([
+        'c.*',
+        'mp.name',
+        'mp.description',
+        'mp.avatar',
+        'mp.type',
+        'mp.price',
+        'mp.limited',
+        knex.raw('c.count * mp.price AS overall_price'),
+      ])
+      .leftJoin(`${this.productTable} as mp`, 'c.product_id', 'mp.id')
+      .where('c.profile_id', profile_id)
+      .andWhere('c.product_id', product_id)
+      .whereNull('c.deleted_at');
+
+    return result;
   }
 
   async list(profile_id: string, knex = this.knex) {
@@ -65,17 +90,29 @@ export class CartRepo {
       .whereNull('deleted_at')
       .decrement('count', 1);
 
-    const reducedData = await knex(this.table)
-      .where('profile_id', profile_id)
-      .andWhere('product_id', product_id)
-      .whereNull('deleted_at')
-      .select('id', 'count')
+    const result = await knex(`${this.table} as c`)
+      .select([
+        'c.*',
+        'mp.name',
+        'mp.description',
+        'mp.avatar',
+        'mp.type',
+        'mp.price',
+        'mp.limited',
+        knex.raw('c.count * mp.price AS overall_price'),
+      ])
+      .leftJoin(`${this.productTable} as mp`, 'c.product_id', 'mp.id')
+      .where('c.profile_id', profile_id)
+      .andWhere('c.product_id', product_id)
+      .whereNull('c.deleted_at')
+      .select('c.id', 'c.count')
       .first();
 
-    if (reducedData.count === 0) {
-      await knex(this.table).where({ id: reducedData.id }).delete();
+    if (result.count === 0) {
+      await knex(this.table).where({ id: result.id }).delete();
+      return true;
     }
-    return true;
+    return result;
   }
 
   async remove(id: string, knex = this.knex) {

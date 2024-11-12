@@ -8,6 +8,7 @@ import {
   MaxLength,
   IsObject,
   IsNumber,
+  IsBoolean
 } from 'class-validator';
 
 export class CreateProductDto {
@@ -46,4 +47,12 @@ export class CreateProductDto {
   @IsOptional()
   @IsInt()
   remaining_count: number;
+
+  @ApiProperty({ example: false })
+  @IsBoolean()
+  limited: boolean;
+
+  @ApiProperty({ example: 'item' })
+  @IsString()
+  type_item: string;
 }
