@@ -28,10 +28,10 @@ export class CreateProductDto {
   @IsString()
   description?: string;
 
-  @ApiProperty({ example: '{}' })
+  @ApiProperty({ example: {} })
   @IsOptional()
   @IsObject()
-  avatar?: string;
+  avatar?: object;
 
   @ApiProperty({ example: 'Product Type' })
   @IsOptional()
@@ -51,8 +51,4 @@ export class CreateProductDto {
   @ApiProperty({ example: false })
   @IsBoolean()
   limited: boolean;
-
-  @ApiProperty({ example: 'item' })
-  @IsString()
-  type_item: string;
 }

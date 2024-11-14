@@ -45,7 +45,7 @@ import { QueueModule } from './modules/queue/queue.module';
     FileModule,
     AttendanceModule,
     CartModule,
-    QueueModule,
+    QueueModule
   ],
   providers: [
     {
