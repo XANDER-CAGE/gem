@@ -31,9 +31,7 @@ export class ProductsService {
     return this.productRepo.findAll(dto);
   }
 
-  async listWithCategories(
-    dto: FindAllCategoriesDto,
-  ): Promise<IFindAllProduct> {
+  async listWithCategories(dto: FindAllCategoriesDto) {
     return await this.productRepo.listWithCategories(dto);
   }
 
