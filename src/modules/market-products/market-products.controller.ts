@@ -87,8 +87,6 @@ export class MarketProductsController {
   @ApiOkResponse({ type: CreateMarketProductResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
   async findOne(@Param() { id }: IdDto) {
-    console.log('ma suka');
-
     const data = await this.productsService.findOne(id);
     return CoreApiResponse.success(data);
   }
@@ -114,13 +112,12 @@ export class MarketProductsController {
     return CoreApiResponse.success(null);
   }
 
-  @Roles(Role.app_admin)
+  @Roles(Role.student)
   @ApiOperation({ summary: 'Find all' })
   @Get('/list_categories')
   @ApiOkResponse({ type: ListMarketProductResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
   async listWithCategories(@Query() dto: FindAllCategoriesDto) {
-    console.log('hello');
     const { total, data } = await this.productsService.listWithCategories(dto);
     const pagination = { total, limit: dto.limit, page: dto.page };
     return CoreApiResponse.success(data, pagination);
