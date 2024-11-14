@@ -8,10 +8,9 @@ import { StudentProfilesService } from '../student-profiles/student-profiles.ser
 import { TransactionEntity } from './entity/transaction.entity';
 import { ProductsService } from '../market-products/market-products.service';
 import {
-  PaginationDto,
+  TransactionFinishedList,
   TransactionListDto,
 } from 'src/common/dto/pagination.dto';
-import { IFindAllTransaction } from './interface/find-all-transaction.interface';
 import { CreateEarningDto } from './dto/create-earning-transaction.dto';
 import { CreateSpendingDto } from './dto/create-spending-transaction.dto';
 import { InjectConnection } from 'nest-knexjs';
@@ -113,7 +112,7 @@ export class TransactionService {
       : null;
   }
 
-  findAll(dto: PaginationDto): Promise<IFindAllTransaction> {
+  findAll(dto: TransactionFinishedList) {
     return this.transactionRepo.findAll(dto);
   }
 

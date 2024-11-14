@@ -1,6 +1,9 @@
 import { Controller, Query, UseGuards, Post, Body, Req } from '@nestjs/common';
 import { TransactionService } from './transaction.service';
-import { TransactionListDto } from 'src/common/dto/pagination.dto';
+import {
+  TransactionFinishedList,
+  TransactionListDto,
+} from 'src/common/dto/pagination.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 import { ErrorApiResponse } from 'src/common/response-class/error.response';
@@ -11,6 +14,7 @@ import { Roles } from 'src/common/decorator/roles.decorator';
 import { Role } from 'src/common/enum/role.enum';
 import { CreateManualTransactionDto } from './dto/create.transaction.dto';
 import { IMyReq } from 'src/common/interface/my-req.interface';
+import { TransactionListEntity } from './entity/transaction.entity';
 
 @ApiTags('Transactions')
 @ApiBearerAuth()
@@ -42,6 +46,28 @@ export class TransactionController {
       dto,
       req.profile.id,
     );
+    const pagination = { total, limit: dto.limit, page: dto.page };
+    return CoreApiResponse.success(data, pagination);
+  }
+
+  @Roles(Role.app_admin)
+  @ApiOperation({ summary: 'Transaction List' })
+  @Post('transaction_list')
+  @ApiOkResponse({ type: TransactionListEntity, status: 200 })
+  @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
+  async transactionList(@Query() dto: TransactionFinishedList) {
+    const { total, data } = await this.transactionService.findAll(dto);
+    const pagination = { total, limit: dto.limit, page: dto.page };
+    return CoreApiResponse.success(data, pagination);
+  }
+
+  @Roles(Role.app_admin)
+  @ApiOperation({ summary: 'Transaction List' })
+  @Post('transaction_list')
+  @ApiOkResponse({ type: TransactionListEntity, status: 200 })
+  @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
+  async transactionUpdateStatus(@Query() dto: TransactionFinishedList) {
+    const { total, data } = await this.transactionService.findAll(dto);
     const pagination = { total, limit: dto.limit, page: dto.page };
     return CoreApiResponse.success(data, pagination);
   }

@@ -8,3 +8,5 @@ export class FindAllProductsDto extends PaginationDto {
   @IsOptional()
   market_id?: string;
 }
+
+export class FindAllCategoriesDto extends PaginationDto {}
