@@ -19,6 +19,7 @@ import { AuthGuard } from './common/guard/auth.guard';
 import { ScheduleModule } from '@nestjs/schedule';
 import { FileModule } from './modules/file/file.module';
 import { AttendanceModule } from './modules/attendance/attendance.module';
+import { CartModule } from './modules/cart/cart.module';
 import { QueueModule } from './modules/queue/queue.module';
 
 //leadership module
@@ -43,6 +44,7 @@ import { QueueModule } from './modules/queue/queue.module';
     LeadershipModule,
     FileModule,
     AttendanceModule,
+    CartModule,
     QueueModule,
   ],
   providers: [

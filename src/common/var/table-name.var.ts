@@ -24,4 +24,5 @@ export const tableName = {
   files: 'public.files',
   students: 'public.students',
   attendance: 'gamification.attendance',
+  cart: 'gamification.cart',
 };
