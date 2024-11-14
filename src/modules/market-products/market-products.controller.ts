@@ -30,7 +30,7 @@ import { RolesGuard } from 'src/common/guard/roles.guard';
 import { Role } from 'src/common/enum/role.enum';
 import { Roles } from 'src/common/decorator/roles.decorator';
 import { Public } from 'src/common/decorator/public.decorator';
-import { FindAllProductsDto } from './dto/find-all.product.dto';
+import { FindAllCategoriesDto, FindAllProductsDto } from './dto/find-all.product.dto';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { IMyReq } from 'src/common/interface/my-req.interface';
 
@@ -107,5 +107,16 @@ export class MarketProductsController {
   async remove(@Param() { id }: IdDto) {
     await this.productsService.remove(id);
     return CoreApiResponse.success(null);
+  }
+
+  @Roles(Role.app_admin)
+  @ApiOperation({ summary: 'Find all' })
+  @Get('/list_with_categories')
+  @ApiOkResponse({ type: ListMarketProductResponse, status: 200 })
+  @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
+  async listWithCategories(@Query() dto: FindAllCategoriesDto) {
+    const { total, data } = await this.productsService.listWithCategories(dto);
+    const pagination = { total, limit: dto.limit, page: dto.page };
+    return CoreApiResponse.success(data, pagination);
   }
 }

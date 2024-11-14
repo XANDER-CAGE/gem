@@ -6,7 +6,10 @@ import { IFindAllProduct } from './interface/market-product.interface';
 import { UpdateProductDto } from './dto/update-market-product.dto';
 import { InjectConnection } from 'nest-knexjs';
 import { Knex } from 'knex';
-import { FindAllProductsDto } from './dto/find-all.product.dto';
+import {
+  FindAllCategoriesDto,
+  FindAllProductsDto,
+} from './dto/find-all.product.dto';
 import { FindMyProductsDto } from './dto/find-my.products.dto';
 
 @Injectable()
@@ -26,6 +29,12 @@ export class ProductsService {
 
   async findAll(dto: FindAllProductsDto): Promise<IFindAllProduct> {
     return this.productRepo.findAll(dto);
+  }
+
+  async listWithCategories(
+    dto: FindAllCategoriesDto,
+  ): Promise<IFindAllProduct> {
+    return await this.productRepo.listWithCategories(dto);
   }
 
   async findMy(dto: FindMyProductsDto): Promise<IFindAllProduct> {

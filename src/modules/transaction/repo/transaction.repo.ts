@@ -3,7 +3,7 @@ import { InjectConnection } from 'nest-knexjs';
 import { TransactionEntity } from '../entity/transaction.entity';
 import { ICreateSpending } from '../interface/create-spending-transaction.interface';
 import {
-  PaginationDto,
+  TransactionFinishedList,
   TransactionListDto,
 } from 'src/common/dto/pagination.dto';
 import { IFindAllTransaction } from '../interface/find-all-transaction.interface';
@@ -58,16 +58,51 @@ export class TransactionRepo {
   }
 
   async findAll(
-    dto: PaginationDto,
+    dto: TransactionFinishedList,
     knex = this.knex,
   ): Promise<IFindAllTransaction> {
-    const { limit = 10, page = 1 } = dto;
-    const innerQuery = knex(this.transactionTable)
-      .select('*')
-      .where('deleted_at', null)
+    const { limit = 10, page = 1, start_date, end_date, name, uid } = dto;
+
+    const innerQuery = knex('gamification.transactions as t')
+      .select([
+        't.id',
+        's.uid',
+        knex.raw("concat(s.first_name, ' ', s.last_name) as full_name"),
+        'mp.name',
+        't.total_gem',
+        't.status',
+        't.created_at',
+      ])
+      .leftJoin('gamification.student_profiles as st', 't.profile_id', 'st.id')
+      .leftJoin('students as s', 's.id', 'st.student_id')
+      .leftJoin('gamification.market_products as mp', 't.product_id', 'mp.id')
+      .whereNull('t.deleted_at');
+
+    if (start_date && end_date) {
+      innerQuery.whereBetween('t.created_at', [start_date, end_date]);
+    } else if (start_date) {
+      innerQuery.where('t.created_at', '>=', start_date);
+    } else if (end_date) {
+      innerQuery.where('t.created_at', '<=', end_date);
+    }
+
+    if (name) {
+      innerQuery.where(
+        knex.raw("LOWER(concat(s.first_name, ' ', s.last_name))"),
+        'like',
+        `%${name.toLowerCase()}%`,
+      );
+    }
+
+    if (uid) {
+      innerQuery.where('s.uid', uid);
+    }
+
+    innerQuery
       .limit(limit)
       .offset((page - 1) * limit)
       .as('c');
+
     const [{ total, data }] = await knex
       .select([
         knex.raw(
