@@ -24,14 +24,6 @@ export class CartRepo {
       .returning('*');
   }
 
-  //   "name": "book2",
-  // "description": null,
-  // "avatar": null,
-  // "type": null,
-  // "price": "200.00",
-  // "remaining_count": 5,
-  // "limited": false,
-  // "type_item": "item"
   async add(product_id: string, profile_id: string, knex = this.knex) {
     await knex(`${this.table} as c`)
       .where('c.profile_id', profile_id)
@@ -44,7 +36,7 @@ export class CartRepo {
       .whereNull('c.deleted_at')
       .returning('c.*');
 
-    const total_price = count.reduce((sum, item) => sum + item.count, 0);
+    const total_count = count.reduce((sum, item) => sum + item.count, 0);
 
     const result = await knex(`${this.table} as c`)
       .select([
@@ -56,12 +48,15 @@ export class CartRepo {
         'mp.price',
         'mp.limited',
         knex.raw('c.count * mp.price AS overall_price'),
-        `${total_price} as total_count`,
       ])
       .leftJoin(`${this.productTable} as mp`, 'c.product_id', 'mp.id')
       .where('c.profile_id', profile_id)
       .andWhere('c.product_id', product_id)
-      .whereNull('c.deleted_at');
+      .whereNull('c.deleted_at')
+      .select('c.id', 'c.count')
+      .first();
+
+    result.total_count = total_count;
 
     return result;
   }
@@ -76,7 +71,14 @@ export class CartRepo {
   async findAll(profile_id: string, knex = this.knex) {
     const items = await knex(`${this.table} as c`)
       .leftJoin(`${this.productTable} as mp`, 'c.product_id', 'mp.id')
-      .select('mp.name', 'mp.avatar', 'mp.description', 'mp.price', 'c.count')
+      .select(
+        'mp.id',
+        'mp.name',
+        'mp.avatar',
+        'mp.description',
+        'mp.price',
+        'c.count',
+      )
       .where('c.profile_id', profile_id)
       .whereNull('c.deleted_at');
 
@@ -85,9 +87,12 @@ export class CartRepo {
       0,
     );
 
+    const total_count = items.reduce((sum, item) => sum + item.count, 0);
+
     return {
       items,
       total_price,
+      total_count,
     };
   }
 

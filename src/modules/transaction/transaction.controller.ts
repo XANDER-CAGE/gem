@@ -12,7 +12,10 @@ import { CoreApiResponse } from 'src/common/response-class/core-api.response';
 import { RolesGuard } from 'src/common/guard/roles.guard';
 import { Roles } from 'src/common/decorator/roles.decorator';
 import { Role } from 'src/common/enum/role.enum';
-import { CreateManualTransactionDto } from './dto/create.transaction.dto';
+import {
+  CreateManualTransactionDto,
+  TransactionUpdateStatus,
+} from './dto/create.transaction.dto';
 import { IMyReq } from 'src/common/interface/my-req.interface';
 import { TransactionListEntity } from './entity/transaction.entity';
 
@@ -55,20 +58,19 @@ export class TransactionController {
   @Post('transaction_list')
   @ApiOkResponse({ type: TransactionListEntity, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
-  async transactionList(@Query() dto: TransactionFinishedList) {
+  async transactionList(@Body() dto: TransactionFinishedList) {
     const { total, data } = await this.transactionService.findAll(dto);
     const pagination = { total, limit: dto.limit, page: dto.page };
     return CoreApiResponse.success(data, pagination);
   }
 
   @Roles(Role.app_admin)
-  @ApiOperation({ summary: 'Transaction List' })
-  @Post('transaction_list')
-  @ApiOkResponse({ type: TransactionListEntity, status: 200 })
+  @ApiOperation({ summary: 'Transaction U' })
+  @Post('transaction_update')
+  @ApiOkResponse({ type: TransactionUpdateStatus, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
-  async transactionUpdateStatus(@Query() dto: TransactionFinishedList) {
-    const { total, data } = await this.transactionService.findAll(dto);
-    const pagination = { total, limit: dto.limit, page: dto.page };
-    return CoreApiResponse.success(data, pagination);
+  async transactionUpdateStatus(@Body() dto: TransactionUpdateStatus) {
+    const data = await this.transactionService.updateStatus(dto);
+    return CoreApiResponse.success(data);
   }
 }
