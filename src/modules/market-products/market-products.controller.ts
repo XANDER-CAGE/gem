@@ -117,8 +117,14 @@ export class MarketProductsController {
   @Get('/list_categories')
   @ApiOkResponse({ type: ListMarketProductResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
-  async listWithCategories(@Query() dto: FindAllCategoriesDto) {
-    const { total, data } = await this.productsService.listWithCategories(dto);
+  async listWithCategories(
+    @Query() dto: FindAllCategoriesDto,
+    @Req() req: IMyReq,
+  ) {
+    const { total, data } = await this.productsService.listWithCategories(
+      dto,
+      req.profile.id,
+    );
     const pagination = { total, limit: dto.limit, page: dto.page };
     return CoreApiResponse.success(data, pagination);
   }

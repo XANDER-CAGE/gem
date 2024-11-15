@@ -62,15 +62,38 @@ export class ProductRepo {
 
   async listWithCategories(
     dto: FindAllCategoriesDto,
+    profile_id: string,
     knex = this.knex,
   ) {
     const { limit = 10, page = 1 } = dto;
 
     const innerQuery = knex('gamification.market_products as mp')
-      .select(['m.name as category', knex.raw('json_agg(mp.*) as products')])
+      .select([
+        'm.name as category',
+        knex.raw(`json_agg(
+      json_build_object(
+        'id', mp.id,
+        'name', mp.name,
+        'description', mp.description,
+        'avatar', mp.avatar,
+        'type', mp.type,
+        'price', mp.price,
+        'limited', mp.limited,
+        'count', COALESCE(c.count, 0)
+      )
+    ) AS products`),
+      ])
       .leftJoin('gamification.markets as m', 'mp.market_id', 'm.id')
+      .leftJoin('gamification.cart as c', function () {
+        this.on('c.product_id', '=', 'mp.id').andOn(
+          'c.profile_id',
+          '=',
+          knex.raw('?', [profile_id]),
+        );
+      })
       .whereNull('mp.deleted_at')
       .whereNull('m.deleted_at')
+      .whereNull('c.deleted_at')
       .groupBy('m.name')
       .limit(limit)
       .offset((page - 1) * limit)

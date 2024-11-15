@@ -15,7 +15,7 @@ import { CreateEarningDto } from './dto/create-earning-transaction.dto';
 import { CreateSpendingDto } from './dto/create-spending-transaction.dto';
 import { InjectConnection } from 'nest-knexjs';
 import { Knex } from 'knex';
-import { CreateManualTransactionDto } from './dto/create.transaction.dto';
+import { CreateManualTransactionDto, TransactionUpdateStatus } from './dto/create.transaction.dto';
 import { LevelService } from '../level/level.service';
 
 @Injectable()
@@ -112,8 +112,12 @@ export class TransactionService {
       : null;
   }
 
-  findAll(dto: TransactionFinishedList) {
-    return this.transactionRepo.findAll(dto);
+  async findAll(dto: TransactionFinishedList) {
+    return await this.transactionRepo.findAll(dto);
+  }
+
+  async updateStatus(dto: TransactionUpdateStatus) {
+    return await this.transactionRepo.updateStatus(dto);
   }
 
   async findOne(id: string): Promise<TransactionEntity> {
