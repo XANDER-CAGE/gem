@@ -18,9 +18,36 @@ export class CartRepo {
   }
 
   async create(data: CreateCartDto, profile_id: string, knex = this.knex) {
-    const [result] = await knex(this.table)
+    const [newCartItem] = await knex(this.table)
       .insert({ ...data, profile_id })
       .returning('*');
+
+    const count = await knex(`${this.table} as c`)
+      .where('c.profile_id', profile_id)
+      .whereNull('c.deleted_at')
+      .select('c.*');
+
+    const total_count = count.reduce((sum, item) => sum + item.count, 0);
+
+    const result = await knex(`${this.table} as c`)
+      .select([
+        'c.*',
+        'mp.name',
+        'mp.description',
+        'mp.avatar',
+        'mp.type',
+        'mp.price',
+        'mp.limited',
+        knex.raw('c.count * mp.price AS overall_price'),
+      ])
+      .leftJoin(`${this.productTable} as mp`, 'c.product_id', 'mp.id')
+      .where('c.profile_id', profile_id)
+      .andWhere('c.product_id', newCartItem.product_id)
+      .whereNull('c.deleted_at')
+      .select('c.id', 'c.count')
+      .first();
+
+    result.total_count = total_count;
 
     return result;
   }
