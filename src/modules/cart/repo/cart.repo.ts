@@ -18,10 +18,11 @@ export class CartRepo {
   }
 
   async create(data: CreateCartDto, profile_id: string, knex = this.knex) {
-    return await knex
+    const [result] = await knex(this.table)
       .insert({ ...data, profile_id })
-      .into(this.table)
       .returning('*');
+
+    return result;
   }
 
   async add(product_id: string, profile_id: string, knex = this.knex) {
@@ -132,7 +133,9 @@ export class CartRepo {
 
     if (result.count === 0) {
       await knex(this.table).where({ id: result.id }).delete();
-      return true;
+      return {
+        count: 0,
+      };
     }
 
     return result;
