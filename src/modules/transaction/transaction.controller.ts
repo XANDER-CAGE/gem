@@ -65,7 +65,7 @@ export class TransactionController {
   }
 
   @Roles(Role.app_admin)
-  @ApiOperation({ summary: 'Transaction U' })
+  @ApiOperation({ summary: 'Transaction Update' })
   @Post('transaction_update')
   @ApiOkResponse({ type: TransactionUpdateStatus, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })

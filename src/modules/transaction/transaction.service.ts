@@ -15,8 +15,12 @@ import { CreateEarningDto } from './dto/create-earning-transaction.dto';
 import { CreateSpendingDto } from './dto/create-spending-transaction.dto';
 import { InjectConnection } from 'nest-knexjs';
 import { Knex } from 'knex';
-import { CreateManualTransactionDto, TransactionUpdateStatus } from './dto/create.transaction.dto';
+import {
+  CreateManualTransactionDto,
+  TransactionUpdateStatus,
+} from './dto/create.transaction.dto';
 import { LevelService } from '../level/level.service';
+import { TransactionStatusEnum } from './enum/transaction.history.enum';
 
 @Injectable()
 export class TransactionService {
@@ -117,7 +121,13 @@ export class TransactionService {
   }
 
   async updateStatus(dto: TransactionUpdateStatus) {
-    return await this.transactionRepo.updateStatus(dto);
+    if (dto.status === TransactionStatusEnum.REFUND) {
+      await this.createManual(
+        { uid: dto.uid, amount: dto.amount },
+        dto.student_id,
+      );
+    }
+    return await this.transactionRepo.updateStatus(dto.id, dto.status);
   }
 
   async findOne(id: string): Promise<TransactionEntity> {
