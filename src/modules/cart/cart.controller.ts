@@ -26,7 +26,7 @@ export class CartController {
   }
 
   @ApiOperation({ summary: 'Reduce number of products' })
-  @Patch('/reduce:product_id')
+  @Patch('/reduce/:product_id')
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
   async update(@Param('product_id') product_id: string, @Req() req: IMyReq) {
     return await this.cartService.reduce(product_id, req.profile.id);

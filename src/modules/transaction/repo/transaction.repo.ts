@@ -90,32 +90,29 @@ export class TransactionRepo {
 
     if (name) {
       innerQuery.where(
-        knex.raw("LOWER(concat(s.first_name, ' ', s.last_name))"),
+        knex.raw('LOWER(mp.name)'),
         'like',
         `%${name.toLowerCase()}%`,
       );
     }
 
     if (uid) {
-      innerQuery.where('s.uid', uid);
+      innerQuery.where('t.uid', uid);
     }
 
-    innerQuery
+    const [{ total }] = await knex(innerQuery.clone().as('count_query')).count(
+      'id as total',
+    );
+
+    const data: any = await innerQuery
       .limit(limit)
       .offset((page - 1) * limit)
-      .as('c');
+      .then((rows) => rows);
 
-    const [{ total, data }] = await knex
-      .select([
-        knex.raw(
-          '(SELECT COUNT(id) FROM ?? WHERE deleted_at is null) AS total',
-          this.transactionTable,
-        ),
-        knex.raw('jsonb_agg(c.*) AS data'),
-      ])
-      .from(innerQuery);
-
-    return { total: +total, data };
+    return {
+      total: +total,
+      data,
+    };
   }
 
   async findOne(id: string, knex = this.knex): Promise<TransactionEntity> {
@@ -185,7 +182,5 @@ export class TransactionRepo {
     return { total: +total, data: data };
   }
 
-  async updateStatus({ id, status }: TransactionUpdateStatus) {
-    
-  }
+  async updateStatus({ id, status }: TransactionUpdateStatus) {}
 }

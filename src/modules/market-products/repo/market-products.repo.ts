@@ -78,8 +78,13 @@ export class ProductRepo {
         'avatar', mp.avatar,
         'type', mp.type,
         'price', mp.price,
+        'remaining_count', mp.remaining_count,
         'limited', mp.limited,
-        'count', COALESCE(c.count, 0)
+        'count', COALESCE(c.count, 0),
+        'is_new', CASE 
+                    WHEN mp.created_at >= now() - interval '3 days' THEN true
+                    ELSE false
+                  END
       )
     ) AS products`),
       ])
