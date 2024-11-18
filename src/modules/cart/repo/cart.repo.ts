@@ -73,9 +73,9 @@ export class CartRepo {
         'mp.description',
         'mp.avatar',
         'mp.type',
-        'mp.price',
+        knex.raw('CAST(mp.price AS INTEGER) AS price'),
         'mp.limited',
-        knex.raw('c.count * mp.price AS overall_price'),
+        knex.raw('CAST(c.count * mp.price AS INTEGER) AS overall_price'),
       ])
       .leftJoin(`${this.productTable} as mp`, 'c.product_id', 'mp.id')
       .where('c.profile_id', profile_id)
@@ -145,9 +145,9 @@ export class CartRepo {
         'mp.description',
         'mp.avatar',
         'mp.type',
-        'mp.price',
+        knex.raw('CAST(mp.price AS INTEGER) AS price'),
         'mp.limited',
-        knex.raw('c.count * mp.price AS overall_price'),
+        knex.raw('CAST(c.count * mp.price AS INTEGER) AS overall_price'),
       ])
       .leftJoin(`${this.productTable} as mp`, 'c.product_id', 'mp.id')
       .where('c.profile_id', profile_id)

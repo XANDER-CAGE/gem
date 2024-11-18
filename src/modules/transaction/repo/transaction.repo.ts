@@ -9,7 +9,6 @@ import {
 import { IFindAllTransaction } from '../interface/find-all-transaction.interface';
 import { tableName } from 'src/common/var/table-name.var';
 import { CreateEarningDto } from '../dto/create-earning-transaction.dto';
-import { TransactionUpdateStatus } from '../dto/create.transaction.dto';
 
 export class TransactionRepo {
   private readonly transactionTable = tableName.transactions;
@@ -68,7 +67,8 @@ export class TransactionRepo {
       .select([
         't.id',
         's.uid',
-        knex.raw("concat(s.first_name, ' ', s.last_name) as full_name"),
+        knex.raw("CONCAT(s.first_name, ' ', s.last_name) as full_name"),
+        'u.id as student_id',
         'mp.name',
         't.total_gem',
         't.status',
@@ -77,6 +77,7 @@ export class TransactionRepo {
       .leftJoin('gamification.student_profiles as st', 't.profile_id', 'st.id')
       .leftJoin('students as s', 's.id', 'st.student_id')
       .leftJoin('gamification.market_products as mp', 't.product_id', 'mp.id')
+      .leftJoin('public.users as u', 'u.student_id', 's.id')
       .where('t.total_gem', '<', 0)
       .whereNull('t.deleted_at');
 
@@ -182,5 +183,10 @@ export class TransactionRepo {
     return { total: +total, data: data };
   }
 
-  async updateStatus({ id, status }: TransactionUpdateStatus) {}
+  async updateStatus(id: string, status: string, knex = this.knex) {
+    return await knex(this.transactionTable)
+      .update({ status: status })
+      .where('id', id)
+      .returning('*');
+  }
 }

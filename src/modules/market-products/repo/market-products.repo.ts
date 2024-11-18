@@ -44,7 +44,15 @@ export class ProductRepo {
         if (dto.market_id) {
           this.where('market_id', dto.market_id);
         }
-      })
+      });
+    if (dto.search) {
+      innerQuery.where(
+        knex.raw('LOWER(mp.name)'),
+        'like',
+        `%${dto.search.toLowerCase()}%`,
+      );
+    }
+    innerQuery
       .limit(limit)
       .offset((page - 1) * limit)
       .as('c');

@@ -38,7 +38,16 @@ export class MarketRepo {
         if (dto.category_id) {
           this.where('m.category_id', dto.category_id);
         }
-      })
+      });
+
+    if (dto.search) {
+      innerQuery.where(
+        knex.raw('LOWER(m.name)'),
+        'like',
+        `%${dto.search.toLowerCase()}%`,
+      );
+    }
+    innerQuery
       .limit(limit)
       .offset((page - 1) * limit)
       .groupBy('m.id')

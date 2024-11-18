@@ -7,6 +7,11 @@ export class FindAllProductsDto extends PaginationDto {
   @IsString()
   @IsOptional()
   market_id?: string;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  search?: string;
 }
 
 export class FindAllCategoriesDto extends PaginationDto {}
