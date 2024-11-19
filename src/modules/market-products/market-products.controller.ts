@@ -113,7 +113,7 @@ export class MarketProductsController {
   }
 
   @Roles(Role.student)
-  @ApiOperation({ summary: 'Find all' })
+  @ApiOperation({ summary: 'Find all categories product' })
   @Get('/list_categories')
   @ApiOkResponse({ type: ListMarketProductResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
@@ -127,5 +127,15 @@ export class MarketProductsController {
     );
     const pagination = { total, limit: dto.limit, page: dto.page };
     return CoreApiResponse.success(data, pagination);
+  }
+
+  @Roles(Role.student)
+  @ApiOperation({ summary: 'Find by one product from 4 categories' })
+  @Get('/get-four-product')
+  @ApiOkResponse({ type: ListMarketProductResponse, status: 200 })
+  @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
+  async listFourProducts() {
+    const { data } = await this.productsService.listFourProducts();
+    return CoreApiResponse.success(data);
   }
 }
