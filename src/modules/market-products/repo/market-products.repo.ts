@@ -126,6 +126,34 @@ export class ProductRepo {
     };
   }
 
+  async listFourProducts(knex = this.knex) {
+    const data = await knex
+      .with('ranked_products', (qb) => {
+        qb.select([
+          'mp.*',
+          knex.raw('CAST(mp.price AS INTEGER) AS price'),
+          knex.raw(
+            'ROW_NUMBER() OVER (PARTITION BY mp.market_id ORDER BY mp.id) AS rn',
+          ),
+        ])
+          .from('gamification.markets as m')
+          .leftJoin(
+            'gamification.market_products as mp',
+            'mp.market_id',
+            'm.id',
+          )
+          .whereNull('mp.deleted_at');
+      })
+      .select('*')
+      .from('ranked_products')
+      .where('rn', 1)
+      .limit(4);
+
+    return {
+      data,
+    };
+  }
+
   async findMy(
     dto: FindMyProductsDto,
     knex = this.knex,
