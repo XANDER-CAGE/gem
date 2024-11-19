@@ -5,6 +5,7 @@ import {
   MinLength,
   MaxLength,
   IsObject,
+  IsNumber,
 } from 'class-validator';
 
 export class CreateMarketDto {
@@ -35,4 +36,9 @@ export class CreateMarketDto {
   @MinLength(1)
   @MaxLength(24)
   category_id: string;
+
+  @ApiProperty({ example: 2 })
+  @IsOptional()
+  @IsNumber()
+  sort_number: number;
 }

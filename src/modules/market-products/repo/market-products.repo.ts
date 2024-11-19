@@ -47,7 +47,7 @@ export class ProductRepo {
       });
     if (dto.search) {
       innerQuery.where(
-        knex.raw('LOWER(mp.name)'),
+        knex.raw('LOWER(name)'),
         'like',
         `%${dto.search.toLowerCase()}%`,
       );

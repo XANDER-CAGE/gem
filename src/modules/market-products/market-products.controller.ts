@@ -56,7 +56,7 @@ export class MarketProductsController {
     return CoreApiResponse.success(data);
   }
 
-  @Roles(Role.student, Role.app_admin)
+  @Roles(Role.app_admin, Role.student)
   @ApiOperation({ summary: 'Find all' })
   @Get('/list')
   @ApiOkResponse({ type: ListMarketProductResponse, status: 200 })
