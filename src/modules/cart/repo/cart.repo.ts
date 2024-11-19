@@ -104,7 +104,7 @@ export class CartRepo {
         'mp.name',
         'mp.avatar',
         'mp.description',
-        'mp.price',
+        knex.raw('CAST(mp.price AS INTEGER) AS price'),
         'c.count',
       )
       .where('c.profile_id', profile_id)
