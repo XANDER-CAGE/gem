@@ -61,7 +61,7 @@ export class MarketController {
 
   @Public()
   @ApiOperation({ summary: 'Get one' })
-  @Get(':id')
+  @Get('/:id')
   @ApiResponse({ type: ErrorApiResponse, status: 500 })
   @ApiResponse({ type: CreateMarketResponse, status: 200 })
   async findOne(@Param('id') id: string) {
