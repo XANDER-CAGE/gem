@@ -210,7 +210,19 @@ export class ProductRepo {
       .first();
   }
 
-  async update(
+  async update(id: string, dto: UpdateProductDto, knex = this.knex) {
+    const [data] = await knex(this.table)
+      .update({
+        ...dto,
+        updated_at: new Date(),
+      })
+      .where('id', id)
+      .andWhere('deleted_at', null)
+      .returning('*');
+    return data;
+  }
+
+  async updateSorting(
     id: string,
     data: UpdateProductDto,
     knex = this.knex,

@@ -103,6 +103,17 @@ export class MarketProductsController {
   }
 
   @Roles(Role.app_admin)
+  @ApiOperation({ summary: 'Update with sorting' })
+  @Patch('/update-sort/:id')
+  @ApiBody({ type: UpdateProductDto })
+  @ApiOkResponse({ type: CreateMarketProductResponse, status: 200 })
+  @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
+  async updateSorting(@Param() { id }: IdDto, @Body() dto: UpdateProductDto) {
+    const data = await this.productsService.update(id, dto);
+    return CoreApiResponse.success(data);
+  }
+
+  @Roles(Role.app_admin)
   @ApiOperation({ summary: 'Delete one' })
   @Delete(':id')
   @ApiOkResponse({ type: DeleteApiResponse, status: 200 })

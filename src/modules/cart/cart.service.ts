@@ -63,6 +63,7 @@ export class CartService {
     }
 
     const items = await this.cartRepo.list(profile_id);
+    console.log(items);
 
     for (const item of items) {
       for (let i = 0; i < item.count; i++) {

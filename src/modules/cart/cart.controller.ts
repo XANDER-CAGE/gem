@@ -25,17 +25,17 @@ export class CartController {
     return await this.cartService.findAll(req.profile.id);
   }
 
-  @ApiOperation({ summary: 'Reduce number of products' })
-  @Patch('/reduce/:product_id')
-  @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
-  async update(@Param('product_id') product_id: string, @Req() req: IMyReq) {
-    return await this.cartService.reduce(product_id, req.profile.id);
-  }
-
   @ApiOperation({ summary: 'Buy selected products' })
   @Post('/buy')
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
   async buy(@Req() req: IMyReq) {
     return await this.cartService.buy(req.profile.id);
+  }
+  
+  @ApiOperation({ summary: 'Reduce number of products' })
+  @Patch('/reduce/:product_id')
+  @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
+  async update(@Param('product_id') product_id: string, @Req() req: IMyReq) {
+    return await this.cartService.reduce(product_id, req.profile.id);
   }
 }
