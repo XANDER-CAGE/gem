@@ -20,16 +20,29 @@ export class ProductRepo {
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
   async create(
-    dto: CreateProductDto,
+    data: CreateProductDto,
     knex = this.knex,
   ): Promise<ProductEntity> {
-    const [data] = await knex
-      .insert({
-        ...dto,
-      })
-      .into(this.table)
-      .returning('*');
-    return data;
+    if (!data.sort_number) {
+      const maxResult = await knex(`${this.table} as m`)
+        .max('m.sort_number as max_sort_number')
+        .where('m.market_id', data.market_id)
+        .first();
+
+      const max = maxResult?.max_sort_number;
+
+      const [res] = await knex(this.table)
+        .insert({ ...data, sort_number: max + 1 })
+        .returning('*');
+      return res;
+    }
+
+    await knex(this.table)
+      .where('sort_number', '>=', data.sort_number)
+      .increment('sort_number', 1);
+
+    const [res] = await knex(this.table).insert(data).returning('*');
+    return res;
   }
 
   async findAll(
@@ -199,18 +212,68 @@ export class ProductRepo {
 
   async update(
     id: string,
-    dto: UpdateProductDto,
+    data: UpdateProductDto,
     knex = this.knex,
   ): Promise<ProductEntity> {
-    const [data] = await knex(this.table)
-      .update({
-        ...dto,
-        updated_at: new Date(),
-      })
-      .where('id', id)
-      .andWhere('deleted_at', null)
-      .returning('*');
-    return data;
+    const trx = await knex.transaction();
+
+    try {
+      const selectedItem = await trx(this.table)
+        .where('id', id)
+        .andWhere('deleted_at', null)
+        .andWhere('market_id', data.market_id)
+        .first();
+
+      if (!selectedItem) {
+        throw new Error('Item not found');
+      }
+
+      const currentSortNumber = selectedItem.sort_number;
+      const newSortNumber = data.sort_number;
+
+      if (!newSortNumber || currentSortNumber === newSortNumber) {
+        const [updatedMarket] = await trx(this.table)
+          .update({
+            ...data,
+            updated_at: new Date(),
+          })
+          .where('id', id)
+          .andWhere('deleted_at', null)
+          .returning('*');
+        await trx.commit();
+        return updatedMarket;
+      }
+
+      if (newSortNumber > currentSortNumber) {
+        await trx(this.table)
+          .whereBetween('sort_number', [currentSortNumber + 1, newSortNumber])
+          .andWhere('deleted_at', null)
+          .andWhere('market_id', data.market_id)
+          .decrement('sort_number', 1);
+      } else if (newSortNumber < currentSortNumber) {
+        await trx(this.table)
+          .whereBetween('sort_number', [newSortNumber, currentSortNumber - 1])
+          .andWhere('deleted_at', null)
+          .andWhere('market_id', data.market_id)
+          .increment('sort_number', 1);
+      }
+
+      const [updatedMarket] = await trx(this.table)
+        .update({
+          ...data,
+          sort_number: newSortNumber,
+          updated_at: new Date(),
+        })
+        .where('id', id)
+        .andWhere('deleted_at', null)
+        .returning('*');
+
+      await trx.commit();
+      return updatedMarket;
+    } catch (error) {
+      await trx.rollback();
+      throw error;
+    }
   }
 
   async delete(id: string, knex = this.knex): Promise<void> {
