@@ -1,9 +1,15 @@
 import { Controller, Get, Post, Body, Patch, Param, Req } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { CreateCartDto } from './dto/create-cart.dto';
-import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { IMyReq } from 'src/common/interface/my-req.interface';
 import { ErrorApiResponse } from 'src/common/response-class/error.response';
+import { CoreApiResponse } from 'src/common/response-class/core-api.response';
 
 @ApiTags('Cart')
 @ApiBearerAuth()
@@ -29,9 +35,10 @@ export class CartController {
   @Post('/buy')
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
   async buy(@Req() req: IMyReq) {
-    return await this.cartService.buy(req.profile.id);
+    await this.cartService.buy(req.profile.id);
+    return CoreApiResponse.success(null);
   }
-  
+
   @ApiOperation({ summary: 'Reduce number of products' })
   @Patch('/reduce/:product_id')
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
