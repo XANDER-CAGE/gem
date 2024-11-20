@@ -107,19 +107,17 @@ export class ProductRepo {
                     ELSE false
                   END
       )
+      ORDER BY mp.sort_number
     ) AS products`),
       ])
       .leftJoin('gamification.markets as m', 'mp.market_id', 'm.id')
       .leftJoin('gamification.cart as c', function () {
-        this.on('c.product_id', '=', 'mp.id').andOn(
-          'c.profile_id',
-          '=',
-          knex.raw('?', [profile_id]),
-        );
+        this.on('c.product_id', '=', 'mp.id')
+          .andOn('c.profile_id', '=', knex.raw('?', [profile_id]))
+          .andOnNull('c.deleted_at');
       })
       .whereNull('mp.deleted_at')
       .whereNull('m.deleted_at')
-      .whereNull('c.deleted_at')
       .groupBy('m.name', 'm.sort_number')
       .orderBy('m.sort_number')
       .limit(limit)
