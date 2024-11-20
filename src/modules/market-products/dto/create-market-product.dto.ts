@@ -51,4 +51,9 @@ export class CreateProductDto {
   @ApiProperty({ example: false })
   @IsBoolean()
   limited: boolean;
+
+  @ApiProperty({ example: 2 })
+  @IsOptional()
+  @IsNumber()
+  sort_number: number;
 }
