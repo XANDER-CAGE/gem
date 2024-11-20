@@ -107,7 +107,8 @@ export class ProductRepo {
       .whereNull('mp.deleted_at')
       .whereNull('m.deleted_at')
       .whereNull('c.deleted_at')
-      .groupBy('m.name')
+      .groupBy('m.name', 'm.sort_number')
+      .orderBy('m.sort_number')
       .limit(limit)
       .offset((page - 1) * limit)
       .as('c');
@@ -126,23 +127,32 @@ export class ProductRepo {
     };
   }
 
-  async listFourProducts(knex = this.knex) {
+  async listFourProducts(profile_id: string, knex = this.knex) {
     const data = await knex
       .with('ranked_products', (qb) => {
         qb.select([
           'mp.*',
+          knex.raw('COALESCE(c.count, 0) AS count'),
           knex.raw('CAST(mp.price AS INTEGER) AS price'),
           knex.raw(
             'ROW_NUMBER() OVER (PARTITION BY mp.market_id ORDER BY mp.id) AS rn',
           ),
         ])
-          .from('gamification.markets as m')
+          .from('gamification.markets AS m')
           .leftJoin(
-            'gamification.market_products as mp',
+            'gamification.market_products AS mp',
             'mp.market_id',
             'm.id',
           )
-          .whereNull('mp.deleted_at');
+          .leftJoin('gamification.cart AS c', function () {
+            this.on('c.product_id', '=', 'mp.id').andOn(
+              'c.profile_id',
+              '=',
+              knex.raw('?', [profile_id]),
+            );
+          })
+          .whereNull('mp.deleted_at')
+          .orderBy('m.sort_number');
       })
       .select('*')
       .from('ranked_products')
