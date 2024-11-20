@@ -134,8 +134,10 @@ export class MarketProductsController {
   @Get('/get-four-product')
   @ApiOkResponse({ type: ListMarketProductResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
-  async listFourProducts() {
-    const { data } = await this.productsService.listFourProducts();
+  async listFourProducts(@Req() req: IMyReq) {
+    const { data } = await this.productsService.listFourProducts(
+      req.profile.id,
+    );
     return CoreApiResponse.success(data);
   }
 }
