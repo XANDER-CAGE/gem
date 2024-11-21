@@ -43,8 +43,8 @@ export class ProductsService {
     return this.productRepo.findMy(dto);
   }
 
-  async findOne(id: string) {
-    return await this.productRepo.findOne(id);
+  async findOne(id: string, knex = this.knex) {
+    return await this.productRepo.findOne(id, knex);
   }
 
   async update(id: string, dto: UpdateProductDto, knex = this.knex) {
