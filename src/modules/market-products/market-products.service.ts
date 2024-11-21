@@ -35,7 +35,7 @@ export class ProductsService {
     return await this.productRepo.listWithCategories(dto, profile_id);
   }
 
-  async listFourProducts(profile_id:string) {
+  async listFourProducts(profile_id: string) {
     return await this.productRepo.listFourProducts(profile_id);
   }
 
@@ -54,6 +54,15 @@ export class ProductsService {
       if (!market) throw new NotFoundException('Market not found');
     }
     return this.productRepo.update(id, dto, knex);
+  }
+
+  async updateSorting(id: string, dto: UpdateProductDto, knex = this.knex) {
+    const { market_id: marketId } = dto;
+    if (marketId) {
+      const market = await this.marketService.findOne(marketId);
+      if (!market) throw new NotFoundException('Market not found');
+    }
+    return this.productRepo.updateSorting(id, dto, knex);
   }
 
   async remove(id: string) {
