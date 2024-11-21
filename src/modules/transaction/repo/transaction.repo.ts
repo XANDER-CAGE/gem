@@ -79,7 +79,8 @@ export class TransactionRepo {
       .leftJoin('gamification.market_products as mp', 't.product_id', 'mp.id')
       .leftJoin('public.users as u', 'u.student_id', 's.id')
       .where('t.total_gem', '<', 0)
-      .whereNull('t.deleted_at');
+      .whereNull('t.deleted_at')
+      .orderBy('t.created_at', 'desc');
 
     if (start_date && end_date) {
       innerQuery.whereBetween('t.created_at', [start_date, end_date]);
