@@ -71,7 +71,6 @@ export class CartService {
           existProfile,
         );
       }
-
       await this.cartRepo.remove(item.id);
     }
   }

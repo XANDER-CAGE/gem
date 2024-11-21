@@ -101,14 +101,17 @@ export class HomeService {
 
   async buyProduct(dto: BuyProductDto, profile: StudentProfileEntity) {
     await this.knex.transaction(async (trx) => {
-      const product = await this.productService.findOne(dto.product_id);
+      const product = await this.productService.findOne(dto.product_id, trx);
       if (!product) throw new NotFoundException('Product not found');
-      if (product.remaining_count == 0) {
+      if (product.remaining_count === 0) {
         throw new NotAcceptableException('Product sold out');
       }
-      if (product.price > profile.gem) {
+
+      const freshProfile = await this.profileService.findOne(profile.id, trx);
+      if (Number(product.price) > Number(freshProfile.gem)) {
         throw new NotAcceptableException('Insufficient funds');
       }
+
       await this.productService.update(
         product.id,
         {
@@ -116,22 +119,30 @@ export class HomeService {
         },
         trx,
       );
-      await this.productService.connectToProfile(profile.id, product.id, trx);
+
+      await this.productService.connectToProfile(
+        freshProfile.id,
+        product.id,
+        trx,
+      );
+
       await this.profileService.update(
-        profile.id,
+        freshProfile.id,
         {
-          gem: profile.gem - product.price,
+          gem: Number(freshProfile.gem) - Number(product.price),
         },
         trx,
       );
+
       await this.transactionService.createSpending(
         {
           product_id: product.id,
-          profile_id: profile.id,
+          profile_id: freshProfile.id,
         },
         trx,
       );
     });
+
     return CoreApiResponse.success(null);
   }
 
