@@ -98,7 +98,7 @@ export class TransactionRepo {
     }
 
     if (uid) {
-      innerQuery.where('t.uid', uid);
+      innerQuery.where('s.uid', uid);
     }
 
     const [{ total }] = await knex(innerQuery.clone().as('count_query')).count(

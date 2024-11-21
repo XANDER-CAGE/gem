@@ -87,7 +87,5 @@ export class CartService {
       }
       await this.cartRepo.remove(item.id);
     }
-
-    
   }
 }
