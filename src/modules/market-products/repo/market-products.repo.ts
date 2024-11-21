@@ -119,6 +119,20 @@ export class ProductRepo {
       .whereNull('mp.deleted_at')
       .whereNull('m.deleted_at')
       .groupBy('m.name', 'm.sort_number')
+      .havingRaw(
+        'json_array_length(json_agg(json_build_object(' +
+          `'id', mp.id,` +
+          `'name', mp.name,` +
+          `'description', mp.description,` +
+          `'avatar', mp.avatar,` +
+          `'type', mp.type,` +
+          `'price', mp.price,` +
+          `'remaining_count', mp.remaining_count,` +
+          `'limited', mp.limited,` +
+          `'count', COALESCE(c.count, 0),` +
+          `'is_new', CASE WHEN mp.created_at >= now() - interval '3 days' THEN true ELSE false END` +
+          ') ORDER BY mp.sort_number) FILTER (WHERE mp.remaining_count > 0)) > 0',
+      )
       .orderBy('m.sort_number')
       .limit(limit)
       .offset((page - 1) * limit)
