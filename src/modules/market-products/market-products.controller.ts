@@ -83,7 +83,7 @@ export class MarketProductsController {
 
   @Public()
   @ApiOperation({ summary: 'Get one' })
-  @Get('/get-one:id')
+  @Get('/get-one/:id')
   @ApiOkResponse({ type: CreateMarketProductResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
   async findOne(@Param() { id }: IdDto) {
