@@ -108,7 +108,7 @@ export class ProductRepo {
                   END
       )
       ORDER BY mp.sort_number
-    ) AS products`),
+    ) FILTER (WHERE mp.remaining_count > 0) AS products`),
       ])
       .leftJoin('gamification.markets as m', 'mp.market_id', 'm.id')
       .leftJoin('gamification.cart as c', function () {
@@ -146,7 +146,7 @@ export class ProductRepo {
           knex.raw('COALESCE(c.count, 0) AS count'),
           knex.raw('CAST(mp.price AS INTEGER) AS price'),
           knex.raw(
-            'ROW_NUMBER() OVER (PARTITION BY mp.market_id ORDER BY mp.id) AS rn',
+            'ROW_NUMBER() OVER (PARTITION BY mp.market_id ORDER BY m.sort_number, mp.sort_number) AS rn',
           ),
         ])
           .from('gamification.markets AS m')
@@ -163,7 +163,10 @@ export class ProductRepo {
             );
           })
           .whereNull('mp.deleted_at')
-          .orderBy('m.sort_number');
+          .whereNull('m.deleted_at')
+          .andWhere('mp.remaining_count', '>', 0)
+          .orderBy('m.sort_number')
+          .orderBy('mp.sort_number');
       })
       .select('*')
       .from('ranked_products')
