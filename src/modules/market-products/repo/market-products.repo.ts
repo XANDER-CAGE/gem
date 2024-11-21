@@ -218,7 +218,7 @@ export class ProductRepo {
 
   async findOne(id: string, knex = this.knex): Promise<ProductEntity> {
     return await knex
-      .select('*')
+      .select(['*', knex.raw('CAST(price AS INTEGER)')])
       .from(this.table)
       .where('id', id)
       .andWhere('deleted_at', null)
