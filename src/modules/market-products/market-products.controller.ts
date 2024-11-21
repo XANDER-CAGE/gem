@@ -109,7 +109,7 @@ export class MarketProductsController {
   @ApiOkResponse({ type: CreateMarketProductResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
   async updateSorting(@Param() { id }: IdDto, @Body() dto: UpdateProductDto) {
-    const data = await this.productsService.update(id, dto);
+    const data = await this.productsService.updateSorting(id, dto);
     return CoreApiResponse.success(data);
   }
 

@@ -1,8 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotAcceptableException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateCartDto } from './dto/create-cart.dto';
 import { CartRepo } from './repo/cart.repo';
 import { HomeService } from '../home/home.service';
 import { StudentProfilesService } from '../student-profiles/student-profiles.service';
+import { ProductsService } from '../market-products/market-products.service';
 
 @Injectable()
 export class CartService {
@@ -10,10 +15,12 @@ export class CartService {
     private readonly cartRepo: CartRepo,
     private readonly homeService: HomeService,
     private readonly studentProfileService: StudentProfilesService,
+    private readonly productService: ProductsService,
   ) {}
 
   async add(createCartDto: CreateCartDto, profile_id: string) {
     const existProfile = await this.studentProfileService.findOne(profile_id);
+    const product = await this.productService.findOne(createCartDto.product_id);
 
     if (!existProfile) {
       throw new NotFoundException('This student profile does not exist');
@@ -25,7 +32,14 @@ export class CartService {
     );
 
     if (!existCart) {
+      if (product.remaining_count <= 0) {
+        throw new NotAcceptableException('Product sold out');
+      }
       return await this.cartRepo.create(createCartDto, profile_id);
+    }
+
+    if (existCart.count + 1 > product.remaining_count) {
+      throw new NotAcceptableException('Shortage of product');
     }
 
     return await this.cartRepo.add(createCartDto.product_id, profile_id);
