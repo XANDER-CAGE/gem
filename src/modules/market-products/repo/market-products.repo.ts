@@ -218,7 +218,16 @@ export class ProductRepo {
 
   async findOneWithCartCount(id: string, profile_id: string, knex = this.knex) {
     const product = await knex('gamification.market_products as mp')
-      .select('mp.*')
+      .select(
+        'mp.*',
+        knex.raw('CAST(mp.price AS INTEGER) AS price'),
+        knex.raw(`
+      CASE 
+        WHEN mp.created_at >= now() - interval '3 days' THEN true
+        ELSE false
+      END AS is_new
+    `),
+      )
       .where('mp.id', id)
       .whereNull('mp.deleted_at')
       .first();
@@ -229,8 +238,10 @@ export class ProductRepo {
 
     const cart = await knex('gamification.cart as c')
       .select('*')
-      .where('c.product_id', id)
-      .andWhere('c.profile_id', profile_id)
+      .where({
+        'c.product_id': id,
+        'c.profile_id': profile_id,
+      })
       .whereNull('c.deleted_at')
       .first();
 
