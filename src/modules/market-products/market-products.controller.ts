@@ -87,7 +87,7 @@ export class MarketProductsController {
   @ApiOkResponse({ type: CreateMarketProductResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
   async findOne(@Param() { id }: IdDto) {
-    const data = await this.productsService.findOne(id);
+    const data = await this.productsService.findOneWithCount(id);
     return CoreApiResponse.success(data);
   }
 
