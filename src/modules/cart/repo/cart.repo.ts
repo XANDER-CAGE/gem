@@ -159,10 +159,11 @@ export class CartRepo {
     result.total_count = total_count;
 
     if (result.count === 0) {
+      const deletedData = await knex(this.table)
+        .where({ id: result.id })
+        .first();
       await knex(this.table).where({ id: result.id }).delete();
-      return {
-        count: 0,
-      };
+      return deletedData;
     }
 
     return result;
