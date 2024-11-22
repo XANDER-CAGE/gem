@@ -216,13 +216,27 @@ export class ProductRepo {
     return { total: +total, data };
   }
 
-  async findOneWithCartCount(id: string, knex = this.knex) {
-    return await knex('gamification.market_products as mp')
-      .leftJoin('gamification.cart as c', 'c.product_id', 'mp.id')
-      .select('mp.*', 'c.count')
-      .where('mp.id', '673fa45aa220ed1c4b634261')
+  async findOneWithCartCount(id: string, profile_id: string, knex = this.knex) {
+    const product = await knex('gamification.market_products as mp')
+      .select('mp.*')
+      .where('mp.id', id)
+      .whereNull('mp.deleted_at')
+      .first();
+
+    if (!product) {
+      return null;
+    }
+
+    const cart = await knex('gamification.cart as c')
+      .select('*')
+      .where('c.product_id', id)
+      .andWhere('c.profile_id', profile_id)
       .whereNull('c.deleted_at')
-      .whereNull('mp.deleted_at');
+      .first();
+
+    product.count = cart ? Number(cart.count) : 0;
+
+    return product;
   }
 
   async findOne(id: string, knex = this.knex): Promise<ProductEntity> {

@@ -47,8 +47,8 @@ export class ProductsService {
     return await this.productRepo.findOne(id, knex);
   }
 
-  async findOneWithCount(id: string, knex = this.knex) {
-    return await this.productRepo.findOneWithCartCount(id, knex);
+  async findOneWithCount(id: string, profile_id: string, knex = this.knex) {
+    return await this.productRepo.findOneWithCartCount(id, profile_id, knex);
   }
 
   async update(id: string, dto: UpdateProductDto, knex = this.knex) {

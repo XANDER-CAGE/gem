@@ -29,7 +29,6 @@ import { DeleteApiResponse } from 'src/common/response-class/all-null.response';
 import { RolesGuard } from 'src/common/guard/roles.guard';
 import { Role } from 'src/common/enum/role.enum';
 import { Roles } from 'src/common/decorator/roles.decorator';
-import { Public } from 'src/common/decorator/public.decorator';
 import {
   FindAllCategoriesDto,
   FindAllProductsDto,
@@ -81,13 +80,16 @@ export class MarketProductsController {
     return CoreApiResponse.success(data, pagination);
   }
 
-  @Public()
+  @Roles(Role.student)
   @ApiOperation({ summary: 'Get one' })
   @Get('/get-one/:id')
   @ApiOkResponse({ type: CreateMarketProductResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
-  async findOne(@Param() { id }: IdDto) {
-    const data = await this.productsService.findOneWithCount(id);
+  async findOne(@Param() { id }: IdDto, @Req() req: IMyReq) {
+    const data = await this.productsService.findOneWithCount(
+      id,
+      req.profile.id,
+    );
     return CoreApiResponse.success(data);
   }
 
