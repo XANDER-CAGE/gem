@@ -21,7 +21,7 @@ export class CronQueueService implements OnModuleInit {
       CronProcessNames.GET_GRADES,
       {},
       {
-        repeat: { cron: '0 0 14 * * *' },
+        repeat: { cron: '0 0 15 * * *' },
       },
     );
     await this.cronQueue.add(
