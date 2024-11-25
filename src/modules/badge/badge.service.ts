@@ -53,8 +53,12 @@ export class BadgeService {
     return await this.badgeRepo.getUnderdoneBadge(profileId, achievementId);
   }
 
-  async getBadgeByLevel(level: number, achievementId: string) {
-    return await this.badgeRepo.getByLevel(level, achievementId);
+  async getBadgeByLevel(
+    level: number,
+    achievementId: string,
+    knex = this.knex,
+  ) {
+    return await this.badgeRepo.getByLevel(level, achievementId, knex);
   }
 
   async updateConnection(
@@ -93,5 +97,9 @@ export class BadgeService {
 
   async assignmentCount(profileId: string, knex = this.knex) {
     return await this.badgeRepo.assignmentCount(profileId, knex);
+  }
+
+  async userHaveTheBadge(profileId: string, badgeId: string, knex = this.knex) {
+    return this.badgeRepo.userHaveTheBadge(profileId, badgeId, knex);
   }
 }

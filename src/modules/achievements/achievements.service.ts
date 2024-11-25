@@ -13,8 +13,8 @@ import { Knex } from 'knex';
 import { BadgeService } from '../badge/badge.service';
 import { TransactionService } from '../transaction/transaction.service';
 import { CoreApiResponse } from 'src/common/response-class/core-api.response';
-import { IGetAGrades } from './interfaces/getgrades.interface';
 import { LevelService } from '../level/level.service';
+import axios from 'axios';
 
 @Injectable()
 export class AchievementsService {
@@ -92,15 +92,11 @@ export class AchievementsService {
     return CoreApiResponse.success(null);
   }
 
-  async getGrades(): Promise<IGetAGrades[]> {
-    return this.achievementRepo.getGrades();
-  }
-
   async findOneByType(type: string, knex = this.knex) {
     return await this.achievementRepo.findOnByType(type, knex);
   }
 
-  async  assignment(profileId: string, knex = this.knex) {
+  async assignment(profileId: string, knex = this.knex) {
     await knex.transaction(async (trx) => {
       const achievement = await this.findOneByType('assignment', trx);
       if (!achievement) throw new NotFoundException('No assignment found');
@@ -169,5 +165,13 @@ export class AchievementsService {
       }
       await this.levelService.connectReachedLevels(profile.id, earnedGem, trx);
     });
+  }
+
+  async getGrades(type: string) {
+    const res = await axios.post(
+      'https://lms.eduplus.uz/api/grade/students-grades-gamification',
+      { type },
+    );
+    return res.data;
   }
 }

@@ -206,4 +206,14 @@ export class BadgeRepo {
       .where('profile_id', profileId);
     return +data.count || 0;
   }
+
+  async userHaveTheBadge(profileId: string, badgeId: string, knex = this.knex) {
+    const badges = await knex
+      .select('b.*')
+      .from(`${this.relationToProfile} as pb`)
+      .where('pb.profile_id', profileId)
+      .andWhere('pb.badge_id', badgeId)
+      .join(`${tableName.badges} as b`, 'b.id', 'pb.badge_id');
+    return badges.length != 0;
+  }
 }

@@ -147,11 +147,95 @@ export class HomeService {
   }
 
   async handleGradeCron() {
-    const grades = await this.achievementsService.getGrades();
-    for (const comp of grades) {
-      for (const { profile_id } of comp.grades) {
-        await this.assignAchievement(profile_id, comp.achievement_id);
+    try {
+      for (const type of ['mid_term', 'final']) {
+        try {
+          const grades = await this.achievementsService.getGrades(type);
+          const midtermAchievement =
+            await this.achievementsService.findOneByType(type);
+          if (!midtermAchievement) {
+            throw new Error('Midterm achievement not found');
+          }
+          for (const grade of grades) {
+            try {
+              await this.knex.transaction(async (trx) => {
+                const profile = await this.profileService.getProfileByColumn(
+                  'student_id',
+                  grade.student_id,
+                );
+                if (!profile) return;
+                if (grade.percentage < 40) return;
+                const level =
+                  grade.percentage >= 80 ? 3 : grade.percentage >= 60 ? 2 : 1;
+                const badge = await this.badgeService.getBadgeByLevel(
+                  level,
+                  midtermAchievement.id,
+                  trx,
+                );
+                if (!badge) return;
+                const userHasTheBadge =
+                  await this.badgeService.userHaveTheBadge(
+                    profile.id,
+                    badge.id,
+                    trx,
+                  );
+                if (userHasTheBadge) return;
+                await this.badgeService.connectToProfile(
+                  profile.id,
+                  badge.id,
+                  1,
+                  trx,
+                );
+                if (badge.reward_gem) {
+                  await this.transactionService.createEarning(
+                    {
+                      badge_id: badge.id,
+                      total_gem: badge.reward_gem,
+                      profile_id: profile.id,
+                    },
+                    trx,
+                  );
+                  const total = await this.transactionService.sumAllEarning(
+                    profile.id,
+                    trx,
+                  );
+                  const levels = await this.levelService.connectReachedLevels(
+                    profile.id,
+                    total,
+                    trx,
+                  );
+                  for (const level of levels) {
+                    badge.reward_gem += level.free_gem;
+                    if (level.free_gem) {
+                      await this.transactionService.createEarning(
+                        {
+                          profile_id: profile.id,
+                          level_id: level.id,
+                          total_gem: level.free_gem,
+                        },
+                        trx,
+                      );
+                    }
+                  }
+                  await this.profileService.update(
+                    profile.id,
+                    { gem: +profile.gem + +badge.reward_gem },
+                    trx,
+                  );
+                }
+              });
+            } catch (error) {
+              console.log(error.message);
+              continue;
+            }
+          }
+        } catch (error) {
+          console.log(error.message);
+          continue;
+        }
       }
+    } catch (error) {
+      console.log(error.message);
     }
   }
 
