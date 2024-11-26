@@ -116,8 +116,8 @@ export class TransactionService {
       : null;
   }
 
-  async findAll(dto: TransactionFinishedList) {
-    return await this.transactionRepo.findAll(dto);
+  async findAll(dto: TransactionFinishedList, role:string) {
+    return await this.transactionRepo.findAll(dto, role);
   }
 
   async updateStatus(dto: TransactionUpdateStatus) {

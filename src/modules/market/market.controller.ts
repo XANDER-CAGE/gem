@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { MarketService } from './market.service';
 import {
@@ -29,11 +30,19 @@ import { Role } from 'src/common/enum/role.enum';
 import { Roles } from 'src/common/decorator/roles.decorator';
 import { FindAllMarketDto } from './dto/find-all.market.dto';
 import { Public } from 'src/common/decorator/public.decorator';
+import { IMyReq } from 'src/common/interface/my-req.interface';
 
 @ApiTags('Market')
 @ApiBearerAuth()
 @UseGuards(RolesGuard)
-@Roles(Role.app_admin)
+@Roles(
+  Role.app_admin,
+  Role.merge_admin,
+  Role.bloomberg_admin,
+  Role.sport_center_admin,
+  Role.career_center_admin,
+  Role.media_studio_admin,
+)
 @Controller('market')
 export class MarketController {
   constructor(private readonly marketService: MarketService) {}
@@ -48,13 +57,15 @@ export class MarketController {
     return CoreApiResponse.success(data);
   }
 
-  @Public()
   @ApiOperation({ summary: 'Find all' })
   @Get('/list')
   @ApiResponse({ type: ErrorApiResponse, status: 500 })
   @ApiResponse({ type: ListMarketResponse, status: 200 })
-  async findAll(@Query() dto: FindAllMarketDto) {
-    const { total, data } = await this.marketService.findAll(dto);
+  async findAll(@Query() dto: FindAllMarketDto, @Req() req: IMyReq) {
+    const { total, data } = await this.marketService.findAll(
+      dto,
+      req.user.role,
+    );
     const pagination = { total, limit: dto.limit, page: dto.page };
     return CoreApiResponse.success(data, pagination);
   }

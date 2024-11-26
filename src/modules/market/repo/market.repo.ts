@@ -6,6 +6,7 @@ import { CreateMarketDto } from '../dto/create-market.dto';
 import { UpdateMarketDto } from '../dto/update-market.dto';
 import { FindAllMarketDto } from '../dto/find-all.market.dto';
 import { tableName } from 'src/common/var/table-name.var';
+import { Role } from 'src/common/enum/role.enum';
 
 @Injectable()
 export class MarketRepo {
@@ -17,6 +18,7 @@ export class MarketRepo {
 
   async findAll(
     dto: FindAllMarketDto,
+    role: string,
     knex = this.knex,
   ): Promise<IFindAllMarkets> {
     const { limit = 10, page = 1 } = dto;
@@ -47,6 +49,19 @@ export class MarketRepo {
         `%${dto.search.toLowerCase()}%`,
       );
     }
+
+    if (role === Role.merge_admin) {
+      innerQuery.where('m.id', '673b1c483e9e4b2fe0e4beaf');
+    } else if (role === Role.sport_center_admin) {
+      innerQuery.where('m.id', '673b1f3841d5292fe0ad6470');
+    } else if (role === Role.career_center_admin) {
+      innerQuery.where('m.id', '673b1e1c79a5502fe06272e3');
+    } else if (role === Role.bloomberg_admin) {
+      innerQuery.where('m.id', '673b1ef3ee98cb2fe043228c');
+    } else if (role === Role.media_studio_admin) {
+      innerQuery.where('m.id', '673b1e6dc87d132fe03e3e73');
+    }
+
     innerQuery
       .orderBy('m.sort_number')
       .limit(limit)

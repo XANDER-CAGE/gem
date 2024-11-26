@@ -21,8 +21,8 @@ export class MarketService {
     return await this.marketRepo.create(createMarketDto);
   }
 
-  async findAll(findAllMarketsDto: FindAllMarketDto) {
-    return await this.marketRepo.findAll(findAllMarketsDto);
+  async findAll(findAllMarketsDto: FindAllMarketDto, role: string) {
+    return await this.marketRepo.findAll(findAllMarketsDto, role);
   }
 
   async findOne(id: string) {

@@ -15,4 +15,9 @@ export enum Role {
   course_leader = 'course_leader',
   teacher = 'teacher',
   app_admin = 'app_admin',
+  merge_admin = 'merge_admin',
+  sport_center_admin = 'sport_center_admin',
+  career_center_admin = 'career_center_admin',
+  bloomberg_admin = 'bloomberg_admin',
+  media_studio_admin = 'media_studio_admin',
 }
