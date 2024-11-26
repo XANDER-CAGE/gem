@@ -9,6 +9,7 @@ import {
 import { IFindAllTransaction } from '../interface/find-all-transaction.interface';
 import { tableName } from 'src/common/var/table-name.var';
 import { CreateEarningDto } from '../dto/create-earning-transaction.dto';
+import { Role } from 'src/common/enum/role.enum';
 
 export class TransactionRepo {
   private readonly transactionTable = tableName.transactions;
@@ -59,6 +60,7 @@ export class TransactionRepo {
 
   async findAll(
     dto: TransactionFinishedList,
+    role: string,
     knex = this.knex,
   ): Promise<IFindAllTransaction> {
     const { limit = 10, page = 1, start_date, end_date, name, uid } = dto;
@@ -78,6 +80,7 @@ export class TransactionRepo {
       .leftJoin('students as s', 's.id', 'st.student_id')
       .leftJoin('gamification.market_products as mp', 't.product_id', 'mp.id')
       .leftJoin('public.users as u', 'u.student_id', 's.id')
+      .leftJoin('gamification.markets as m', 'm.id', 'mp.market_id')
       .where('t.total_gem', '<', 0)
       .whereNull('t.deleted_at')
       .orderBy('t.created_at', 'desc');
@@ -88,6 +91,18 @@ export class TransactionRepo {
       innerQuery.where('t.created_at', '>=', start_date);
     } else if (end_date) {
       innerQuery.where('t.created_at', '<=', end_date);
+    }
+
+    if (role === Role.merge_admin) {
+      innerQuery.where('m.id', '673b1c483e9e4b2fe0e4beaf');
+    } else if (role === Role.sport_center_admin) {
+      innerQuery.where('m.id', '673b1f3841d5292fe0ad6470');
+    } else if (role === Role.career_center_admin) {
+      innerQuery.where('m.id', '673b1e1c79a5502fe06272e3');
+    } else if (role === Role.bloomberg_admin) {
+      innerQuery.where('m.id', '673b1ef3ee98cb2fe043228c');
+    } else if (role === Role.media_studio_admin) {
+      innerQuery.where('m.id', '673b1e6dc87d132fe03e3e73');
     }
 
     if (name) {

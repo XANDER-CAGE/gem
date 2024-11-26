@@ -55,7 +55,15 @@ export class MarketProductsController {
     return CoreApiResponse.success(data);
   }
 
-  @Roles(Role.app_admin, Role.student)
+  @Roles(
+    Role.app_admin,
+    Role.student,
+    Role.merge_admin,
+    Role.sport_center_admin,
+    Role.career_center_admin,
+    Role.bloomberg_admin,
+    Role.media_studio_admin,
+  )
   @ApiOperation({ summary: 'Find all' })
   @Get('/list')
   @ApiOkResponse({ type: ListMarketProductResponse, status: 200 })

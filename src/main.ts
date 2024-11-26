@@ -33,6 +33,6 @@ async function bootstrap() {
   }
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
-  await app.listen(env.PORT || 3000);
+  await app.listen(env.PORT || 3003);
 }
 bootstrap().then(() => console.log('API running on port ', env.PORT));

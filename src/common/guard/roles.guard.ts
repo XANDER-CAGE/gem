@@ -24,8 +24,24 @@ export class RolesGuard implements CanActivate {
     ]);
     if (isPublic) return true;
     const req = context.switchToHttp().getRequest();
-    if (req?.user?.role != Role.app_admin && !req.profile) {
-      throw new NotFoundException('Profile not found');
+
+    function hasRole(userRole: Role, allowedRoles: Role[]) {
+      return allowedRoles.includes(userRole);
+    }
+
+    if (
+      (!req?.user ||
+        !hasRole(req.user.role, [
+          Role.app_admin,
+          Role.merge_admin,
+          Role.sport_center_admin,
+          Role.career_center_admin,
+          Role.bloomberg_admin,
+          Role.media_studio_admin,
+        ])) &&
+      !req.profile
+    ) {
+      throw new NotFoundException('Role is forbidden');
     }
     return requiredRoles.includes(req?.user?.role);
   }

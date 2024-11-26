@@ -53,13 +53,26 @@ export class TransactionController {
     return CoreApiResponse.success(data, pagination);
   }
 
-  @Roles(Role.app_admin)
+  @Roles(
+    Role.app_admin,
+    Role.merge_admin,
+    Role.sport_center_admin,
+    Role.career_center_admin,
+    Role.bloomberg_admin,
+    Role.media_studio_admin,
+  )
   @ApiOperation({ summary: 'Transaction List' })
   @Post('transaction_list')
   @ApiOkResponse({ type: TransactionListEntity, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
-  async transactionList(@Body() dto: TransactionFinishedList) {
-    const { total, data } = await this.transactionService.findAll(dto);
+  async transactionList(
+    @Body() dto: TransactionFinishedList,
+    @Req() req: IMyReq,
+  ) {
+    const { total, data } = await this.transactionService.findAll(
+      dto,
+      req.user.role,
+    );
     const pagination = { total, limit: dto.limit, page: dto.page };
     return CoreApiResponse.success(data, pagination);
   }
