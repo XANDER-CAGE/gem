@@ -8,6 +8,14 @@ export class StudentProfileEntity {
   @ApiProperty()
   gem: number;
   @ApiProperty()
+  ava: string;
+  @ApiProperty()
+  streak_background: string;
+  @ApiProperty()
+  frame: string;
+  @ApiProperty()
+  app_icon?: string;
+  @ApiProperty()
   deleted_at?: Date;
   @ApiProperty()
   created_at: Date;

@@ -86,6 +86,7 @@ export class StudentProfilesController {
   @ApiBody({ type: UpdateStudentProfileDto })
   @ApiOkResponse({ type: CreateStudentProfileResponse, status: 200 })
   @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
+  @Roles(Role.student)
   async update(
     @Param('id') id: string,
     @Body() updateProductReview: UpdateStudentProfileDto,

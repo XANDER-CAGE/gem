@@ -35,6 +35,13 @@ export class ProductsService {
     return await this.productRepo.listWithCategories(dto, profile_id);
   }
 
+  async listWithAppearanceCategories(
+    dto: FindAllCategoriesDto,
+    profile_id: string,
+  ) {
+    return await this.productRepo.listWithAppearanceCategories(dto, profile_id);
+  }
+
   async listFourProducts(profile_id: string) {
     return await this.productRepo.listFourProducts(profile_id);
   }
