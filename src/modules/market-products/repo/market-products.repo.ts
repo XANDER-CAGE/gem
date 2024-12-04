@@ -133,7 +133,103 @@ export class ProductRepo {
           `'is_new', CASE WHEN mp.created_at >= now() - interval '3 days' THEN true ELSE false END` +
           ') ORDER BY mp.sort_number) FILTER (WHERE mp.remaining_count > 0)) > 0',
       )
+      .where('m.category_id', '6735be34c6adfa1b87988dfe')
       .orderBy('m.sort_number')
+      .limit(limit)
+      .offset((page - 1) * limit)
+      .as('c');
+
+    const [{ total }] = await knex('gamification.market_products')
+      .whereNull('deleted_at')
+      .count({ total: 'id' });
+
+    const data = await knex
+      .select(knex.raw('jsonb_agg(c.*) AS data'))
+      .from(innerQuery);
+
+    return {
+      total: +total,
+      data: data[0].data || [],
+    };
+  }
+
+  async listWithAppearanceCategories(
+    dto: FindAllCategoriesDto,
+    profile_id: string,
+    knex = this.knex,
+  ) {
+    const { limit = 10, page = 1 } = dto;
+
+    const selectedProducts = knex('gamification.student_profiles as sp')
+      .select('sp.ava', 'sp.streak_background', 'sp.frame', 'sp.app_icon')
+      .whereNull('sp.deleted_at')
+      .andWhere('sp.id', profile_id);
+
+    const innerQuery = knex
+      .with(
+        'products_by_market',
+        knex('gamification.market_products as mp')
+          .select(
+            'm.name as category',
+            knex.raw(
+              `
+          json_agg(
+            jsonb_build_object(
+              'id', mp.id,
+              'name', mp.name,
+              'description', mp.description,
+              'avatar', mp.avatar,
+              'type', mp.type,
+              'price', mp.price,
+              'purchased', 
+                case 
+                  when mp.is_free = true then true
+                  when t.id is not null then true
+                  else false 
+                end,
+              'selected', 
+                case 
+                  when mp.id = ANY(?) then true
+                  else false
+                end
+            ) order by mp.is_free desc, mp.sort_number
+          ) filter (where mp.remaining_count > 0) as products
+        `,
+              [
+                (await selectedProducts)
+                  .map((sp) => sp.ava)
+                  .concat(
+                    (await selectedProducts).map((sp) => sp.streak_background),
+                     (await selectedProducts).map((sp) => sp.frame),
+                     (await selectedProducts).map((sp) => sp.app_icon),
+                  ),
+              ],
+            ),
+          )
+          .leftJoin('gamification.markets as m', 'mp.market_id', 'm.id')
+          .leftJoin(
+            knex('gamification.transactions as t')
+              .select('*')
+              .where({
+                profile_id: profile_id,
+                deleted_at: null,
+              })
+              .as('t'),
+            function () {
+              this.on('t.product_id', '=', 'mp.id');
+            },
+          )
+          .where({
+            'mp.deleted_at': null,
+            'm.deleted_at': null,
+            'mp.type': 'appearance',
+          })
+          .groupBy('m.name', 'm.sort_number'),
+      )
+      .select('*')
+      .from('products_by_market')
+      .where(knex.raw('json_array_length(products) > 0'))
+      .orderBy('category')
       .limit(limit)
       .offset((page - 1) * limit)
       .as('c');
