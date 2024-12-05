@@ -8,7 +8,7 @@ import {
   MaxLength,
   IsObject,
   IsNumber,
-  IsBoolean
+  IsBoolean,
 } from 'class-validator';
 
 export class CreateProductDto {
@@ -31,7 +31,7 @@ export class CreateProductDto {
   @ApiProperty({ example: {} })
   @IsOptional()
   @IsObject()
-  avatar?: object;
+  ava?: object;
 
   @ApiProperty({ example: 'Product Type' })
   @IsOptional()
@@ -56,4 +56,9 @@ export class CreateProductDto {
   @IsOptional()
   @IsNumber()
   sort_number: number;
+
+  @ApiProperty({ example: false })
+  @IsOptional()
+  @IsBoolean()
+  is_free: boolean;
 }

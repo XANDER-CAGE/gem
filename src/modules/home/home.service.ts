@@ -112,13 +112,15 @@ export class HomeService {
         throw new NotAcceptableException('Insufficient funds');
       }
 
-      await this.productService.update(
-        product.id,
-        {
-          remaining_count: product.remaining_count - 1,
-        },
-        trx,
-      );
+      if (product.type !== 'appearance') {
+        await this.productService.update(
+          product.id,
+          {
+            remaining_count: product.remaining_count - 1,
+          },
+          trx,
+        );
+      }
 
       await this.productService.connectToProfile(
         freshProfile.id,
