@@ -200,8 +200,8 @@ export class ProductRepo {
                   .map((sp) => sp.ava)
                   .concat(
                     (await selectedProducts).map((sp) => sp.streak_background),
-                     (await selectedProducts).map((sp) => sp.frame),
-                     (await selectedProducts).map((sp) => sp.app_icon),
+                    (await selectedProducts).map((sp) => sp.frame),
+                    (await selectedProducts).map((sp) => sp.app_icon),
                   ),
               ],
             ),
@@ -272,6 +272,7 @@ export class ProductRepo {
               knex.raw('?', [profile_id]),
             );
           })
+          .where('m.category_id', '6735be34c6adfa1b87988dfe')
           .whereNull('mp.deleted_at')
           .whereNull('m.deleted_at')
           .andWhere('mp.remaining_count', '>', 0)
