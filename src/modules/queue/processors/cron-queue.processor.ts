@@ -10,7 +10,7 @@ export class CronProcessor {
   constructor(
     private readonly leadershipService: LeadershipService,
     private readonly attendanceService: AttendanceService,
-    private readonly homeservice: HomeService,
+    private readonly homeService: HomeService,
   ) {}
   @Process(CronProcessNames.ATTENDANCE)
   async attendanceCron() {
@@ -19,7 +19,7 @@ export class CronProcessor {
 
   @Process(CronProcessNames.GET_GRADES)
   async getGradesCron() {
-    await this.homeservice.handleGradeCron();
+    await this.homeService.handleGradeCron();
   }
 
   @Process(CronProcessNames.SAVE_LEADERSHIP)
