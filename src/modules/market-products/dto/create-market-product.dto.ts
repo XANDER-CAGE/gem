@@ -31,7 +31,7 @@ export class CreateProductDto {
   @ApiProperty({ example: {} })
   @IsOptional()
   @IsObject()
-  ava?: object;
+  avatar?: object;
 
   @ApiProperty({ example: 'Product Type' })
   @IsOptional()
