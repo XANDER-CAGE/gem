@@ -151,6 +151,23 @@ export class MarketProductsController {
   }
 
   @Roles(Role.student)
+  @ApiOperation({ summary: 'Default avatars for student' })
+  @Get('/default_appearance_categories')
+  @ApiOkResponse({ type: ListMarketProductResponse, status: 200 })
+  @ApiOkResponse({ type: ErrorApiResponse, status: 500 })
+  async defaultAppearanceAvatars(
+    @Query() dto: FindAllCategoriesDto,
+    @Req() req: IMyReq,
+  ) {
+    const { total, data } = await this.productsService.defaultAppearanceAvatars(
+      dto,
+      req.profile.id,
+    );
+    const pagination = { total, limit: dto.limit, page: dto.page };
+    return CoreApiResponse.success(data, pagination);
+  }
+
+  @Roles(Role.student)
   @ApiOperation({ summary: 'Find all appearance products' })
   @Get('/list_appearance_categories')
   @ApiOkResponse({ type: ListMarketProductResponse, status: 200 })

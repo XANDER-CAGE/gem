@@ -153,14 +153,42 @@ export class ProductRepo {
     };
   }
 
-  async listWithAppearanceCategories(
+  async defaultAppearanceAvatars(
     dto: FindAllCategoriesDto,
     profile_id: string,
     knex = this.knex,
   ) {
     const { limit = 10, page = 1 } = dto;
 
-    const selectedProducts = knex('gamification.student_profiles as sp')
+    const profile_data = await knex('gamification.student_profiles as sp')
+      .leftJoin('students as s', 's.id', 'sp.student_id')
+      .select(knex.raw("COALESCE(s.gender, 'male') as gender"), 's.school_id')
+      .where('sp.id', profile_id)
+      .andWhere('s.is_deleted', false)
+      .first();
+
+    if (!profile_data) {
+      throw new Error('Profile data not found');
+    }
+
+    const genderProductId =
+      profile_data.gender === 'male'
+        ? '6756d1757875751160b5c12a'
+        : '6756d1897bab2a1160b4326f';
+
+    const schoolProductMap = {
+      '648d8982548f561eca35d167': '6756d210cf81441160e94db4',
+      '648d89c03c662b1eca0cefad': '6756d1ab927598116057f6fc',
+      '648d89b0934cee1eca8f1622': '6756d22a2a7b851160d4cd3d',
+      '648d88a641e2f91eca2ea59e': '6756d23e37584311609dc1d6',
+    };
+    const schoolProductId = schoolProductMap[profile_data.school_id];
+
+    const allowedProductIds = [genderProductId, schoolProductId].filter(
+      Boolean,
+    );
+
+    const selectedProducts = await knex('gamification.student_profiles as sp')
       .select('sp.ava', 'sp.streak_background', 'sp.frame', 'sp.app_icon')
       .whereNull('sp.deleted_at')
       .andWhere('sp.id', profile_id);
@@ -224,6 +252,7 @@ export class ProductRepo {
             'm.deleted_at': null,
             'mp.type': 'appearance',
           })
+          .whereIn('mp.id', allowedProductIds)
           .groupBy('m.name', 'm.sort_number'),
       )
       .select('*')
@@ -236,6 +265,114 @@ export class ProductRepo {
 
     const [{ total }] = await knex('gamification.market_products')
       .whereNull('deleted_at')
+      .count({ total: 'id' });
+
+    const data = await knex
+      .select(knex.raw('jsonb_agg(c.*) AS data'))
+      .from(innerQuery);
+
+    return {
+      total: +total,
+      data: data[0].data || [],
+    };
+  }
+
+  async listWithAppearanceCategories(
+    dto: FindAllCategoriesDto,
+    profile_id: string,
+    knex = this.knex,
+  ) {
+    const { limit = 10, page = 1 } = dto;
+
+    const selectedProducts = knex('gamification.student_profiles as sp')
+      .select('sp.ava', 'sp.streak_background', 'sp.frame', 'sp.app_icon')
+      .whereNull('sp.deleted_at')
+      .andWhere('sp.id', profile_id);
+
+    const excludedIds = [
+      '6756d1757875751160b5c12a',
+      '6756d1897bab2a1160b4326f',
+      '6756d210cf81441160e94db4',
+      '6756d1ab927598116057f6fc',
+      '6756d22a2a7b851160d4cd3d',
+      '6756d23e37584311609dc1d6',
+    ];
+
+    const innerQuery = knex
+      .with(
+        'products_by_market',
+        knex('gamification.market_products as mp')
+          .select(
+            'm.name as category',
+            'm.sort_number',
+            knex.raw(
+              `
+        json_agg(
+          jsonb_build_object(
+            'id', mp.id,
+            'name', mp.name,
+            'description', mp.description,
+            'avatar', mp.avatar,
+            'type', mp.type,
+            'price', mp.price,
+            'purchased', 
+              case 
+                when mp.is_free = true then true
+                when t.id is not null then true
+                else false 
+              end,
+            'selected', 
+              case 
+                when mp.id = ANY(?) then true
+                else false
+              end
+          ) order by mp.is_free desc, mp.sort_number
+        ) filter (where mp.remaining_count > 0) as products
+      `,
+              [
+                (await selectedProducts)
+                  .map((sp) => sp.ava)
+                  .concat(
+                    (await selectedProducts).map((sp) => sp.streak_background),
+                    (await selectedProducts).map((sp) => sp.frame),
+                    (await selectedProducts).map((sp) => sp.app_icon),
+                  ),
+              ],
+            ),
+          )
+          .leftJoin('gamification.markets as m', 'mp.market_id', 'm.id')
+          .leftJoin(
+            knex('gamification.transactions as t')
+              .select('*')
+              .where({
+                profile_id: profile_id,
+                deleted_at: null,
+              })
+              .as('t'),
+            function () {
+              this.on('t.product_id', '=', 'mp.id');
+            },
+          )
+          .where({
+            'mp.deleted_at': null,
+            'm.deleted_at': null,
+            'mp.type': 'appearance',
+          })
+          .whereNotIn('mp.id', excludedIds)
+          .groupBy('m.name', 'm.sort_number')
+          .orderBy('m.sort_number'),
+      )
+      .select('*')
+      .from('products_by_market')
+      .where(knex.raw('json_array_length(products) > 0'))
+      .orderBy('sort_number')
+      .limit(limit)
+      .offset((page - 1) * limit)
+      .as('c');
+
+    const [{ total }] = await knex('gamification.market_products')
+      .whereNull('deleted_at')
+      .whereNotIn('id', excludedIds)
       .count({ total: 'id' });
 
     const data = await knex
