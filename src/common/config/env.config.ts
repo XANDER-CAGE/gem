@@ -5,7 +5,7 @@ config();
 
 export const env = cleanEnv(process.env, {
   PORT: num({ default: 3000, example: '3000' }),
-  NODE_ENV: str({ default; 'development', choices: ['development', 'test', 'production'] }),
+  NODE_ENV: str({ default: 'development', choices: ['development', 'test', 'production'] }),
   API_HOST: str({ default: 'localhost' }),
   PG_HOST: str({default: '10.7.9.28'}),
   PG_PORT: num({ default: 5432 }),
