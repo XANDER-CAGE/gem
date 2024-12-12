@@ -292,10 +292,11 @@ export class ProductRepo {
     const excludedIds = [
       '6756d1757875751160b5c12a',
       '6756d1897bab2a1160b4326f',
-      '6756d210cf81441160e94db4',
+      '67584282528e2e1a48c8c16c',
       '6756d1ab927598116057f6fc',
       '6756d22a2a7b851160d4cd3d',
-      '6756d23e37584311609dc1d6',
+      '67583f240a0f661a48cc344d',
+      '675ac64a977c632a62315ed7',
     ];
 
     const innerQuery = knex
