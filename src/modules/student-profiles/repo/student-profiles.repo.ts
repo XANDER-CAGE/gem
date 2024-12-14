@@ -14,6 +14,7 @@ export class StudentProfilesRepo {
   private levels_on_profiles_table = tableName.levelsM2MProfiles;
   private levels_table = tableName.levels;
   private transaction_table = tableName.transactions;
+  private market_products_table = tableName.marketProducts;
 
   constructor(@InjectConnection() private readonly knex: Knex) {}
 
@@ -97,13 +98,13 @@ export class StudentProfilesRepo {
         ),
         knex.raw('sp.gem::double precision as gem'),
         knex.raw(`
-          (select sum(t.total_gem) from ${this.transaction_table} as t where t.profile_id = sp.id and t.total_gem > 0)::double precision as total_point
-        `),
+      (select sum(t.total_gem) from ${this.transaction_table} as t where t.profile_id = sp.id and t.total_gem > 0)::double precision as total_point
+    `),
         knex.raw(`(
-          select lv_current.reward_point from ${this.levels_table} as lv_current
-          where lv_current.level = l.level
-          limit 1
-        ) as current_level_reward_point`),
+      select lv_current.reward_point from ${this.levels_table} as lv_current
+      where lv_current.level = l.level
+      limit 1
+    ) as current_level_reward_point`),
         knex.raw(`
       (
         select (lv_next.reward_point - gem)::double precision
@@ -111,6 +112,30 @@ export class StudentProfilesRepo {
         where lv_next.level = l.level + 1
         limit 1
       ) as next_level_reward_point
+    `),
+        knex.raw(`
+      jsonb_build_object(
+        'id', sp.ava,
+        'avatar', mp_ava.avatar
+      ) as ava_object
+    `),
+        knex.raw(`
+      jsonb_build_object(
+        'id', sp.streak_background,
+        'avatar', mp_streak_background.avatar
+      ) as streak_background_object
+    `),
+        knex.raw(`
+      jsonb_build_object(
+        'id', sp.frame,
+        'avatar', mp_frame.avatar
+      ) as frame_object
+    `),
+        knex.raw(`
+      jsonb_build_object(
+        'id', sp.app_icon,
+        'avatar', mp_app_icon.avatar
+      ) as app_icon_object
     `),
       )
       .from({ sp: this.table })
@@ -121,6 +146,22 @@ export class StudentProfilesRepo {
         'sop.profile_id',
       )
       .leftJoin({ l: this.levels_table }, 'l.id', 'sop.level_id')
+      .leftJoin({ mp_ava: this.market_products_table }, 'sp.ava', 'mp_ava.id')
+      .leftJoin(
+        { mp_streak_background: this.market_products_table },
+        'sp.streak_background',
+        'mp_streak_background.id',
+      )
+      .leftJoin(
+        { mp_frame: this.market_products_table },
+        'sp.frame',
+        'mp_frame.id',
+      )
+      .leftJoin(
+        { mp_app_icon: this.market_products_table },
+        'sp.app_icon',
+        'mp_app_icon.id',
+      )
       .where('sp.id', id)
       .andWhere('sp.deleted_at', null)
       .orderBy('sop.joined_at', 'desc')
