@@ -92,6 +92,10 @@ export class StudentProfilesRepo {
         'l.name',
         knex.raw('COALESCE(l.level, 1) as stage'),
         'sp.*',
+        knex.raw('mp_ava.avatar as ava'),
+        knex.raw('mp_streak_background.avatar as streak_background'),
+        knex.raw('mp_frame.avatar as frame'),
+        knex.raw('mp_app_icon.avatar as app_icon'),
         'st.gender',
         knex.raw(
           `(select sum(t.total_gem) from ${this.transaction_table} as t where t.profile_id = sp.id and t.created_at >= NOW() - INTERVAL '1 week')::double precision as transaction_week`,
@@ -107,35 +111,11 @@ export class StudentProfilesRepo {
     ) as current_level_reward_point`),
         knex.raw(`
       (
-        select (lv_next.reward_point - gem)::double precision
+        select (lv_next.reward_point - sp.gem)::double precision
         from ${this.levels_table} as lv_next 
         where lv_next.level = l.level + 1
         limit 1
       ) as next_level_reward_point
-    `),
-        knex.raw(`
-      jsonb_build_object(
-        'id', sp.ava,
-        'avatar', mp_ava.avatar
-      ) as ava_object
-    `),
-        knex.raw(`
-      jsonb_build_object(
-        'id', sp.streak_background,
-        'avatar', mp_streak_background.avatar
-      ) as streak_background_object
-    `),
-        knex.raw(`
-      jsonb_build_object(
-        'id', sp.frame,
-        'avatar', mp_frame.avatar
-      ) as frame_object
-    `),
-        knex.raw(`
-      jsonb_build_object(
-        'id', sp.app_icon,
-        'avatar', mp_app_icon.avatar
-      ) as app_icon_object
     `),
       )
       .from({ sp: this.table })
