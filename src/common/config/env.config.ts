@@ -22,7 +22,7 @@ export const env = cleanEnv(process.env, {
   MINIO_PORT: num({ default: 9000 }),
   MINIO_SECRET_KEY: str({ default: 'NyBSfizDX8ORZK6oNhpBSiB8lmFYP96S' }),
   MINIO_BUCKET: str({ default: 'admission' }),
-  REDIS_HOST: str(),
-  REDIS_PORT: num(),
-  REDIS_PASS: str(),
+  REDIS_HOST: str({ default: '10.7.9.28' }),
+  REDIS_PORT: num({ default: 6379 }),
+  REDIS_PASS: str({ default: 'OhsEQBlsaumkifKg0z23J0eTo1ldKWrK' }),
 });
