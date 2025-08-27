@@ -148,6 +148,8 @@ export class LeadershipRepo {
       .leftJoin('students AS s', function () {
         this.on('s.id', 'rp.student_id')
           .andOn(knex.raw('s.is_deleted is false'))
+          .andOn(knex.raw('s.is_blocked is false'))
+          .andOn(knex.raw('s.is_archived is false'))
           .andOnNotNull('s.school_id');
       })
       .where(
