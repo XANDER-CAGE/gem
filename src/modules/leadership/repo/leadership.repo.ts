@@ -14,7 +14,7 @@ export class LeadershipRepo {
   private level_on_profiles_table = tableName.levelsM2MProfiles;
   private profiles_table = tableName.studentProfiles;
 
-  constructor(@InjectConnection() private readonly knex: Knex) {}
+  constructor(@InjectConnection() private readonly knex: Knex) { }
 
   async saveLeadership(knex = this.knex) {
     const subQuery = knex(`${this.table} as p`)
@@ -82,20 +82,21 @@ export class LeadershipRepo {
         'lv.level AS stage',
         's.first_name',
         's.last_name',
-        knex.raw(
-          'SUM(COALESCE(t.total_gem, 0))::double precision AS total_earning',
-        ),
+        's.school_id',
+        knex.raw('SUM(COALESCE(t.total_gem, 0))::double precision AS total_earning'),
         knex.raw(
           'ROW_NUMBER() OVER (PARTITION BY s.school_id ORDER BY COALESCE(p.gem::double precision, 0) DESC)::integer AS position_by_gem',
         ),
         knex.raw(
-          'ROW_NUMBER() OVER (PARTITION BY s.school_id ORDER BY SUM(COALESCE(t.total_gem, 0)) DESC, p.gem DESC)::integer AS position_by_earning',
+          'ROW_NUMBER() OVER (PARTITION BY s.school_id ORDER BY SUM(COALESCE(t.total_gem, 0)) DESC, COALESCE(p.gem::double precision, 0) DESC)::integer AS position_by_earning',
         ),
       ])
         .from(`${this.profiles_table} as p`)
         .leftJoin('students as s', function () {
           this.on('s.id', '=', 'p.student_id')
             .andOn(knex.raw('s.is_deleted is false'))
+            .andOn(knex.raw('s.is_blocked is false'))
+            .andOn(knex.raw('s.is_archived is false'))
             .andOnNotNull('s.school_id');
         })
         .leftJoin(`${this.transaction_table} as t`, function () {
@@ -115,45 +116,25 @@ export class LeadershipRepo {
           'p.id',
         )
         .leftJoin(`${this.level_table} as lv`, function () {
-          this.on('lv.level', '=', 'max_levels.max_level').andOnNull(
-            'lv.deleted_at',
-          );
+          this.on('lv.level', '=', 'max_levels.max_level').andOnNull('lv.deleted_at');
         })
         .whereNull('p.deleted_at')
-        .groupBy(
-          'p.id',
-          's.school_id',
-          'p.gem',
-          'lv.level',
-          's.first_name',
-          's.last_name',
-        );
+        .groupBy('p.id', 's.school_id', 'p.gem', 'lv.level', 's.first_name', 's.last_name');
     });
 
     const data = withQuery
       .clone()
       .select(
         'rp.*',
-        knex.raw(
-          `(COALESCE(l.last_position_by_earning, rp.position_by_earning) - rp.position_by_earning) AS status_by_earning`,
-        ),
-        knex.raw(
-          `(COALESCE(l.last_position_by_gem, rp.position_by_gem) - rp.position_by_gem) AS status_by_gem`,
-        ),
+        knex.raw('(COALESCE(l.last_position_by_earning, rp.position_by_earning) - rp.position_by_earning) AS status_by_earning'),
+        knex.raw('(COALESCE(l.last_position_by_gem, rp.position_by_gem) - rp.position_by_gem) AS status_by_gem'),
       )
       .from('rankedProfiles AS rp')
       .leftJoin(`${this.leadership_table} AS l`, function () {
         this.on('l.profile_id', '=', 'rp.id').andOnNull('l.deleted_at');
       })
-      .leftJoin('students AS s', function () {
-        this.on('s.id', 'rp.student_id')
-          .andOn(knex.raw('s.is_deleted is false'))
-          .andOn(knex.raw('s.is_blocked is false'))
-          .andOn(knex.raw('s.is_archived is false'))
-          .andOnNotNull('s.school_id');
-      })
       .where(
-        's.school_id',
+        'rp.school_id',
         '=',
         knex
           .select('s.school_id')
@@ -167,16 +148,20 @@ export class LeadershipRepo {
           .limit(1),
       )
       .limit(dto.limit);
-    const me = await data
+
+    const me = await withQuery
       .clone()
       .select('*')
       .from('rankedProfiles as rp')
       .where('rp.id', profileId)
       .first();
+
     dto.top_type == LeadershipEnum.BY_GEM
       ? data.orderBy('rp.position_by_gem')
       : data.orderBy('rp.position_by_earning');
+
     return { top: await data, me };
+
   }
 
   async topListByAllSchools(school: string, knex = this.knex) {
