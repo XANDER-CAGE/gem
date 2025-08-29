@@ -16,7 +16,7 @@ export class StudentProfilesRepo {
   private transaction_table = tableName.transactions;
   private market_products_table = tableName.marketProducts;
 
-  constructor(@InjectConnection() private readonly knex: Knex) {}
+  constructor(@InjectConnection() private readonly knex: Knex) { }
 
   async findAll(
     dto: PaginationDto,
@@ -89,6 +89,8 @@ export class StudentProfilesRepo {
         'st.first_name',
         'st.last_name',
         'st.avatar',
+        'st.level',
+        'st.academic_status',
         'l.name',
         knex.raw('COALESCE(l.level, 1) as stage'),
         'sp.*',
@@ -190,6 +192,8 @@ export class StudentProfilesRepo {
         'st.first_name',
         'st.last_name',
         'st.avatar',
+        'st.academic_status',
+        'st.level',
         'l.name',
         'l.level as stage',
         'sp.*',

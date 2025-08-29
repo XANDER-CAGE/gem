@@ -30,7 +30,7 @@ export class TransactionService {
     private readonly profileService: StudentProfilesService,
     private readonly productService: ProductsService,
     private readonly levelService: LevelService,
-  ) {}
+  ) { }
 
   async createManual(
     dto: CreateManualTransactionDto,
@@ -107,16 +107,16 @@ export class TransactionService {
     totalGem += product.price;
     return totalGem
       ? await this.transactionRepo.createSpending(
-          {
-            ...dto,
-            total_gem: -totalGem,
-          },
-          knex,
-        )
+        {
+          ...dto,
+          total_gem: -totalGem,
+        },
+        knex,
+      )
       : null;
   }
 
-  async findAll(dto: TransactionFinishedList, role:string) {
+  async findAll(dto: TransactionFinishedList, role: string) {
     return await this.transactionRepo.findAll(dto, role);
   }
 
