@@ -1,6 +1,6 @@
 import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger';
 import { CreateStudentProfileDto } from './create-student-profile.dto';
-import { IsOptional, MaxLength, MinLength } from 'class-validator';
+import { IsBoolean, IsOptional, MaxLength, MinLength } from 'class-validator';
 
 export class UpdateStudentProfileDto extends PartialType(
   OmitType(CreateStudentProfileDto, ['student_id'] as const),
@@ -30,4 +30,9 @@ export class UpdateStudentProfileDto extends PartialType(
   @MinLength(1)
   @MaxLength(24)
   app_icon?: string;
+
+  @ApiProperty({ example: true })
+  @IsOptional()
+  @IsBoolean()
+  one_time_reward?: boolean;
 }
