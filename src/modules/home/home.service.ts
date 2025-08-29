@@ -28,7 +28,7 @@ export class HomeService {
     private readonly achievementsService: AchievementsService,
     private readonly productService: ProductsService,
     private readonly assignmentRepo: AssignmentRepo,
-  ) {}
+  ) { }
 
   async assignAchievement(
     profileId: string,
@@ -252,5 +252,24 @@ export class HomeService {
       await this.achievementsService.assignment(profileId, trx);
       await this.assignmentRepo.create(dto.file_id, profileId, trx);
     });
+  }
+
+  async oneTimeRewardClaim(userId: string, profileId: string, knex = this.knex) {
+    const profile = await this.profileService.getProfileByColumn('sp.id', profileId)
+    const payments = {
+      progress: 1000,
+      progress_trailing_credits: 500,
+      module_retriever: 0
+    };
+    const pay = payments[`${profile.academic_status}`] ?? 0;
+    return await knex.transaction(async (trx) => {
+      if (profile.level !== 1) {
+        await this.profileService.update(profileId, { one_time_reward: true, gem: profile.gem }, trx)
+        await this.transactionService.createManual({
+          uid: profile.uid,
+          amount: pay,
+        }, userId, trx)
+      }
+    })
   }
 }

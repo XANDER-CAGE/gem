@@ -23,7 +23,7 @@ import { UploadHomeworkDto } from './dto/upload-homework.dto';
 @UseGuards(RolesGuard)
 @Controller()
 export class HomeController {
-  constructor(private readonly homeService: HomeService) {}
+  constructor(private readonly homeService: HomeService) { }
 
   @ApiOperation({ summary: 'Assign achievement' })
   @ApiBody({ type: AssignAchievementDto })
@@ -54,6 +54,13 @@ export class HomeController {
   @Roles(Role.student)
   async uploadHomework(@Body() dto: UploadHomeworkDto, @Req() req: IMyReq) {
     await this.homeService.uploadHomework(dto, req.user.id, req.profile.id);
+    return CoreApiResponse.success(null);
+  }
+
+  @Post('one-time-reward/claim')
+  @Roles(Role.student)
+  async oneTimeRewardClaim(@Req() req: IMyReq) {
+    await this.homeService.oneTimeRewardClaim(req.user.id, req.profile.id);
     return CoreApiResponse.success(null);
   }
 }
