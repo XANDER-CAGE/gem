@@ -17,7 +17,7 @@ export class TransactionRepo {
   private readonly levelsTable = tableName.levels;
   private readonly badgesTable = tableName.badges;
   private readonly productTable = tableName.marketProducts;
-  constructor(@InjectConnection() private readonly knex: Knex) {}
+  constructor(@InjectConnection() private readonly knex: Knex) { }
 
   async createManual(
     dto: { profile_id: string; amount: number },
@@ -172,7 +172,7 @@ export class TransactionRepo {
         if (listType) {
           this.where('t.total_gem', listType === 'expense' ? '<' : '>', 0);
         }
-      });
+      })
 
     const [{ total }] = await baseQuery.clone().count('* as total');
     const data = await baseQuery
@@ -194,7 +194,8 @@ export class TransactionRepo {
         ]),
       )
       .limit(limit)
-      .offset((page - 1) * limit);
+      .offset((page - 1) * limit)
+      .orderBy('t.created_at', 'desc');
 
     return { total: +total, data: data };
   }
