@@ -8,7 +8,7 @@ export class UserRepo {
   private readonly users = tableName.users;
   private readonly profileTable = tableName.studentProfiles;
   private readonly tokensTable = tableName.tokens;
-  constructor(@InjectConnection() private readonly knex: Knex) {}
+  constructor(@InjectConnection() private readonly knex: Knex) { }
 
   async findUserByToken(token: string, knex = this.knex) {
     const user = knex
@@ -20,10 +20,11 @@ export class UserRepo {
       .andWhere('u.is_deleted', false)
       .andWhere('u.is_blocked', false)
       .andWhere('u.is_archived', false)
-      .andWhere('u.is_verified', true)
       .andWhere('t.is_deleted', false)
       .andWhere('t.expired_at', '>', new Date())
       .first();
+
+
     return user;
   }
 }
