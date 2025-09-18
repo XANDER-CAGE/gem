@@ -8,6 +8,7 @@ import { Knex } from 'knex';
 import { TransactionService } from '../transaction/transaction.service';
 import { LevelService } from '../level/level.service';
 import axios from 'axios';
+import { Cron } from '@nestjs/schedule';
 @Injectable()
 export class AttendanceService {
   constructor(
@@ -17,7 +18,7 @@ export class AttendanceService {
     private readonly streakService: StreaksService,
     private readonly transactionService: TransactionService,
     private readonly levelService: LevelService,
-  ) {}
+  ) { }
   async assignAttendance(studentId: string, isDone: boolean) {
     try {
       const profile = await this.profileService.getProfileByColumn(
@@ -109,10 +110,13 @@ export class AttendanceService {
     return response.data;
   }
 
+
+  @Cron('0 0 19 * * *', { timeZone: 'Asia/Tashkent' })
   async attendanceCron() {
     const datas = await this.getAttendances();
     console.log('DATA LENGTH: ', datas.length);
     for (const data of datas) {
+      console.log(data.student_id)
       await this.assignAttendance(data.student_id, data.daily_strike_status);
     }
   }

@@ -6,17 +6,17 @@ import { CronProcessNames } from '../enum/process-name.enum';
 
 @Injectable()
 export class CronQueueService implements OnModuleInit {
-  constructor(@InjectQueue(CRON_QUEUE_NAME) private cronQueue: Queue) {}
+  constructor(@InjectQueue(CRON_QUEUE_NAME) private cronQueue: Queue) { }
 
   async onModuleInit() {
-    await this.cronQueue.obliterate();
-    await this.cronQueue.add(
-      CronProcessNames.ATTENDANCE,
-      {},
-      {
-        repeat: { cron: '0 0 14 * * *' },
-      },
-    );
+    await this.cronQueue.obliterate({ force: true });
+    // await this.cronQueue.add(
+    //   CronProcessNames.ATTENDANCE,
+    //   {},
+    //   {
+    //     repeat: { cron: '0 0 18 * * *' , tz: 'Asia/Tashkent'},
+    //   },
+    // );
     await this.cronQueue.add(
       CronProcessNames.GET_GRADES,
       {},
