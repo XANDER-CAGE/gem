@@ -5,17 +5,18 @@ import {
 } from '@nestjs/common';
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
+import { CoreApiResponse } from 'src/common/response-class/core-api.response';
+import { AchievementsService } from '../achievements/achievements.service';
+import { BadgeService } from '../badge/badge.service';
+import { LevelService } from '../level/level.service';
+import { BuyProductDto } from '../market-products/dto/buy.product.dto';
+import { ProductsService } from '../market-products/market-products.service';
+import { StudentProfileEntity } from '../student-profiles/entity/student-profile.entity';
 import { StudentProfilesService } from '../student-profiles/student-profiles.service';
 import { TransactionService } from '../transaction/transaction.service';
-import { LevelService } from '../level/level.service';
-import { BadgeService } from '../badge/badge.service';
-import { AchievementsService } from '../achievements/achievements.service';
-import { CoreApiResponse } from 'src/common/response-class/core-api.response';
-import { BuyProductDto } from '../market-products/dto/buy.product.dto';
-import { StudentProfileEntity } from '../student-profiles/entity/student-profile.entity';
-import { ProductsService } from '../market-products/market-products.service';
-import { AssignmentRepo } from './repo/assignment.repo';
 import { UploadHomeworkDto } from './dto/upload-homework.dto';
+import { AssignmentRepo } from './repo/assignment.repo';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class HomeService {
@@ -148,6 +149,7 @@ export class HomeService {
     return CoreApiResponse.success(null);
   }
 
+  @Cron('0 0 20 * * *', { timeZone: 'Asia/Tashkent', name: 'grade' })
   async handleGradeCron() {
     try {
       for (const type of ['mid_term', 'final']) {

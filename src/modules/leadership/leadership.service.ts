@@ -1,12 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { LeadershipRepo } from './repo/leadership.repo';
 import { LimitWithTopListDto } from './dto/create-leadership.dto';
+import { LeadershipRepo } from './repo/leadership.repo';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class LeadershipService {
   @Inject() private readonly leadershipRepo: LeadershipRepo;
 
+  @Cron('0 0 21 * * *', { timeZone: 'Asia/Tashkent', name: 'leadership' })
   async saveLeadership() {
+    console.log('Leadership cron started');
     return await this.leadershipRepo.saveLeadership();
   }
 
