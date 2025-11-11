@@ -1,14 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { StudentProfilesService } from '../student-profiles/student-profiles.service';
-import { AttendanceRepo } from './repo/attendance.repo';
-import { CoreApiResponse } from 'src/common/response-class/core-api.response';
-import { StreaksService } from '../streaks/streaks.service';
-import { InjectConnection } from 'nest-knexjs';
-import { Knex } from 'knex';
-import { TransactionService } from '../transaction/transaction.service';
-import { LevelService } from '../level/level.service';
-import axios from 'axios';
 import { Cron } from '@nestjs/schedule';
+import axios from 'axios';
+import { Knex } from 'knex';
+import { InjectConnection } from 'nest-knexjs';
+import { CoreApiResponse } from 'src/common/response-class/core-api.response';
+import { LevelService } from '../level/level.service';
+import { StreaksService } from '../streaks/streaks.service';
+import { StudentProfilesService } from '../student-profiles/student-profiles.service';
+import { TransactionService } from '../transaction/transaction.service';
+import { AttendanceRepo } from './repo/attendance.repo';
+
 @Injectable()
 export class AttendanceService {
   constructor(
@@ -111,7 +112,7 @@ export class AttendanceService {
   }
 
 
-  @Cron('0 0 19 * * *', { timeZone: 'Asia/Tashkent' })
+  @Cron('0 0 19 * * *', { timeZone: 'Asia/Tashkent', name: 'attendance' })
   async attendanceCron() {
     const datas = await this.getAttendances();
     console.log('DATA LENGTH: ', datas.length);
