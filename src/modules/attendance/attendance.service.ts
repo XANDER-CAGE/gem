@@ -112,7 +112,7 @@ export class AttendanceService {
   }
 
 
-  // @Cron('0 0 19 * * *', { timeZone: 'Asia/Tashkent', name: 'attendance' })
+  @Cron('0 0 19 * * *', { timeZone: 'Asia/Tashkent', name: 'attendance' })
   async attendanceCron() {
     const datas = await this.getAttendances();
     console.log('DATA LENGTH: ', datas.length);
