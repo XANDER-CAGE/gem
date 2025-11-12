@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
+// import { Cron } from '@nestjs/schedule';
 import axios from 'axios';
 import { Knex } from 'knex';
 import { InjectConnection } from 'nest-knexjs';
