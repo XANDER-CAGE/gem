@@ -26,7 +26,26 @@ import { TransactionListEntity } from './entity/transaction.entity';
 export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
 
-  @Roles(Role.app_admin)
+  @Roles(
+    Role.super_admin,
+    Role.admin,
+    Role.moderator,
+    Role.academic_director,
+    Role.head_admission,
+    Role.admission_specialist,
+    Role.finance_manager,
+    Role.hr,
+    Role.dean,
+    Role.academic_manager,
+    Role.department_head,
+    Role.course_leader,
+    Role.app_admin,
+    Role.merge_admin,
+    Role.sport_center_admin,
+    Role.career_center_admin,
+    Role.bloomberg_admin,
+    Role.media_studio_admin,
+  )
   @Post('manual')
   async createEarning(
     @Body() dto: CreateManualTransactionDto,
