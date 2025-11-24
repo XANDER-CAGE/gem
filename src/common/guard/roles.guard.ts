@@ -5,13 +5,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { IS_PUBLIC_KEY } from '../decorator/public.decorator';
 import { ROLES_KEY } from '../decorator/roles.decorator';
 import { Role } from '../enum/role.enum';
-import { IS_PUBLIC_KEY } from '../decorator/public.decorator';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+  constructor(private reflector: Reflector) { }
 
   canActivate(context: ExecutionContext): boolean {
     const requiredRoles = this.reflector.getAllAndOverride<Role[]>(ROLES_KEY, [
@@ -32,6 +32,24 @@ export class RolesGuard implements CanActivate {
     if (
       (!req?.user ||
         !hasRole(req.user.role, [
+          Role.app_admin,
+          Role.merge_admin,
+          Role.sport_center_admin,
+          Role.career_center_admin,
+          Role.bloomberg_admin,
+          Role.media_studio_admin,
+          Role.super_admin,
+          Role.admin,
+          Role.moderator,
+          Role.academic_director,
+          Role.head_admission,
+          Role.admission_specialist,
+          Role.finance_manager,
+          Role.hr,
+          Role.dean,
+          Role.academic_manager,
+          Role.department_head,
+          Role.course_leader,
           Role.app_admin,
           Role.merge_admin,
           Role.sport_center_admin,
